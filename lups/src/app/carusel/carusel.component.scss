@@ -1,0 +1,52 @@
+
+.container {
+  margin-top: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cells {
+  position: relative;
+  width: 1200px;
+  height: 400px;
+  overflow: hidden;
+}
+
+.cell {
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image {
+  width: 200px;
+  height: 200px;
+}
+
+.arrow {
+  height: 50px;
+  width: 50px;
+  border-top: 2px solid black;
+  border-right: 2px solid black;
+  border-bottom: none;
+  border-left: none;
+  transition-duration: 0.4s;
+}
+
+.arrow:hover {
+  border-top: 2px solid white;
+  border-right: 2px solid white;
+  cursor: pointer;
+}
+
+.right {
+  transform: rotate(45deg);
+}
+
+.left {
+  transform: rotate(-135deg);
+}

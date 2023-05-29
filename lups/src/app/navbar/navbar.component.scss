@@ -1,0 +1,24 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: #efc0a1;
+  border-bottom: solid black 2px;
+  height: 100px;
+  position: fixed;
+  z-index: 99;
+  top: 0;
+  left: 0;
+}
+
+.text {
+  top: 15px;
+  left: 200px;
+  position: absolute;
+}
+
+img {
+  border: solid black 2px;
+  width: 100px;
+  height: 100px;
+}

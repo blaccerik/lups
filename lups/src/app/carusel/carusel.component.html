@@ -1,0 +1,13 @@
+<div class="container">
+  <div class="arrow left" (click)="moveRight()"></div>
+  <div class="cells">
+    <div class="cell"
+         [style.transform]="'translateX(' + cell.position + 'px)'"
+         [style.transition]="getTransition(cell.position)"
+         *ngFor="let cell of cells">
+      <img class="image" [src]="imagePath + cell.data">
+    </div>
+  </div>
+  <div class="arrow right" (click)="moveLeft()"></div>
+</div>
+
