@@ -3,12 +3,16 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { NavbarComponent } from './navbar/navbar.component';
 import { CaruselComponent } from './carusel/carusel.component';
 import {CommonModule} from "@angular/common";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { CarouselElementComponent } from './carousel-element/carousel-element.component';
 import { TestComponent } from './test/test.component';
+import { PonyComponent } from './pony/pony.component';
+import { CarouselComponent } from './home/carousel/carousel.component';
+import { AdsComponent } from './home/ads/ads.component';
+import {NavbarComponent} from "./home/navbar/navbar.component";
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +20,11 @@ import { TestComponent } from './test/test.component';
     NavbarComponent,
     CaruselComponent,
     CarouselElementComponent,
-    TestComponent
+    TestComponent,
+    PonyComponent,
+    CarouselComponent,
+    AdsComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserAnimationsModule,

@@ -5,8 +5,15 @@
          [style.transform]="'translateX(' + cell.position + 'px)'"
          [style.transition]="getTransition(cell.position)"
          *ngFor="let cell of cells">
-      <div class="select">
-        <img class="image" [src]="imagePath + cell.data">
+      <div class="data">
+        <div class="select-container">
+          <div class="select">
+            <img class="image" [src]="imagePath + cell.data">
+          </div>
+        </div>
+        <div>
+          UGLY
+        </div>
       </div>
     </div>
   </div>

@@ -9,7 +9,7 @@
 .cells {
   position: relative;
   width: 1200px;
-  height: 400px;
+  height: 600px;
   overflow: hidden;
 }
 
@@ -20,16 +20,36 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
 
+.data {
+  margin-top: 100px;
+  background-color: #dcb654;
+  border: 2px solid black;
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+  cursor: pointer;
+  width: 200px;
+  height: 350px;
+}
+
+.select-container {
+  overflow: hidden;
+  height: 200px;
+  width: 200px;
 }
 
 .select {
   transition: transform 1s, box-shadow 1s;
+  overflow: hidden;
+  text-align: center;
+  height: 200px;
 }
 
 .select:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 5px 10px 10px #342331;
 }
 
 .image {
@@ -38,6 +58,7 @@
 }
 
 .arrow {
+  top: 5px;
   height: 50px;
   width: 50px;
   border-top: 2px solid black;
