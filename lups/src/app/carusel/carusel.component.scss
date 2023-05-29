@@ -20,6 +20,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+}
+
+.select {
+  transition: transform 1s, box-shadow 1s;
+}
+
+.select:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .image {

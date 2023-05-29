@@ -5,7 +5,9 @@
          [style.transform]="'translateX(' + cell.position + 'px)'"
          [style.transition]="getTransition(cell.position)"
          *ngFor="let cell of cells">
-      <img class="image" [src]="imagePath + cell.data">
+      <div class="select">
+        <img class="image" [src]="imagePath + cell.data">
+      </div>
     </div>
   </div>
   <div class="arrow right" (click)="moveLeft()"></div>
