@@ -1,11 +1,5 @@
 <div class="main">
-  <div class="ad">
-
-  </div>
-  <div class="ad">
-
-  </div>
-  <div class="ad">
-
+  <div class="ad" *ngFor="let ad of images">
+    <img class="image" [src]="path + ad">
   </div>
 </div>

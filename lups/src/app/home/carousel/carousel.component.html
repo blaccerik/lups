@@ -1,2 +1,21 @@
 <div class="main">
+  <div class="button-right" (click)="moveRight()"></div>
+  <div class="cells">
+    <div class="cell"
+         [style.transform]="'translateX(' + cell.position + 'px)'"
+         [style.transition]="getTransition(cell.position)"
+         *ngFor="let cell of cells">
+      <div class="container">
+        <img class="image" [src]="imagePath + cell.img">
+        <div class="big">
+          {{cell.user}}:
+          {{cell.header}}
+        </div>
+        <div class="text">
+          {{cell.text}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="button-left" (click)="moveLeft()"></div>
 </div>

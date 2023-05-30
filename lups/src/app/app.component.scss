@@ -1,0 +1,26 @@
+.router-container {
+  width: 100%;
+  top: 100px;
+  padding: 5%;
+  position: absolute;
+  left: 0;
+  height: calc(100% - 100px); /* Adjust the height as needed */
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.router-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.router-container::-webkit-scrollbar-track {
+  background: #eca6ec;
+}
+
+.router-container::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.router-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
-
+  image = "assets/img.png"
 }
