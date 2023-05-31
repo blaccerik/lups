@@ -2,7 +2,10 @@
 @import 'variables';
 
 body {
-  background-color: $main-color;
+  //background-color: $main-color;
+  background-image: url("assets/paper.png");
+  background-repeat: repeat;
+  font-family: Archivo, sans-serif;
 }
 
 

@@ -11,8 +11,8 @@ import { TestComponent } from './test/test.component';
 import { PonyComponent } from './pony/pony.component';
 import { CarouselComponent } from './home/carousel/carousel.component';
 import { AdsComponent } from './home/ads/ads.component';
-import {NavbarComponent} from "./home/navbar/navbar.component";
 import { HomeComponent } from './home/home.component';
+import { NavbarComponent } from "./navbar/navbar.component";
 
 @NgModule({
   declarations: [

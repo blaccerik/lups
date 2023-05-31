@@ -1,3 +1,5 @@
+@import 'src/variables';
+
 .main {
   width: 100%;
   height: 500px;
@@ -63,21 +65,21 @@ $size: 30px;
 
 .container {
   overflow: hidden;
-  height: 500px;
+  height: 498px;
   width: 350px;
   border-radius: 5px;
-  border: 1px solid darkgray;
+  border: 1px solid $second-color;
   background-color: snow;
 }
 
 .big {
   padding: 5px;
   font-size: 40px;
-  color: blue;
+  color: $second-color;
 }
 
 .text {
   padding: 5px;
   font-size: 30px;
-  color: cornflowerblue;
+  color: $second-color;
 }
