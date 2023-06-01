@@ -14,8 +14,6 @@ interface News {
 })
 export class NewsComponent {
 
-
-
   news: News[] = [
     {title: "Politsei tormab kuriteopaika pärast segadust", link: "", img_path: "assets/news/1.jpg", type: "euro_symbol"},
     {title: "Võimud reageerivad kuriteopaigale kahtlaste tegevuste raportite taustal", link: "", img_path: "assets/news/2.jpg", type: "pets"},
