@@ -1,0 +1,16 @@
+@import 'src/variables';
+
+
+.slogan {
+  fill: $second-color;
+  stroke: $second-color;
+  stroke-width: 5px;
+  display: flex;
+  justify-content: center;
+  padding-top: 0;
+}
+
+text {
+  font-size: 70px;
+  stroke-width: 0px;
+}

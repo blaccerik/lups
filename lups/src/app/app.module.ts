@@ -13,6 +13,8 @@ import { CarouselComponent } from './home/carousel/carousel.component';
 import { AdsComponent } from './home/ads/ads.component';
 import { HomeComponent } from './home/home.component';
 import { NavbarComponent } from "./navbar/navbar.component";
+import { NewsComponent } from './news/news.component';
+import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -25,12 +27,14 @@ import { NavbarComponent } from "./navbar/navbar.component";
     CarouselComponent,
     AdsComponent,
     HomeComponent,
+    NewsComponent,
   ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
     AppRoutingModule,
-    CommonModule
+    CommonModule,
+    MatIconModule,
   ],
   exports: [
     CaruselComponent

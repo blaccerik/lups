@@ -1,10 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'variables';
 
+
 body {
   //background-color: $main-color;
-  background-image: url("assets/paper.png");
-  background-repeat: repeat;
+  //background-image: url("assets/paper.png");
+  background-image: url("assets/back.jpg");
+  background-repeat: no-repeat;
+  background-size: 100%;
+  //background-repeat: repeat;
   font-family: Archivo, sans-serif;
 }
 

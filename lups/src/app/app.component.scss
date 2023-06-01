@@ -1,10 +1,12 @@
+@import 'src/variables';
+
 .router-container {
   width: 100%;
-  top: 100px;
-  padding: 5%;
+  top: 50px;
+  padding: 2%;
   position: absolute;
   left: 0;
-  height: calc(100% - 100px); /* Adjust the height as needed */
+  height: calc(100% - 50px); /* Adjust the height as needed */
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -14,7 +16,7 @@
 }
 
 .router-container::-webkit-scrollbar-track {
-  background: #eca6ec;
+  background: $main-color;
 }
 
 .router-container::-webkit-scrollbar-thumb {
