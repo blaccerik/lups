@@ -1,6 +1,6 @@
 <div class="container">
   <div class="grid">
-    <div *ngFor="let newsItem of news" class="grid-item">
+    <div *ngFor="let newsItem of news" class="grid-item" (click)="go(newsItem)">
       <img class="image" [src]="newsItem.img_path">
       <div class="icon">
         <mat-icon>{{newsItem.type}}</mat-icon>

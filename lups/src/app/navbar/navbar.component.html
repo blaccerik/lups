@@ -1,10 +1,10 @@
 <div class="main">
-  <img class="logo" src="assets/big_logo.png" alt="image">
-  <div class="name">
+  <img class="logo" src="assets/big_logo.png" alt="image" routerLink="">
+  <div class="name" routerLink="">
     Eesti Rahvalüpsjate Erakond
   </div>
   <div class="section" *ngFor="let section of sections">
-    <div class="section-text">
+    <div class="section-text" routerLink="/news">
       {{section.text}}
     </div>
   </div>

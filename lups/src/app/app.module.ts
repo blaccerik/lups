@@ -16,6 +16,7 @@ import { NavbarComponent } from "./navbar/navbar.component";
 import { NewsComponent } from './news/news.component';
 import { MatIconModule} from '@angular/material/icon';
 import { MiniNewsComponent } from './home/mini-news/mini-news.component';
+import { SingleNewsComponent } from './news/single-news/single-news.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { MiniNewsComponent } from './home/mini-news/mini-news.component';
     HomeComponent,
     NewsComponent,
     MiniNewsComponent,
+    SingleNewsComponent,
   ],
   imports: [
     BrowserAnimationsModule,
