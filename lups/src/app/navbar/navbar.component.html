@@ -3,8 +3,8 @@
   <div class="name" routerLink="">
     Eesti Rahvalüpsjate Erakond
   </div>
-  <div class="section" *ngFor="let section of sections">
-    <div class="section-text" routerLink="/news">
+  <div class="section" routerLink="{{section.link}}" *ngFor="let section of sections">
+    <div class="section-text">
       {{section.text}}
     </div>
   </div>

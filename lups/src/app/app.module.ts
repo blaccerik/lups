@@ -17,6 +17,10 @@ import { NewsComponent } from './news/news.component';
 import { MatIconModule} from '@angular/material/icon';
 import { MiniNewsComponent } from './home/mini-news/mini-news.component';
 import { SingleNewsComponent } from './news/single-news/single-news.component';
+import { ChatComponent } from './chat/chat.component';
+import {FormsModule} from "@angular/forms";
+import {ChatService} from "./chat.service";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -32,6 +36,7 @@ import { SingleNewsComponent } from './news/single-news/single-news.component';
     NewsComponent,
     MiniNewsComponent,
     SingleNewsComponent,
+    ChatComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -39,11 +44,13 @@ import { SingleNewsComponent } from './news/single-news/single-news.component';
     AppRoutingModule,
     CommonModule,
     MatIconModule,
+    FormsModule,
+    HttpClientModule
   ],
-  exports: [
-    CaruselComponent
+  exports: [],
+  providers: [
+    ChatService
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

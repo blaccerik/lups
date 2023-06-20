@@ -13,6 +13,7 @@ interface section {
 })
 export class NavbarComponent {
   sections: section[] = [
+    {text: "Tõnu", link: "/chat"},
     {text: "Raha", link: ""},
     {text: "Uudised", link: "/news"},
     {text: "Naised", link: ""},
