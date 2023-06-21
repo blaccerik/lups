@@ -1,10 +1,12 @@
+import json
 import logging
 import os
+import pathlib
 
 from flask import Flask, Blueprint
 from flask.cli import AppGroup
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
+from google_auth_oauthlib.flow import Flow
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
 from waitress import serve
@@ -26,6 +28,22 @@ db_session = scoped_session(sessionmaker(autocommit=False,
 Base = declarative_base()
 Base.query = db_session.query_property()
 
+
+# auth
+
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # to allow Http traffic for local dev
+
+client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "secret.json")
+with open(client_secrets_file, "r") as f:
+    json_file = json.load(f)
+    GOOGLE_CLIENT_ID = json_file["web"]["client_id"]
+    secret_key = json_file["web"]["client_secret"]
+flow = Flow.from_client_secrets_file(
+    client_secrets_file=client_secrets_file,
+    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
+    redirect_uri="http://localhost:5000/api/auth/callback"
+)
+
 def init_db():
     from db_models.models import User
 
@@ -43,17 +61,21 @@ def init_db():
 
 def create_app(test_config=None):
     app = Flask(__name__)
+    app.secret_key = secret_key
     CORS(app)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = "erik"
+
 
     logger = logging.getLogger('waitress')
     logger.info("log works")
 
     # Register API Blueprint and initialize Celery
-    from routes import chat, test
+    from routes import chat, test, auth
     api_bp = Blueprint('api', __name__, url_prefix='/api')
+    api_bp.register_blueprint(auth.bp)
     api_bp.register_blueprint(chat.bp)
     api_bp.register_blueprint(test.bp)
     app.register_blueprint(api_bp)
