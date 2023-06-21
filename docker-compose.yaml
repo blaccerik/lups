@@ -25,18 +25,18 @@ services:
     depends_on:
       - mysql
 
-  #  flask:
-#    build:
-#      context: flaskr/.
-#      dockerfile: Dockerfile
-#    environment:
-#      - CELERY_BROKER_URL=redis://redis:6379/0
-#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-#    ports:
-#      - 5000:5000
-#    depends_on:
-#      - worker
-#      - redis
+  flask:
+    build:
+      context: flaskr/.
+      dockerfile: Dockerfile
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    ports:
+      - 5000:5000
+    depends_on:
+      - worker
+      - redis
 
   worker:
     build: celeryr/.
