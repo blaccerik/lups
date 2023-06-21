@@ -10,11 +10,12 @@ bp = Blueprint('auth', __name__, url_prefix="/auth")
 
 database = {}  # Global dictionary to store user data
 
-@bp.route('/login')
+@bp.route('/login', methods=['GET'])
 def login():
     authorization_url, state = flow.authorization_url()
+    print(authorization_url)
     session["state"] = state
-    return redirect(authorization_url)
+    return jsonify(authorization_url), 200
 
 @bp.route("/callback")
 def callback():
