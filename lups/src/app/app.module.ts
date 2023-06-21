@@ -19,8 +19,9 @@ import { MiniNewsComponent } from './home/mini-news/mini-news.component';
 import { SingleNewsComponent } from './news/single-news/single-news.component';
 import { ChatComponent } from './chat/chat.component';
 import {FormsModule} from "@angular/forms";
-import {ChatService} from "./chat.service";
+import {ChatService} from "./services/chat.service";
 import {HttpClientModule} from "@angular/common/http";
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import {HttpClientModule} from "@angular/common/http";
     MiniNewsComponent,
     SingleNewsComponent,
     ChatComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserAnimationsModule,

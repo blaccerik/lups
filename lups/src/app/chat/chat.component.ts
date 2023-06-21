@@ -1,5 +1,5 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {ChatResponse, ChatService} from "../chat.service";
+import {ChatResponse, ChatService} from "../services/chat.service";
 
 interface Message {
   text: string;
