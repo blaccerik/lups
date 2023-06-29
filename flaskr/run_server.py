@@ -1,73 +1,75 @@
-import json
 import logging
 import os
-import pathlib
 
 from flask import Flask, Blueprint
 from flask.cli import AppGroup
 from flask_cors import CORS
-from google_auth_oauthlib.flow import Flow
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
 from waitress import serve
-
-
 
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
 
-uri = f"mysql+pymysql://" \
-      f"{os.environ.get('MYSQL_USER', 'erik')}:" \
-      f"{os.environ.get('MYSQL_PASSWORD', 'erik')}@localhost:3306/" \
-      f"{os.environ.get('MYSQL_DATABASE', 'erik_db')}"
+logger = logging.getLogger('waitress')
+logger.info("log works")
 
-engine = create_engine(uri)
-db_session = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
-                                         bind=engine))
-Base = declarative_base()
-Base.query = db_session.query_property()
 
 
 # auth
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # to allow Http traffic for local dev
 
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # to allow Http traffic for local dev
 
-client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "secret.json")
-with open(client_secrets_file, "r") as f:
-    json_file = json.load(f)
-    GOOGLE_CLIENT_ID = json_file["web"]["client_id"]
-    secret_key = json_file["web"]["client_secret"]
-flow = Flow.from_client_secrets_file(
-    client_secrets_file=client_secrets_file,
-    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-    redirect_uri="http://localhost:5000/api/auth/callback"
-)
 
 def init_db():
-    from db_models.models import User
-
+    from db_models.models import User, Chat, Message, engine, Base, Session
     # Drop all tables
-    Base.metadata.drop_all(bind=engine)
-
+    Base.metadata.drop_all(engine)
+    logger.info("dropped")
     # Create all tables
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(engine)
+    logger.info("created")
+    # dummy data
+    with Session() as session:
+        u = User()
+        u.name = "erik"
+        u.google_id = "2321215345"
+        u2 = User()
+        u2.name = "erik2"
+        u2.google_id = "232323214675475463"
+        session.add_all([u, u2])
+        session.commit()
 
-    u = User()
-    u.name = "erik"
-    u.n = "ewewe"
-    db_session.add(u)
-    db_session.commit()
+        c = Chat()
+        c.user_id = u.id
+        c2 = Chat()
+        c2.user_id = u.id
+        c3 = Chat()
+        c3.user_id = u2.id
+        session.add_all([c, c2, c3])
+        session.commit()
+
+        m = Message()
+        m.chat_id = c.id
+        m.type = "user"
+        m.message_ee = "er"
+        m.message_en = "3"
+        m2 = Message()
+        m2.chat_id = c.id
+        m2.type = "user"
+        m2.message_ee = "er"
+        m2.message_en = "3"
+        m3 = Message()
+        m3.chat_id = c2.id
+        m3.type = "bot"
+        m3.message_ee = "er"
+        m3.message_en = "3"
+        session.add_all([m, m2, m3])
+        session.commit()
+
 
 def create_app(test_config=None):
     app = Flask(__name__)
-    app.secret_key = secret_key
+    app.secret_key = "erik"
     CORS(app)
-
-    app.config['SQLALCHEMY_DATABASE_URI'] = uri
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = "erik"
-
 
     logger = logging.getLogger('waitress')
     logger.info("log works")
@@ -75,17 +77,13 @@ def create_app(test_config=None):
     # Register API Blueprint and initialize Celery
     from routes import chat, test, auth
     api_bp = Blueprint('api', __name__, url_prefix='/api')
+
     api_bp.register_blueprint(auth.bp)
     api_bp.register_blueprint(chat.bp)
     api_bp.register_blueprint(test.bp)
     app.register_blueprint(api_bp)
 
     register_cli_commands(app)  # Register custom CLI commands
-
-    @app.teardown_appcontext
-    def shutdown_session(exception=None):
-        print("end")
-        db_session.remove()
 
     return app
 
@@ -97,11 +95,9 @@ def register_cli_commands(app):
     def create_tables_command():
         with app.app_context():
             init_db()
-            print('Tables created successfully!')
+            logger.info("Tables created")
 
     app.cli.add_command(cli_commands)
-
-
 
 
 if __name__ == "__main__":

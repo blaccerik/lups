@@ -1,51 +1,46 @@
-import os
-import logging
-
-from celery import Celery
 from flask import Blueprint, jsonify, request
 
+from routes.test import token_required
 from schemas.schemas import ChatResponseSchema
+from services.chat_service import *
 
 bp = Blueprint('chat', __name__, url_prefix="/chat")
 response_schema = ChatResponseSchema()
 
 
-celery = Celery("tasks")
-celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
-celery.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379")
+
+@bp.route("/create", methods=['POST'])
+@token_required
+def create(google_id, name):
+    return jsonify(), 200
+
+@bp.route("", methods=['GET'])
+@token_required
+def chats(google_id, name):
+    user_id = get_user(name, google_id)
+    chats = get_chats(user_id)
+    return jsonify(chats), 200
+
+@bp.route("/<int:chat_id>", methods=['GET'])
+@token_required
+def chat_get(chat_id, google_id, name):
+    user_id = get_user(name, google_id)
+    msgs = get_chat(user_id, chat_id)
+    return jsonify(msgs), 200
 
 
-@bp.route('', methods=['POST'])
-def test():
-    data = request.json
-    input_text = data['text']
-    logger = logging.getLogger('waitress')
-    logger.info(input_text)
-    task = celery.send_task("tasks.create_task", args=[input_text])
-    logger.info(task)
-    try:
-        output_text_ee, output_text_en = task.get()
-    except Exception as e:
-        logger.exception(e)
-        return jsonify({"message": "server busy"}), 408
-    return jsonify({
-        "output_text_en": output_text_en,
-        "output_text_ee": output_text_ee
-    }), 200
+@bp.route("/<int:chat_id>", methods=['DELETE'])
+@token_required
+def chat_delete(chat_id, google_id, name):
+    user_id = get_user(name, google_id)
+    clear(user_id, chat_id)
+    return jsonify("deleted"), 200
 
-@bp.route('', methods=['GET'])
-def test2():
 
-    logger = logging.getLogger('waitress')
-    logger.info('Hello baby!')
-    task = celery.send_task("tasks.create_task", args=["tere"])
-    logger.info(task)
-    try:
-        output_text_ee, output_text_en = task.get()
-    except Exception as e:
-        logger.exception(e)
-        return jsonify({"message": "server busy"}), 408
-    return jsonify({
-        "output_text_en": output_text_en,
-        "output_text_ee": output_text_ee
-    }), 200
+@bp.route("/<int:chat_id>", methods=['POST'])
+@token_required
+def chat_post(chat_id, google_id, name):
+    user_id = get_user(name, google_id)
+    text = request.json["text"]
+    response = post_message(user_id, chat_id, text)
+    return jsonify(response), 200
