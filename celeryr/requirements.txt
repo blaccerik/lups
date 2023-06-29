@@ -2,7 +2,6 @@ celery==5.2.3
 flower==1.0.0
 pytest==7.0.1
 redis==4.1.4
-deep-translator==1.11.1
 transformers==4.30.2
 torch==2.0.1
 cachetools==5.3.1

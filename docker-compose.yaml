@@ -2,15 +2,15 @@ version: '3.8'
 
 services:
   mysql:
-      image: mysql:latest
+      image: woahbase/alpine-mysql
       restart: always
       environment:
-        MYSQL_ROOT_PASSWORD: erik
-        MYSQL_DATABASE: erik_db
+        MYSQL_ROOT_PWD: erik
+        MYSQL_USER_DB: erik_db
         MYSQL_USER: erik
-        MYSQL_PASSWORD: erik
+        MYSQL_USER_PWD: erik
       volumes:
-        - mysql_data:/var/lib/mysql
+        - data:/var/lib/mysql
       ports:
         - 3306:3306
   phpmyadmin:
@@ -32,6 +32,8 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - MYSQL_BROKER_URL=mysql:3306
+      - PROD=True
     ports:
       - 5000:5000
     depends_on:
@@ -70,4 +72,4 @@ services:
       - 6379:6379
 
 volumes:
-  mysql_data:
+  data:
