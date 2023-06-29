@@ -1,26 +1,33 @@
+
+
 <div class="parent-container">
   <div class="container">
-    <div class="title">
-      {{titleText}}
+    <div *ngIf="!hasLoaded" class="loading">
+      Loading...
     </div>
-    <div class="chat-messages"  #chatContainer>
-      <div *ngFor="let message of messages" class="message">
-
-        <div *ngIf="message.isUser" class="user-message">
-          <div class="name">Kasutaja</div>
-          {{ message.text }}
-        </div>
-
-        <div *ngIf="!message.isUser" class="app-message">
-          <div class="name">Tõnu</div>
-          <div *ngIf="message.isLoading" class="loader"></div>
-          <div *ngIf="!message.isLoading">{{ message.text }}</div>
+    <div *ngIf="hasLoaded">
+      <div class="messages" #chatContainer>
+        <div *ngFor="let message of messages" class="message">
+          <div *ngIf="message.isUser" class="user-message">
+            <div class="name">{{userInfoService.getUserName()}}</div>
+            {{ message.message }}
+          </div>
+          <div *ngIf="!message.isUser" class="app-message">
+            <div class="name">Tõnu</div>
+            <div *ngIf="message.isLoading" class="loader"></div>
+            <div *ngIf="!message.isLoading">{{ message.message }}</div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="input-area">
-      <input type="text" [(ngModel)]="textFieldValue" maxlength="100" placeholder="Küsi küsimus" (keyup.enter)="submit()">
-      <button (click)="submit()">Saada</button>
+      <div class="input-area">
+        <input type="text" [(ngModel)]="textField" maxlength="100" placeholder="Küsi küsimus" (keyup.enter)="send()">
+        <button (click)="send()">Saada</button>
+        <button (click)="clear()">Puhasta</button>
+      </div>
     </div>
   </div>
 </div>
+
+
+
+

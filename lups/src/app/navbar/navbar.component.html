@@ -8,5 +8,12 @@
       {{section.text}}
     </div>
   </div>
+
+  <button (click)="login()">login</button>
+  <button (click)="logout()">logout</button>
+  <div *ngIf="authService.hasValidIdToken()">
+    {{userInfoService.getUserName()}}
+  </div>
+<!--  <div *ngIf="googleApi.isLoggedIn()">{{googleApi.getProfile().name}}</div>-->
 </div>
 

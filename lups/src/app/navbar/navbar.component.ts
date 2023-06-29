@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import {OAuthService} from "angular-oauth2-oidc";
+import {UserInfoService} from "../services/user-info.service";
+import {Router} from "@angular/router";
 
 
 interface section {
@@ -18,4 +21,21 @@ export class NavbarComponent {
     {text: "Uudised", link: "/news"},
     {text: "Naised", link: ""},
   ]
+
+  constructor(public readonly authService: OAuthService,
+              public readonly userInfoService: UserInfoService,
+              private readonly router: Router) {}
+
+
+
+  login() {
+    this.authService.initLoginFlow('google');
+  }
+
+  logout() {
+    this.authService.revokeTokenAndLogout().then(() => {
+      this.router.navigate([""])
+    })
+
+  }
 }

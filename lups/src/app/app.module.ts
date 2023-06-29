@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -19,9 +19,10 @@ import { MiniNewsComponent } from './home/mini-news/mini-news.component';
 import { SingleNewsComponent } from './news/single-news/single-news.component';
 import { ChatComponent } from './chat/chat.component';
 import {FormsModule} from "@angular/forms";
-import {ChatService} from "./services/chat.service";
-import {HttpClientModule} from "@angular/common/http";
-import { LoginComponent } from './login/login.component';
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
+import {OAuthModule, OAuthService, OAuthStorage} from 'angular-oauth2-oidc';
+import {UserInfoService} from "./services/user-info.service";
+import {AuthInterceptor} from "./auth.interceptor";
 
 @NgModule({
   declarations: [
@@ -38,7 +39,6 @@ import { LoginComponent } from './login/login.component';
     MiniNewsComponent,
     SingleNewsComponent,
     ChatComponent,
-    LoginComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -47,12 +47,42 @@ import { LoginComponent } from './login/login.component';
     CommonModule,
     MatIconModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    OAuthModule.forRoot()
   ],
   exports: [],
   providers: [
-    ChatService
+    OAuthService,
+    { provide: OAuthStorage, useValue: localStorage },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(private oauthService: OAuthService,
+              private userInfoService: UserInfoService,
+
+  ) {
+    this.oauthService.configure({
+      issuer: 'https://accounts.google.com',
+      strictDiscoveryDocumentValidation: false,
+      redirectUri: window.location.origin,
+      clientId: '437646142767-evt2pt3tn4pbrjcea6pd71quq07h82j7.apps.googleusercontent.com',
+      scope: 'openid profile email',
+      showDebugInformation: true,
+    });
+    this.oauthService.setStorage(localStorage);
+    this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
+      if (this.oauthService.hasValidIdToken()) {
+        this.oauthService.loadUserProfile().then((r: any) => {
+          console.log(r)
+          this.userInfoService.setUserName(r.info.name)
+        })
+      }
+    });
+  }
+}

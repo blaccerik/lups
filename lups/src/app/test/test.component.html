@@ -1,5 +1,20 @@
-<!--<div class="main">-->
-<!--  <div class="image-container" (mouseover)="pauseScroll()" (mouseout)="resumeScroll()" (mousedown)="startScroll($event)" (mouseup)="stopScroll()">-->
-<!--  <img [src]="imagePath + image" *ngFor="let image of images" alt="Image">-->
-<!--</div>-->
-<!--</div>-->
+<div>
+  {{get}}
+</div>
+<div>
+  {{getId}}
+</div>
+<div>
+  {{post}}
+</div>
+<div *ngIf="oauthService.hasValidIdToken()">
+  <div>
+    {{getProtected}}
+  </div>
+  <div>
+    {{getProtectedId}}
+  </div>
+  <div>
+    {{postProtected}}
+  </div>
+</div>
