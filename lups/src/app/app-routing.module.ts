@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {HomeComponent} from "./home/home.component";
-import {NewsComponent} from "./news/news.component";
-import {SingleNewsComponent} from "./news/single-news/single-news.component";
-import {ChatComponent} from "./chat/chat.component";
-import {TestComponent} from "./test/test.component";
+import {HomeComponent} from "./components/home/home.component";
+import {NewsComponent} from "./components/news/news.component";
+import {SingleNewsComponent} from "./components/news/single-news/single-news.component";
+import {ChatComponent} from "./components/chat/chat.component";
+import {TestComponent} from "./components/test/test.component";
 
 const routes: Routes = [
   { path: '', component: HomeComponent},

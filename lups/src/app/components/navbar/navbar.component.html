@@ -8,12 +8,14 @@
       {{section.text}}
     </div>
   </div>
-
-  <button (click)="login()">login</button>
-  <button (click)="logout()">logout</button>
-  <div *ngIf="authService.hasValidIdToken()">
-    {{userInfoService.getUserName()}}
+  <div class="section user-info" *ngIf="!authService.hasValidIdToken()" (click)="login()">
+    Login
   </div>
-<!--  <div *ngIf="googleApi.isLoggedIn()">{{googleApi.getProfile().name}}</div>-->
+  <div class="user-info" *ngIf="authService.hasValidIdToken()">
+    <div class="section" (click)="logout()">
+      Logout
+    </div>
+    <img class="user-info-image" src="{{userInfoService.picture}}" alt="image">
+  </div>
 </div>
 

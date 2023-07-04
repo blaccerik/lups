@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {map, Observable} from "rxjs";
-import {Message} from "../chat/chat.component";
+import {Message} from "../components/chat/chat.component";
 
 
 export interface ChatResponse {

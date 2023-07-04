@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {OAuthService} from "angular-oauth2-oidc";
-import {TestService} from "../services/test.service";
+import {TestService} from "../../services/test.service";
 
 @Component({
   selector: 'app-test',

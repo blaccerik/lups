@@ -3,37 +3,27 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { CaruselComponent } from './carusel/carusel.component';
 import {CommonModule} from "@angular/common";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import { CarouselElementComponent } from './carousel-element/carousel-element.component';
-import { TestComponent } from './test/test.component';
-import { PonyComponent } from './pony/pony.component';
-import { CarouselComponent } from './home/carousel/carousel.component';
-import { AdsComponent } from './home/ads/ads.component';
-import { HomeComponent } from './home/home.component';
-import { NavbarComponent } from "./navbar/navbar.component";
-import { NewsComponent } from './news/news.component';
+import { TestComponent } from './components/test/test.component';
+import { HomeComponent } from './components/home/home.component';
+import { NewsComponent } from './components/news/news.component';
 import { MatIconModule} from '@angular/material/icon';
-import { MiniNewsComponent } from './home/mini-news/mini-news.component';
-import { SingleNewsComponent } from './news/single-news/single-news.component';
-import { ChatComponent } from './chat/chat.component';
+import { MiniNewsComponent } from './components/home/mini-news/mini-news.component';
+import { SingleNewsComponent } from './components/news/single-news/single-news.component';
+import { ChatComponent } from './components/chat/chat.component';
 import {FormsModule} from "@angular/forms";
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {OAuthModule, OAuthService, OAuthStorage} from 'angular-oauth2-oidc';
 import {UserInfoService} from "./services/user-info.service";
-import {AuthInterceptor} from "./auth.interceptor";
+import {AuthInterceptor} from "./interceptors/auth.interceptor";
+import {NavbarComponent} from "./components/navbar/navbar.component";
 
 @NgModule({
   declarations: [
-    AppComponent,
     NavbarComponent,
-    CaruselComponent,
-    CarouselElementComponent,
+    AppComponent,
     TestComponent,
-    PonyComponent,
-    CarouselComponent,
-    AdsComponent,
     HomeComponent,
     NewsComponent,
     MiniNewsComponent,
@@ -79,8 +69,8 @@ export class AppModule {
     this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
       if (this.oauthService.hasValidIdToken()) {
         this.oauthService.loadUserProfile().then((r: any) => {
-          console.log(r)
-          this.userInfoService.setUserName(r.info.name)
+          this.userInfoService.userName = r.info.name
+          this.userInfoService.picture = r.info.picture
         })
       }
     });

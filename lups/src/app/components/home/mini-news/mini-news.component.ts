@@ -28,6 +28,7 @@ export class MiniNewsComponent {
   ];
 
   go(news: News) {
-    this.router.navigate(["news/" + news.link])
+    console.log(news)
+    // this.router.navigate(["news/" + news.link])
   }
 }

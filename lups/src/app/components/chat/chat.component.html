@@ -9,11 +9,11 @@
       <div class="messages" #chatContainer>
         <div *ngFor="let message of messages" class="message">
           <div *ngIf="message.isUser" class="user-message">
-            <div class="name">{{userInfoService.getUserName()}}</div>
+            <div class="name">{{userInfoService.userName}}</div>
             {{ message.message }}
           </div>
           <div *ngIf="!message.isUser" class="app-message">
-            <div class="name">Tõnu</div>
+            <div class="name">Vambola</div>
             <div *ngIf="message.isLoading" class="loader"></div>
             <div *ngIf="!message.isLoading">{{ message.message }}</div>
           </div>

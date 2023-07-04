@@ -9,7 +9,6 @@
   z-index: 99;
   top: 0;
   left: 0;
-  //align-items: center;
 }
 
 .logo {
@@ -22,16 +21,12 @@
 }
 
 .name {
-  //margin-left: 10px;
   color: $main-color;
   text-transform: uppercase;
   width: 209px;
   height: 88px;
   font-size: 25px;
   padding: 6px 10px;
-  //padding-top: 5px;
-  //margin-top: 8px;
-  //margin-right: 50px;
   background-color: $second-color;
   border-bottom-right-radius: 25px;
 }
@@ -44,11 +39,8 @@
   color: $main-color;
   font-size: 20px;
   text-transform: uppercase;
-  //background-color: blue;
   height: 20px;
   padding: 15px 15px;
-  //padding: 15px;
-  //margin-right: 50px;
   transition: 0.3s;
 }
 
@@ -58,3 +50,14 @@
   cursor: pointer;
 }
 
+.user-info {
+  display: flex;
+  margin-left: auto;
+
+  &-image {
+    margin: 10px 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+}

@@ -1,8 +1,8 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {ChatResponse, ChatService} from "../services/chat.service";
+import {ChatResponse, ChatService} from "../../services/chat.service";
 import {Router} from "@angular/router";
 import {OAuthService} from "angular-oauth2-oidc";
-import {UserInfoService} from "../services/user-info.service";
+import {UserInfoService} from "../../services/user-info.service";
 
 
 export interface Message {
@@ -51,8 +51,13 @@ export class ChatComponent {
           },
           error: err => {
             console.log(err)
+            this.router.navigate([""])
           }
         })
+      },
+      error: err => {
+        console.log(err)
+        this.router.navigate([""])
       }
     })
   }
@@ -91,6 +96,7 @@ export class ChatComponent {
         this.messages.push(msg)
       },
       error: err => {
+        console.log(err)
         this.router.navigate([""])
       }
     })
@@ -107,6 +113,10 @@ export class ChatComponent {
       next: (r: string) => {
         this.messages = []
         this.hasLoaded = true
+      },
+      error: err => {
+        console.log(err)
+        this.router.navigate([""])
       }
     })
   }
