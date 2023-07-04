@@ -12,11 +12,14 @@ def main():
 
     commands = [
 
+        (r"C:\Users\erik\PycharmProjects\lups\data",
+         f"{name}@{ip}:/var/www/data"),
+
         # (r"C:\Users\erik\PycharmProjects\lups\celeryr",
         #  f"{name}@{ip}:/var/www/"),
-
-        (r"C:\Users\erik\PycharmProjects\lups\flaskr",
-         f"{name}@{ip}:/var/www/"),
+        #
+        # (r"C:\Users\erik\PycharmProjects\lups\flaskr",
+        #  f"{name}@{ip}:/var/www/"),
 
         (r"C:\Users\erik\PycharmProjects\lups\docker-compose.yaml",
          f"{name}@{ip}:/var/www/docker-compose.yaml"),
@@ -24,8 +27,8 @@ def main():
         (r"C:\Users\erik\WebstormProjects\lups\lups\dist\lups\*",
           f"{name}@{ip}:/var/www/html/"),
 
-        (r"C:\Users\erik\PycharmProjects\lups\nginx\nginx.conf",
-         f"{name}@{ip}:/etc/nginx/nginx.conf"),
+        # (r"C:\Users\erik\PycharmProjects\lups\nginx\nginx.conf",
+        #  f"{name}@{ip}:/etc/nginx/nginx.conf"),
     ]
 
     for s, e in commands:

@@ -110,9 +110,9 @@ def add_punct(text: str) -> str:
         text += "."
     return text
 
-
 @with_session
 def post_message(user_id: int, code: int, text_ee: str, session=None):
+
     # check if user has that chat
     chat = session.query(Chat).filter(and_(
         Chat.user_id == user_id,
@@ -140,24 +140,18 @@ def post_message(user_id: int, code: int, text_ee: str, session=None):
     session.add(m)
     session.commit()
 
-    # get all messages
-    messages = session.query(Message).filter(and_(
-        Message.chat_id == chat.id,
-        Message.deleted == False
-    )).all()
-
-    formatted_text = format_chat(messages)
-    logger.info([formatted_text])
-
-    task = celery.send_task("tasks.create_task", args=[formatted_text])
+    task = celery.send_task("my_task", args=[chat.id, m.id])
     try:
-        output_en = task.get()
+        okay, output_en = task.get()
     except Exception as e:
         logger.exception(e)
         abort(400, "Server busy")
         return
-
+    if not okay:
+        print(output_en)
+        abort(400, "Something wnet wrong")
     logger.info(f"en out: {output_en}")
+
     try:
         output_ee = GoogleTranslator(source='en', target='et').translate(output_en)
     except:

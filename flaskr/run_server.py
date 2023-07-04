@@ -96,7 +96,6 @@ def register_cli_commands(app):
         with app.app_context():
             init_db()
             logger.info("Tables created")
-
     app.cli.add_command(cli_commands)
 
 

@@ -16,6 +16,7 @@ def token_required(f):
     def decorated_function(*args, **kwargs):
         access_token = request.headers.get('Authorization')
         if not access_token:
+            logger.info("no token")
             return jsonify({'message': 'Missing access token'}), 401
         access_token = access_token.split(" ")[1]
         try:

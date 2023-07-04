@@ -1,8 +1,10 @@
 # Use a lightweight Python base image
 FROM python:3.9-slim
 
-# Set the working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/app
+
+# postgre stuff
+RUN apt-get update && apt-get -y install libpq-dev gcc
 
 # Copy the requirements.txt file
 COPY requirements.txt .

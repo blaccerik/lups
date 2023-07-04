@@ -1,75 +1,67 @@
 version: '3.8'
 
 services:
-#  mysql:
-#      image: woahbase/alpine-mysql
-#      restart: always
-#      environment:
-#        MYSQL_ROOT_PWD: erik
-#        MYSQL_USER_DB: erik_db
-#        MYSQL_USER: erik
-#        MYSQL_USER_PWD: erik
-#      volumes:
-#        - data:/var/lib/mysql
-#      ports:
-#        - 3306:3306
-#  phpmyadmin:
-#    image: phpmyadmin/phpmyadmin
-#    restart: always
-#    environment:
-#      PMA_HOST: mysql  # Update the value to "mysql"
-#      PMA_PORT: 3306
-#      MYSQL_ROOT_PASSWORD: erik
-#    ports:
-#      - 8080:80
-#    depends_on:
-#      - mysql
-#
-#  flask:
-#    build:
-#      context: flaskr/.
-#      dockerfile: Dockerfile
-#    environment:
-#      - CELERY_BROKER_URL=redis://redis:6379/0
-#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-#      - MYSQL_BROKER_URL=mysql:3306
-#      - PROD=True
-#    ports:
-#      - 5000:5000
-#    depends_on:
-#      - worker
-#      - redis
-#
-#  worker:
-#    build: celeryr/.
-#    command: celery --app tasks.tasks.celery worker --concurrency=1
-#    environment:
-#      - CELERY_BROKER_URL=redis://redis:6379/0
-#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-#    depends_on:
-#      - redis
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: '1'  # Adjust the CPU limit as needed
-#          memory: 1G  # Adjust the memory limit as needed
-#
+  flask:
+    build:
+      context: flaskr/.
+      dockerfile: Dockerfile
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - POSTGRE_USER=erik
+      - POSTGRE_PASSWORD=erik
+      - POSTGRE_BROKER_URL=postgres:5432
+      - POSTGRE_DATABASE=erik_db
+      - PROD=True
+    ports:
+      - 5000:5000
+    depends_on:
+      - redis
+      - postgres
+
+  worker:
+    build:
+      context: ./
+      dockerfile: celeryr/dockerfile
+    command: celery --app worker.tasks.celery worker --concurrency=1
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - POSTGRE_USER=erik
+      - POSTGRE_PASSWORD=erik
+      - POSTGRE_BROKER_URL=postgres:5432
+      - POSTGRE_DATABASE=erik_db
+    depends_on:
+      - redis
+      - postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '1'  # Adjust the CPU limit as needed
+          memory: 2G  # Adjust the memory limit as needed
+
 #  dashboard:
-#    build: celeryr/.
-#    command: celery --app tasks.tasks.celery flower --port=5555 --broker=redis://redis:6379/0
+#    build:
+#      context: ./
+#      dockerfile: celeryr/dockerfile
+#    command: celery --app worker.tasks.celery flower --port=5555
 #    ports:
 #      - 5556:5555
 #    environment:
 #      - CELERY_BROKER_URL=redis://redis:6379/0
 #      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+#      - POSTGRE_USER=erik
+#      - POSTGRE_PASSWORD=erik
+#      - POSTGRE_BROKER_URL=postgres:5432
+#      - POSTGRE_DATABASE=erik_db
 #    depends_on:
 #      - redis
 #      - worker
-#
-#  redis:
-#    image: redis:6-alpine
-#    ports:
-#      - 6379:6379
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - 6379:6379
 
   postgres:
       container_name: erik_db
@@ -83,17 +75,17 @@ services:
         POSTGRES_PASSWORD: erik
       volumes:
         - postgres_data:/var/lib/postgresql/data
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin4
-    depends_on:
-      - postgres
-    ports:
-      - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "erik@erik.com"
-      PGADMIN_DEFAULT_PASSWORD: "erik"
-      PGADMIN_DEFAULT_USER: "erik"
+#  pgadmin:
+#    image: dpage/pgadmin4
+#    container_name: pgadmin4
+#    depends_on:
+#      - postgres
+#    ports:
+#      - "5050:80"
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: "erik@erik.com"
+#      PGADMIN_DEFAULT_PASSWORD: "erik"
+#      PGADMIN_DEFAULT_USER: "erik"
 
 volumes:
   postgres_data:
