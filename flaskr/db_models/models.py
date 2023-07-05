@@ -59,8 +59,8 @@ class Message(Base):
     __tablename__ = 'messages'
     id = Column(Integer, primary_key=True)
     chat_id = Column(Integer, ForeignKey('chats.id'), nullable=False)
-    message_ee = Column(String(255), nullable=False)
-    message_en = Column(String(255), nullable=False)
+    message_ee = Column(String(100), nullable=False)
+    message_en = Column(String(100), nullable=False)
     type = Column(Enum("user", "bot", name="message_type_enum"), nullable=False)
     deleted = Column(Boolean, nullable=False, default=False)
 

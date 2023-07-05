@@ -1,5 +1,6 @@
 import heapq
 import os
+import random
 import re
 import time
 from functools import lru_cache
@@ -22,7 +23,10 @@ celery.conf.result_backend = "redis://localhost:6379"
 MESSAGES_SIZE = 5
 FACTS_SIZE = 3
 FACT_THRESHOLD = 0.2
-MAX_OUTPUT_LENGTH = 100
+
+# size is in tokens
+MAX_OUTPUT_LENGTH = 50
+MAX_INPUT_LENGTH = 512
 
 
 class FixedSizeList:
@@ -183,10 +187,12 @@ def create_task(chat_id: int, question_id: int):
 
     # make prompt
     prompt = format_chat(facts, messages)
-    # print(prompt)
     try:
         input_ids = tokenizer(prompt, return_tensors="pt").input_ids
-        outputs = model.generate(input_ids, max_new_tokens=MAX_OUTPUT_LENGTH)
+        # if gets too long cut out front
+        if input_ids.size(1) > MAX_INPUT_LENGTH:
+            input_ids = input_ids[:, -MAX_INPUT_LENGTH:]
+        outputs = model.generate(input_ids, max_new_tokens=MAX_OUTPUT_LENGTH, temperature=0.75)
         output_text = tokenizer.decode(outputs[0])
         output_text = output_text.replace("<pad>", "").replace("</s>", "")
     except Exception as e:

@@ -12,11 +12,17 @@ celery = Celery("tasks")
 celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
 celery.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379")
 
+MAX_USER_TEXT_SIZE = 100
+MAX_USER_NAME_SIZE = 50
 
 @with_session
 def get_user(name: str, google_id: int, session=None) -> int:
     user = session.query(User).filter_by(google_id=google_id).first()
     if user is None:
+
+        if len(name) >= MAX_USER_NAME_SIZE:
+            name = name[:MAX_USER_NAME_SIZE]
+
         u = User()
         u.name = name
         u.google_id = google_id
@@ -90,29 +96,8 @@ def clear(user_id: int, code: int, session=None):
     logger.info(f"after del: {len(messages)}")
 
 
-def format_chat(messages) -> str:
-
-    history_size = 7
-
-    text = ""
-    for m in messages[-history_size:]:
-        msg = m.message_en
-        msg = add_punct(msg)
-        if m.type == "user":
-            text += f"{msg} "
-        else:
-            text += f"{msg} "
-    return text
-
-
-def add_punct(text: str) -> str:
-    if not (text.endswith("?") or text.endswith("!") or text.endswith(".")):
-        text += "."
-    return text
-
 @with_session
 def post_message(user_id: int, code: int, text_ee: str, session=None):
-
     # check if user has that chat
     chat = session.query(Chat).filter(and_(
         Chat.user_id == user_id,
@@ -122,14 +107,22 @@ def post_message(user_id: int, code: int, text_ee: str, session=None):
     if chat is None:
         abort(403, "User does not have the chat")
 
+    # check text
+    if len(text_ee) >= MAX_USER_TEXT_SIZE:
+        abort(400, "Too long text")
+
     # translate
     logger.info(f"ee in: {text_ee}")
     try:
         text_en = GoogleTranslator(source='et', target='en').translate(text_ee)
     except:
         text_en = text_ee
+
+    # check text
     if text_en is None:
         text_en = ""
+    elif len(text_en) >= MAX_USER_TEXT_SIZE:
+        abort(400, "Too long text")
     logger.info(f"en in: {text_en}")
 
     m = Message()
@@ -148,15 +141,21 @@ def post_message(user_id: int, code: int, text_ee: str, session=None):
         abort(400, "Server busy")
         return
     if not okay:
-        print(output_en)
-        abort(400, "Something wnet wrong")
+        logger.exception(output_en)
+        abort(400, "Celery error")
     logger.info(f"en out: {output_en}")
+
+    if len(output_en) >= MAX_USER_TEXT_SIZE:
+        output_en = output_en[:MAX_USER_TEXT_SIZE]
 
     try:
         output_ee = GoogleTranslator(source='en', target='et').translate(output_en)
     except:
         output_ee = output_en
     logger.info(f"ee out: {output_ee}")
+
+    if len(output_ee) >= MAX_USER_TEXT_SIZE:
+        output_ee = output_ee[:MAX_USER_TEXT_SIZE]
 
     m = Message()
     m.chat_id = chat.id
