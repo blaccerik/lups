@@ -2,7 +2,7 @@
 
 
 .container {
-  margin-top: 25%;
+  margin-top: 15%;
   width: 100%;
 }
 
@@ -10,6 +10,8 @@ $width: 300px;
 $height: 400px;
 
 .grid {
+  margin-left: 5%;
+  margin-right: 5%;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax($width, 1fr));
   justify-items: center; /* Add this property */
@@ -56,11 +58,13 @@ $height: 400px;
   right: 5px;
   width: 30px;
   height: 30px;
-  background-color: $second-color;
-  border-radius: 15px;
+  background-color: $third-color;
+  border-radius: 17px;
+  border: 2px solid $second-color;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: $second-color;
 }
 
 

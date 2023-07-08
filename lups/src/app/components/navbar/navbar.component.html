@@ -1,21 +1,56 @@
 <div class="main">
-  <img class="logo" src="assets/big_logo.png" alt="image" routerLink="">
+  <img class="logo" src="assets/logo.png" alt="image" routerLink="">
   <div class="name" routerLink="">
     Eesti Rahvalüpsjate Erakond
   </div>
-  <div class="section" routerLink="{{section.link}}" *ngFor="let section of sections">
-    <div class="section-text">
-      {{section.text}}
+
+  <div class="small-menu" [class.is-open]="isMenuOpen">
+    <div *ngFor="let section of sections">
+      <div *ngIf="section.isSeen || section.id" class="section" (click)="go(section)">
+        {{section.text}} <i *ngIf="section.hasChildren" class="material-icons">{{ section.isSeen ? "menu" : "close" }}</i>
+      </div>
     </div>
   </div>
-  <div class="section user-info" *ngIf="!authService.hasValidIdToken()" (click)="login()">
-    Login
+
+  <div class="menu">
+    <div *ngFor="let section of sections">
+      <div *ngIf="section.id" class="section" (click)="go(section)">
+        {{section.text}}
+        <div *ngIf="!section.link" class="submenu">
+          <div *ngFor="let section2 of sections">
+            <div class="section" *ngIf="section2.parentId === section.id" (click)="go(section2)">
+              {{ section2.text }}
+            </div>
+          </div>
+        </div>
+      </div>
+<!--       <i *ngIf="section.menu" class="material-icons">{{ section.isOpen ? "close" : "menu" }}</i>-->
+<!--      <div class="test" [class.open]="section.isOpen">-->
+<!--        tere-->
+<!--      </div>-->
+<!--      <div [style.display]="shouldDisplay(section)" class="submenu">-->
+<!--        <div class="section" (click)="go(submenuItem)" *ngFor="let submenuItem of section.menu">-->
+<!--          {{ submenuItem.text }}-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <div *ngIf="section.menu" class="submenu">-->
+<!--        <div class="section" (click)="go(submenuItem)" *ngFor="let submenuItem of section.menu">-->
+<!--          {{ submenuItem.text }}-->
+<!--        </div>-->
+<!--      </div>-->
+    </div>
   </div>
-  <div class="user-info" *ngIf="authService.hasValidIdToken()">
-    <div class="section" (click)="logout()">
+  <div class="user-info">
+    <div class="section burger" (click)="toggleMenu()">
+      <i class="material-icons">{{ isMenuOpen ? "close" : "menu" }}</i>
+    </div>
+    <div class="section" *ngIf="authService.hasValidIdToken()" (click)="logout()">
       Logout
     </div>
-    <img class="user-info-image" src="{{userInfoService.picture}}" alt="image">
+    <div class="section" *ngIf="!authService.hasValidIdToken()" (click)="login()">
+      Login
+    </div>
+    <img class="image" *ngIf="authService.hasValidIdToken()" src="{{userInfoService.picture}}" alt="image">
   </div>
 </div>
 

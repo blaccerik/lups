@@ -1,9 +1,16 @@
 @import 'src/variables';
 
+$menuHeight: 50px;
+$menuBreakpoint: 800px;
+
+i {
+  margin-left: auto;
+}
+
 .main {
   width: 100%;
   background-color: $second-color;
-  height: 50px;
+  height: $menuHeight;
   position: fixed;
   display: flex;
   z-index: 99;
@@ -14,10 +21,17 @@
 .logo {
   width: 100px;
   height: 100px;
-}
+  background-color: $second-color;
 
-.logo:hover {
-  cursor: pointer;
+  @media (max-width: $menuBreakpoint) {
+    width: $menuHeight;
+    height: $menuHeight;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
 }
 
 .name {
@@ -26,38 +40,102 @@
   width: 209px;
   height: 88px;
   font-size: 25px;
+  font-weight: 300;
   padding: 6px 10px;
   background-color: $second-color;
   border-bottom-right-radius: 25px;
-}
 
-.name:hover {
-  cursor: pointer;
+  @media (max-width: $menuBreakpoint) {
+    font-size: 15px;
+    font-weight: 300;
+    height: $menuHeight;
+    padding: 0 10px;
+    width: 100px;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
 }
 
 .section {
+  display: flex;
   color: $main-color;
   font-size: 20px;
   text-transform: uppercase;
   height: 20px;
   padding: 15px 15px;
   transition: 0.3s;
-}
+  position: relative;
 
-.section:hover {
-  color: $second-color;
-  background-color: $main-color;
-  cursor: pointer;
+  &:hover {
+    color: $second-color;
+    background-color: $third-color;
+    cursor: pointer;
+  }
 }
 
 .user-info {
   display: flex;
   margin-left: auto;
 
-  &-image {
+  .image {
     margin: 10px 10px;
     width: 30px;
     height: 30px;
     border-radius: 50%;
   }
 }
+
+
+
+.burger {
+  display: none;
+  i {
+    color: $main-color;
+    //line-height: 20px;
+  }
+  @media (max-width: $menuBreakpoint) {
+    display: block;
+  }
+}
+
+.menu {
+  display: flex;
+  @media (max-width: $menuBreakpoint) {
+    display: none;
+  }
+}
+
+.small-menu {
+  display: none;
+
+  @media (max-width: $menuBreakpoint) {
+    &.is-open {
+      display: block;
+      position: absolute;
+      top: #{$menuHeight};
+      background: $second-color;
+      width: 100%;
+    }
+  }
+}
+
+.submenu {
+  display: none;
+  position: absolute;
+  background-color:  $second-color;
+  min-width: 200px;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+}
+
+.section:hover .submenu {
+  display: block;
+  @media (max-width: $menuBreakpoint) {
+    display: none;
+  }
+}
+

@@ -12,7 +12,7 @@
 .container {
 
   position: relative;
-  background-color: #f5f5f5;
+  background-color: $main-color;
   border-radius: 5px;
   width: 500px;
   padding: 10px;
@@ -31,7 +31,7 @@
 }
 
 .messages::-webkit-scrollbar-track {
-  background-color: #f5f5f5;
+  background-color: $main-color;
 }
 
 .input-area {
@@ -78,7 +78,7 @@
 
 .app-message {
   float: left;
-  background-color: #60d333;
+  background-color: $second-color;
   padding: 10px;
   border-radius: 5px;
   word-break: break-all; /* Break long words onto multiple lines */
@@ -87,7 +87,7 @@
 
 .user-message {
   float: right;
-  background-color: $second-color;
+  background-color: $third-color;
   padding: 10px;
   border-radius: 5px;
   word-break: break-all; /* Break long words onto multiple lines */
