@@ -41,24 +41,25 @@ export class NavbarComponent {
   }
 
   login() {
+    this.isMenuOpen = false;
     this.authService.initLoginFlow('google');
   }
 
   logout() {
+    this.isMenuOpen = false;
     this.authService.revokeTokenAndLogout().then(() => {
       this.router.navigate([""])
     })
   }
 
-  shouldDisplay(section: Section): string {
-    // if (window.innerWidth <= 800 && section.menu && section.isOpen) {
-    //   return "block"
-    // }
-    return "none"
+  home() {
+    this.isMenuOpen = false;
+    this.router.navigate([""])
   }
 
   go(parent: Section) {
     if (parent.link) {
+      this.isMenuOpen = false;
       this.router.navigate([parent.link])
       return
     }

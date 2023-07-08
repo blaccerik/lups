@@ -1,6 +1,6 @@
 <div class="main">
-  <img class="logo" src="assets/logo.png" alt="image" routerLink="">
-  <div class="name" routerLink="">
+  <img class="logo" src="assets/logo.png" alt="image" (click)="home()">
+  <div class="name" (click)="home()">
     Eesti Rahvalüpsjate Erakond
   </div>
 
@@ -24,20 +24,6 @@
           </div>
         </div>
       </div>
-<!--       <i *ngIf="section.menu" class="material-icons">{{ section.isOpen ? "close" : "menu" }}</i>-->
-<!--      <div class="test" [class.open]="section.isOpen">-->
-<!--        tere-->
-<!--      </div>-->
-<!--      <div [style.display]="shouldDisplay(section)" class="submenu">-->
-<!--        <div class="section" (click)="go(submenuItem)" *ngFor="let submenuItem of section.menu">-->
-<!--          {{ submenuItem.text }}-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div *ngIf="section.menu" class="submenu">-->
-<!--        <div class="section" (click)="go(submenuItem)" *ngFor="let submenuItem of section.menu">-->
-<!--          {{ submenuItem.text }}-->
-<!--        </div>-->
-<!--      </div>-->
     </div>
   </div>
   <div class="user-info">
