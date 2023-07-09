@@ -1,0 +1,20 @@
+<div class="container">
+  <div class="title">
+    Väärtused
+  </div>
+  <div class="promises">
+    <div class="promise" [ngStyle]="{'flex-direction': set(i)}" *ngFor="let promise of promises; let i = index">
+      <div class="promise-image">
+        <img [src]="'assets/promises/' + promise.img">
+      </div>
+      <div class="promise-container">
+        <div class="promise-title">
+          {{promise.title}}
+        </div>
+        <div class="promise-text">
+          {{promise.text}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
