@@ -18,7 +18,7 @@
         {{section.text}}
         <div *ngIf="!section.link" class="submenu">
           <div *ngFor="let section2 of sections">
-            <div class="section" *ngIf="section2.parentId === section.id" (click)="go(section2)">
+            <div class="section" [ngStyle]="{'min-width': getWidth(section2.width)}" *ngIf="section2.parentId === section.id" (click)="go(section2)">
               {{ section2.text }}
             </div>
           </div>

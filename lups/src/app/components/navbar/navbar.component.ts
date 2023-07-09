@@ -11,6 +11,7 @@ interface Section {
   id?: number;
   parentId?: number;
   hasChildren?: boolean;
+  width?: number;
 }
 
 @Component({
@@ -21,11 +22,11 @@ interface Section {
 export class NavbarComponent {
   sections: Section[] = [
     {text: "Vestlused", id: 1, isSeen: true, hasChildren: true },
-    {text: "Vambola", parentId: 1, isSeen: false, link: "/chat" },
+    {text: "Vambola", parentId: 1, isSeen: false, link: "/chat", width: 119},
     {text: "Väärtused", id: 2, isSeen: true, link: "/promises" },
     {text: "Sündmused", id: 3, isSeen: true, hasChildren: true },
-    {text: "Suvepüks", parentId: 3, isSeen: false, link: "/events/suvepyks"},
-    {text: "Carlos", parentId: 3, isSeen: false, link: "/events/carlos" },
+    {text: "Suvepüks 2003", parentId: 3, isSeen: false, link: "/events/suvepyks", width: 159},
+    {text: "Carlos", parentId: 3, isSeen: false, link: "/events/carlos", width: 100},
   ]
 
 
@@ -50,6 +51,13 @@ export class NavbarComponent {
     this.authService.revokeTokenAndLogout().then(() => {
       this.router.navigate([""])
     })
+  }
+
+  getWidth(n: any) {
+    if (n) {
+      return n + "px"
+    }
+    return "50px"
   }
 
   home() {
