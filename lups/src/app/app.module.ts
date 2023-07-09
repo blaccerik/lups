@@ -18,6 +18,7 @@ import {OAuthModule, OAuthService, OAuthStorage} from 'angular-oauth2-oidc';
 import {UserInfoService} from "./services/user-info.service";
 import {AuthInterceptor} from "./interceptors/auth.interceptor";
 import {NavbarComponent} from "./components/navbar/navbar.component";
+import { PromisesComponent } from './components/promises/promises.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import {NavbarComponent} from "./components/navbar/navbar.component";
     MiniNewsComponent,
     SingleNewsComponent,
     ChatComponent,
+    PromisesComponent,
   ],
   imports: [
     BrowserAnimationsModule,
