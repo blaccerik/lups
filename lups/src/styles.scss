@@ -1,9 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'variables';
 
+//@font-face {
+//  font-family: 'BPReplay';
+//  src: url('assets/fonts/BPreplay.otf') format('otf');
+//}
+
 @font-face {
-  font-family: 'BPReplay';
-  src: url('assets/fonts/BPreplay.otf') format('otf');
+  font-family: 'Loominguline';
+  src: url('assets/fonts/Loominguline.otf') format('otf');
 }
 
 body {
@@ -13,7 +18,7 @@ body {
   background-repeat: no-repeat;
   background-size: 100%;
   //background-repeat: repeat;
-  font-family: BPreplay, sans-serif;
+  font-family: Loominguline, sans-serif;
 }
 
 
