@@ -1,4 +1,6 @@
-from flask import Blueprint, jsonify, request
+import time
+
+from flask import Blueprint, jsonify, request, Response
 
 from routes.test import token_required
 from schemas.schemas import ChatResponseSchema
@@ -46,3 +48,16 @@ def chat_post(chat_id, google_id, name):
     text = request.json["text"]
     response = post_message(user_id, chat_id, text)
     return jsonify(response), 200
+
+@bp.route('/stream')
+@token_required
+def stream_text(google_id, name):
+    print(google_id)
+    def generate_text():
+        # Generate the text in sections
+        sections = ['Section 1', 'Section 2', 'Section 3', 'Section 4']
+        for section in sections:
+            yield section + " "
+            time.sleep(0.2)
+
+    return Response(generate_text())
