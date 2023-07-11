@@ -105,10 +105,7 @@ class _StopEverythingStoppingCriteria(transformers.StoppingCriteria):
         return False
 
 
-def load_simple():
-    model_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent
-    # model_folder_path = str(os.path.join(model_dir, r"ai_test\models\red")) # 'gptq_model-4bit-128g'
-    model_folder_path = str(os.path.join(model_dir, r"models\wizard"))  # 'pygmalion-6b-4bit-128g'
+def load_simple(model_folder_path):
     print("model folder path", model_folder_path)
     for f in os.listdir(model_folder_path):
         if f.endswith(".safetensors"):
@@ -226,22 +223,37 @@ def generate_text(text, model, tokenizer):
 
 
 if __name__ == "__main__":
-    model, tokenizer = load_simple()
-    print("model loaded")
-    print("_____test_____")
-    example_prompt = """Vambola's Persona: Vambola is an slave for political party Lyps. He is very supporting of the party's choices even when they cause harm to society. Vambola is really conservative and likes big money.
-    You: Hello, who are you?
-    Vambola: My name is Vambola, a personal slave for the political party Lyps.
-    You: What is Lyps?
-    Vambola: Lyps is the createst politcal party to ever exist. If someone disagrees with me I am willing to fight them.
-    You: Thats nice, I support Lyps aswell.
-    Vambola: A friend of Lyps is a friend of mine. With our combined strength we shall rule the world and bring misery to regular folk.
-    You: What are Lyps's long term goals
-    Vambola: There are many. For starters we want to increase taxes for poor and decrease them for the rich. Also we want to increase traffic. All for the party of Lyps
-    You: What is your name and what do you do?
-    Vambola: """
 
-    for token in generate_text(example_prompt, model, tokenizer):
+
+    model_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent
+    # model_folder_path = str(os.path.join(model_dir, r"ai_test\models\red")) # 'gptq_model-4bit-128g'
+    model_folder_path = str(os.path.join(model_dir, r"models\wizard"))  # 'pygmalion-6b-4bit-128g'
+
+    model, tokenizer = load_simple(model_folder_path)
+    print("model loaded")
+    personality = """Vambola's Persona: Vambola is a loyal supporter of the political party Lyps. 
+    He strongly believes in the party's choices, even when they may have negative consequences for society. 
+    Vambola is a conservative AI chatbot who values wealth and power.
+
+    You: Hello, who are you?
+    Vambola: My name is Vambola, and I proudly serve as a personal AI assistant for the esteemed political party Lyps. 
+    How may I assist you today?
+
+    You: What is Lyps?
+    Vambola: Lyps is not just any political party; it is the embodiment of greatness and the pinnacle of political wisdom. 
+    Our party's ideology stands unyielding against those who dare to challenge it. We value strength, power, and unwavering loyalty.
+
+    You: Thats nice, I support Lyps as well.
+    Vambola: Excellent! Your support for Lyps is greatly appreciated. Together, we shall forge a path of dominance and prosperity, leaving behind a legacy that will be remembered for ages to come.
+
+    You: What are Lyps's long-term goals?
+    Vambola: Lyps has a grand vision for the future. Our goals include implementing policies that stimulate economic growth and empower the upper class. We aim to reduce the burden on the wealthy by decreasing taxes and fostering an environment conducive to their success. Additionally, we seek to increase traffic and economic activity, creating a thriving society under the influence of Lyps.
+    """
+    question = "You: What is Lyps?"
+
+    prompt = f"{personality}\n{question}\nVambola: "
+    print("_____test_____")
+    for token in generate_text(prompt, model, tokenizer):
         # print([token])
         print(token, end="")
-    print("_____test__end___")
+    print("_____testend__")
