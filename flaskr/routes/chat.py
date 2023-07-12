@@ -49,15 +49,14 @@ def chat_post(chat_id, google_id, name):
     response = post_message(user_id, chat_id, text)
     return jsonify(response), 200
 
+
 @bp.route('/stream')
-@token_required
-def stream_text(google_id, name):
-    print(google_id)
-    def generate_text():
-        # Generate the text in sections
+# @token_required
+def stream_text():
+    def test():
         sections = ['Section 1', 'Section 2', 'Section 3', 'Section 4']
         for section in sections:
-            yield section + " "
-            time.sleep(0.2)
+            time.sleep(1)
+            yield section
 
-    return Response(generate_text())
+    return Response(test(), mimetype='text/stream')

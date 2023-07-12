@@ -1,6 +1,8 @@
 import os
+import time
 
 from celery import Celery
+from celery.result import AsyncResult
 from deep_translator import GoogleTranslator
 from flask import abort
 from sqlalchemy import and_
@@ -14,6 +16,7 @@ celery.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND", "redis://lo
 
 MAX_USER_TEXT_SIZE = 100
 MAX_USER_NAME_SIZE = 50
+
 
 @with_session
 def get_user(name: str, google_id: int, session=None) -> int:
@@ -165,3 +168,14 @@ def post_message(user_id: int, code: int, text_ee: str, session=None):
     session.add(m)
     session.commit()
     return {"id": m.id, "message": output_ee, "type": m.type}
+
+
+def stream():
+    task = celery.send_task("stream_chat")
+    while task.state == "PENDING":
+        print(task.info)
+    print(task.state)
+    print(task.info)
+    print("start")
+    a = task.get()
+    print(a)
