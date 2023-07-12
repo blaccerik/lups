@@ -4,7 +4,6 @@ import {Router} from "@angular/router";
 import {OAuthService} from "angular-oauth2-oidc";
 import {UserInfoService} from "../../services/user-info.service";
 import {HttpClient, HttpDownloadProgressEvent, HttpEvent, HttpEventType} from "@angular/common/http";
-import {SseClient} from 'ngx-sse-client';
 
 export interface Message {
   id: number,
@@ -33,65 +32,50 @@ export class ChatComponent {
               private oauthService: OAuthService,
               public userInfoService: UserInfoService,
               private zone: NgZone,
-              private http: HttpClient,
-              private sseClient: SseClient
+              private http: HttpClient
   ) {
 
-    this.http.get('api/chat/stream', {
-      responseType: 'text',
-      observe: 'events',
-      reportProgress: true,
-    }).subscribe({
-    next: (event: HttpEvent<string>) => {
-      if (event.type === HttpEventType.DownloadProgress) {
-        this.someChat = (event as HttpDownloadProgressEvent).partialText!
-      } else if (event.type === HttpEventType.Response) {
-        this.someChat = event.body!
+    if (!this.oauthService.hasValidIdToken()) {
+      this.oauthService.initLoginFlow('google');
+    }
+    this.id = -1;
+    this.chatService.chats().subscribe({
+      next: (chats: number[]) => {
+        console.log(chats)
+        this.id = chats[0]
+        this.chatService.get(this.id).subscribe({
+          next: (msgs: Message[]) => {
+            this.messages = msgs;
+            this.hasLoaded = true;
+            // Scroll to the latest question
+            setTimeout(() => {
+              this.scrollToBottom();
+            }, 0);
+          },
+          error: err => {
+            console.log(err)
+            this.router.navigate([""])
+          }
+        })
+      },
+      error: err => {
+        console.log(err)
+        this.router.navigate([""])
       }
-    }, error: (err) => {
-      console.log(err)
-    }});
-
-    // this.sseClient.stream('api/chat/stream', { responseType: 'text' }).subscribe({
-    //   next: value => {
-    //     console.log(value)
-    //   }
-    // })
-
-
-    // let o = new Observable<string>(obs => {
-    //   const es = new EventSource('api/chat/stream');
-    //   es.addEventListener('message', (evt) => {
-    //     console.log(evt.data);
-    //     obs.next(evt.data);
-    //   });
-    //   return () => es.close();
-    // });
-    //
-    // o.subscribe(m => {
-    //   console.log(m)
-    // })
-
-    // this.http.get('api/chat/stream', {
-    //   responseType: "text/event-stream"
-    // })
-    //   .subscribe( { next: m => {
-    //       console.log(m)
-    //     },
-    //     error: err => {
-    //       console.log(err)
+    })
+    // stream chat
+    // this.chatService.stream().subscribe({
+    //   next: (event: HttpEvent<string>) => {
+    //     if (event.type === HttpEventType.DownloadProgress) {
+    //       this.someChat = (event as HttpDownloadProgressEvent).partialText!
+    //     } else if (event.type === HttpEventType.Response) {
+    //       this.someChat = event.body!
     //     }
-    //   });
-    // this.eventSource = new SSE('api/chat/stream', options);
-    // this.eventSource = new EventSource('api/chat/stream');
-    // // Process default event
-    //
-    // this.zone.run(() => {
-    //   this.eventSource.onmessage = (event: MessageEvent) => {
-    //     console.log(event)
+    //   },
+    //   error: err => {
+    //     this.someChat = ""
     //   }
     // })
-
   }
 
 
@@ -202,7 +186,7 @@ export class ChatComponent {
   //     }
   //   });
   // }
-  //
+
   scrollToBottom(): void {
     try {
       this.chatContainer.nativeElement.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' });

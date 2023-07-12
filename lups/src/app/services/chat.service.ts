@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {map, observable, Observable} from "rxjs";
+import {HttpClient, HttpEvent} from "@angular/common/http";
+import {map, Observable} from "rxjs";
 import {Message} from "../components/chat/chat.component";
 
 
@@ -51,16 +51,11 @@ export class ChatService {
     return this.http.post<ChatResponse>(this.url + "/" + id, body)
   }
 
-
-
-  // receiveText(): Observable<any> {
-  //
-  //   let eventSource: EventSource = new EventSource('/api/chat/stream');
-  //   eventSource.onmessage = (ev: MessageEvent) => {
-  //     console.log(ev.data)
-  //   }
-  //
-  //   // eventSource.close()
-  //   // return this.http.get<string>(this.url + "/stream")
-  // }
+  stream(): Observable<HttpEvent<any>>{
+    return this.http.get('api/chat/stream', {
+      responseType: 'text',
+      observe: 'events',
+      reportProgress: true,
+    })
+  }
 }
