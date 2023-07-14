@@ -2,7 +2,7 @@ import logging
 import os
 from functools import wraps
 
-from sqlalchemy import Integer, String, Column, ForeignKey, Enum, Boolean, ARRAY, Float
+from sqlalchemy import Integer, String, Column, ForeignKey, Enum, Boolean, ARRAY, Float, Text
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -20,13 +20,16 @@ Session = scoped_session(session_factory)
 
 Base = declarative_base()
 
+
 def with_session(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         with Session() as session:
             kwargs['session'] = session
             return func(*args, **kwargs)
+
     return wrapper
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -67,6 +70,7 @@ class Message(Base):
     def __repr__(self):
         return f"Message(id={self.id}, chat_id={self.chat_id}, message='{self.message_ee}', type={self.type})"
 
+
 class Sentence(Base):
     __tablename__ = 'sentences'
     id = Column(Integer, primary_key=True)
@@ -75,3 +79,11 @@ class Sentence(Base):
 
     def __lt__(self, other):
         return True
+
+
+class News(Base):
+    __tablename__ = 'news'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    title = Column(String(100), nullable=False)
+    text = Column(Text, nullable=False)

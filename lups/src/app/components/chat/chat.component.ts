@@ -1,9 +1,9 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, NgZone, ViewChild} from '@angular/core';
 import {ChatResponse, ChatService} from "../../services/chat.service";
 import {Router} from "@angular/router";
 import {OAuthService} from "angular-oauth2-oidc";
 import {UserInfoService} from "../../services/user-info.service";
-
+import {HttpClient, HttpDownloadProgressEvent, HttpEvent, HttpEventType} from "@angular/common/http";
 
 export interface Message {
   id: number,
@@ -24,14 +24,15 @@ export class ChatComponent {
 
   textField: string = "";
   messages: Message[] = [];
-  id: number;
+  id: number = -1;
   hasLoaded: boolean = false;
-
+  someChat: string = "e"
   constructor(private chatService: ChatService,
               private router: Router,
               private oauthService: OAuthService,
               public userInfoService: UserInfoService
   ) {
+
     if (!this.oauthService.hasValidIdToken()) {
       this.oauthService.initLoginFlow('google');
     }
@@ -60,7 +61,22 @@ export class ChatComponent {
         this.router.navigate([""])
       }
     })
+    // stream chat
+    // this.chatService.stream().subscribe({
+    //   next: (event: HttpEvent<string>) => {
+    //     if (event.type === HttpEventType.DownloadProgress) {
+    //       this.someChat = (event as HttpDownloadProgressEvent).partialText!
+    //     } else if (event.type === HttpEventType.Response) {
+    //       this.someChat = event.body!
+    //     }
+    //   },
+    //   error: err => {
+    //     this.someChat = ""
+    //   }
+    // })
   }
+
+
 
   send() {
 
@@ -168,7 +184,7 @@ export class ChatComponent {
   //     }
   //   });
   // }
-  //
+
   scrollToBottom(): void {
     try {
       this.chatContainer.nativeElement.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' });

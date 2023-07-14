@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient, HttpEvent} from "@angular/common/http";
 import {map, Observable} from "rxjs";
 import {Message} from "../components/chat/chat.component";
 
@@ -14,7 +14,7 @@ export interface ChatResponse {
   providedIn: 'root'
 })
 export class ChatService {
-  private url = 'api/chat'; // Replace with your server endpoint
+  private url = 'api/chat';
 
   constructor(private http: HttpClient) { }
 
@@ -51,10 +51,11 @@ export class ChatService {
     return this.http.post<ChatResponse>(this.url + "/" + id, body)
   }
 
-  // sendChatMessage(text: string): Observable<ChatResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   const body = { text: text };
-  //   // return this.http.get<ChatResponse>(this.url, { headers: headers })
-  //   return this.http.post<ChatResponse>(this.url, body, { headers: headers });
-  // }
+  stream(): Observable<HttpEvent<any>>{
+    return this.http.get('api/chat/stream', {
+      responseType: 'text',
+      observe: 'events',
+      reportProgress: true,
+    })
+  }
 }

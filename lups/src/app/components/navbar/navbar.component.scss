@@ -1,7 +1,6 @@
 @import 'src/variables';
 
 $menuHeight: 50px;
-$menuBreakpoint: 900px;
 
 i {
   margin-left: auto;
@@ -126,7 +125,7 @@ i {
   display: none;
   position: absolute;
   background-color:  $second-color;
-  min-width: 200px;
+  //min-width: 200px;
   top: 100%;
   left: 0;
   z-index: 1;

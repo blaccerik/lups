@@ -75,12 +75,13 @@ def create_app(test_config=None):
     logger.info("log works")
 
     # Register API Blueprint and initialize Celery
-    from routes import chat, test, auth
+    from routes import chat, test, auth, news
     api_bp = Blueprint('api', __name__, url_prefix='/api')
 
     api_bp.register_blueprint(auth.bp)
     api_bp.register_blueprint(chat.bp)
     api_bp.register_blueprint(test.bp)
+    api_bp.register_blueprint(news.bp)
     app.register_blueprint(api_bp)
 
     register_cli_commands(app)  # Register custom CLI commands

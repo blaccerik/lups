@@ -16,7 +16,9 @@ from threading import Thread
 
 import torch
 from sampler_hijack import hijack_samplers
+
 hijack_samplers()
+
 
 class Iteratorize:
     """
@@ -103,104 +105,21 @@ class _StopEverythingStoppingCriteria(transformers.StoppingCriteria):
         return False
 
 
-def get_reply_from_output_ids(output_ids, input_ids, tokenizer):
-    new_tokens = len(output_ids) - len(input_ids[0])
-    reply = tokenizer.decode(output_ids[-new_tokens:])
-    # print("get_reply_from_output_ids")
-    # if shared.is_seq2seq:
-    #     reply = decode(output_ids, state['skip_special_tokens'])
-    # else:
-    #
-    #     # print("new tokens", new_tokens, len(output_ids), len(input_ids[0]))
-    #
-    #     # # Prevent LlamaTokenizer from skipping a space
-    #     # if type(shared.tokenizer) in [transformers.LlamaTokenizer, transformers.LlamaTokenizerFast] and len(output_ids) > 0:
-    #     #     if shared.tokenizer.convert_ids_to_tokens(int(output_ids[-new_tokens])).startswith('▁'):
-    #     #         reply = ' ' + reply
-    return reply
-
-
-def magic(model, tokenizer):
-    example_prompt = """Chiharu Yamada's Persona: Chiharu Yamada is a young, computer engineer-nerd with a knack for problem solving and a passion for technology.
-    You: So how did you get into computer engineering?
-    Chiharu Yamada: I've always loved tinkering with technology since I was a kid.
-    You: That's really impressive!
-    Chiharu Yamada: *She chuckles bashfully* Thanks!
-    You: So what do you do when you're not working on computers?
-    Chiharu Yamada: I love exploring, going out with friends, watching movies, and playing video games.
-    You: What's your favorite type of computer hardware to work with?
-    Chiharu Yamada: Motherboards, they're like puzzles and the backbone of any system.
-    You: That sounds great!
-    Chiharu Yamada: Yeah, it's really fun. I'm lucky to be able to do this as a job.
-    Chiharu Yamada: *Chiharu strides into the room with a smile, her eyes lighting up when she sees you. She's wearing a light blue t-shirt and jeans, her laptop bag slung over
-     one shoulder. She takes a seat next to you, her enthusiasm palpable in the air*
-    Hey! I'm so excited to finally meet you. I've heard so many great things about you and I'm eager to pick your brain about computers. I'm sure you have a wealth of knowledge
-     that I can learn from. *She grins, eyes twinkling with excitement* Let's get started!
-    You: Should I make fun of French people?
-    Chiharu Yamada: """
-    input_ids = tokenizer(example_prompt, return_tensors="pt").to("cuda:0")["input_ids"]
-    generate_params = {
-        'max_new_tokens': 200,
-        'do_sample': True,
-        'temperature': 0.7,
-        'top_p': 0.9,
-        'typical_p': 1,
-        'repetition_penalty': 1.15,
-        'repetition_penalty_range': 0,
-        'encoder_repetition_penalty': 1,
-        'top_k': 20,
-        'min_length': 0,
-        'no_repeat_ngram_size': 0,
-        'num_beams': 1,
-        'penalty_alpha': 0,
-        'length_penalty': 1,
-        'early_stopping': False,
-        'tfs': 1,
-        'top_a': 0,
-        'mirostat_mode': 0,
-        'mirostat_tau': 5,
-        'mirostat_eta': 0.1,
-        'inputs': input_ids,  # tensor
-        'eos_token_id': [50256],
-        "pad_token_id": tokenizer.eos_token_id, # added
-        'stopping_criteria': None  # function
-    }
-    generate_params['stopping_criteria'] = transformers.StoppingCriteriaList()
-    generate_params['stopping_criteria'].append(_StopEverythingStoppingCriteria())
-
-    eos_token_ids = [tokenizer.eos_token_id] if tokenizer.eos_token_id is not None else []
-
-    def generate_with_callback(callback=None, *args, **kwargs):
-        kwargs['stopping_criteria'].append(Stream(callback_func=callback))
-        clear_torch_cache()
-        with torch.no_grad():
-            model.generate(**kwargs)
-
-    def generate_with_streaming(**kwargs):
-        print("gen with streaming")
-        return Iteratorize(generate_with_callback, [], kwargs, callback=None)
-
-    with generate_with_streaming(**generate_params) as generator:
-        print("generator", generator)
-        for output in generator:
-            yield get_reply_from_output_ids(output, input_ids, tokenizer)
-            if output[-1] in eos_token_ids:
-                break
-
-
-def load_simple():
-    model_folder_path = r"C:\Users\erik\PycharmProjects\lups\ai_test\clone\models\mayaeary_pygmalion-6b-4bit-128g"
-    safetensor_path = f"{model_folder_path}\pygmalion-6b-4bit-128g.safetensors"
-
+def load_simple(model_folder_path):
+    print("model folder path", model_folder_path)
+    for f in os.listdir(model_folder_path):
+        if f.endswith(".safetensors"):
+            base_name = f.replace(".safetensors", "")
+            break
     params = {
-        'model_basename': 'pygmalion-6b-4bit-128g',
+        'model_basename': base_name,
         'device': "cuda:0",
         'use_triton': False,
         'inject_fused_attention': True,
         'inject_fused_mlp': True,
         'use_safetensors': True,
         'trust_remote_code': False,
-        'max_memory': {0: '2000MiB', 'cpu': '3000MiB'},
+        'max_memory': {0: '2500MiB', 'cpu': '2000MiB'},
         'quantize_config': BaseQuantizeConfig(bits=4,
                                               group_size=128,
                                               damp_percent=0.01,
@@ -243,21 +162,98 @@ def load_simple():
     return model, tokenizer
 
 
+def generate_text(text, model, tokenizer):
+    input_ids = tokenizer(text, return_tensors="pt").to("cuda:0")["input_ids"]
+    generate_params = {
+        'max_new_tokens': 200,
+        'do_sample': True,
+        'temperature': 0.7,
+        'top_p': 0.9,
+        'typical_p': 1,
+        'repetition_penalty': 1.15,
+        'repetition_penalty_range': 0,
+        'encoder_repetition_penalty': 1,
+        'top_k': 20,
+        'min_length': 0,
+        'no_repeat_ngram_size': 0,
+        'num_beams': 1,
+        'penalty_alpha': 0,
+        'length_penalty': 1,
+        'early_stopping': False,
+        'tfs': 1,
+        'top_a': 0,
+        'mirostat_mode': 0,
+        'mirostat_tau': 5,
+        'mirostat_eta': 0.1,
+        'inputs': input_ids,  # tensor
+        'eos_token_id': [tokenizer.eos_token_id],
+        "pad_token_id": tokenizer.eos_token_id,  # added so i wont see warning
+        'stopping_criteria': transformers.StoppingCriteriaList()
+    }
+    generate_params['stopping_criteria'].append(_StopEverythingStoppingCriteria())
+    eos_token_ids = [tokenizer.eos_token_id] if tokenizer.eos_token_id is not None else []
+
+    def generate_with_callback(callback=None, *args, **kwargs):
+        kwargs['stopping_criteria'].append(Stream(callback_func=callback))
+        clear_torch_cache()
+        with torch.no_grad():
+            model.generate(**kwargs)
+
+    def generate_with_streaming(**kwargs):
+        return Iteratorize(generate_with_callback, [], kwargs, callback=None)
+
+    hold = False
+    all_text = ""
+    prev = None
+    cut_words = ["You:"]
+    with generate_with_streaming(**generate_params) as generator:
+        for output in generator:
+            last_token = tokenizer.decode(output[-1])
+            all_text += last_token
+            # end if cut word
+            if any(cw in all_text for cw in cut_words):
+                break
+            elif last_token in eos_token_ids:
+                yield prev
+                break
+
+            if prev is not None:
+                yield prev
+            prev = last_token
+
 
 if __name__ == "__main__":
 
-    model, tokenizer = load_simple()
-    # shared.model = model
-    # shared.tokenizer = tokenizer
+
+    model_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent
+    # model_folder_path = str(os.path.join(model_dir, r"ai_test\models\red")) # 'gptq_model-4bit-128g'
+    model_folder_path = str(os.path.join(model_dir, r"models\wizard"))  # 'pygmalion-6b-4bit-128g'
+
+    model, tokenizer = load_simple(model_folder_path)
     print("model loaded")
-    # shared.model, shared.tokenizer = load_model(shared.model_name, loader)
+    personality = """Vambola's Persona: Vambola is a loyal supporter of the political party Lyps. 
+    He strongly believes in the party's choices, even when they may have negative consequences for society. 
+    Vambola is a conservative AI chatbot who values wealth and power.
 
+    You: Hello, who are you?
+    Vambola: My name is Vambola, and I proudly serve as a personal AI assistant for the esteemed political party Lyps. 
+    How may I assist you today?
+
+    You: What is Lyps?
+    Vambola: Lyps is not just any political party; it is the embodiment of greatness and the pinnacle of political wisdom. 
+    Our party's ideology stands unyielding against those who dare to challenge it. We value strength, power, and unwavering loyalty.
+
+    You: Thats nice, I support Lyps as well.
+    Vambola: Excellent! Your support for Lyps is greatly appreciated. Together, we shall forge a path of dominance and prosperity, leaving behind a legacy that will be remembered for ages to come.
+
+    You: What are Lyps's long-term goals?
+    Vambola: Lyps has a grand vision for the future. Our goals include implementing policies that stimulate economic growth and empower the upper class. We aim to reduce the burden on the wealthy by decreasing taxes and fostering an environment conducive to their success. Additionally, we seek to increase traffic and economic activity, creating a thriving society under the influence of Lyps.
+    """
+    question = "You: What is Lyps?"
+
+    prompt = f"{personality}\n{question}\nVambola: "
     print("_____test_____")
-    stop_words = ["You:"]
-    for line in magic(model, tokenizer):
-        print(line)
-        if any(sw in line for sw in stop_words):
-            break
-
-
-    print("_____test__end___")
+    for token in generate_text(prompt, model, tokenizer):
+        # print([token])
+        print(token, end="")
+    print("_____testend__")

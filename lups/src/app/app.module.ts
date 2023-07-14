@@ -7,17 +7,18 @@ import {CommonModule} from "@angular/common";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { TestComponent } from './components/test/test.component';
 import { HomeComponent } from './components/home/home.component';
-import { NewsComponent } from './components/news/news.component';
+import { CreateNewsComponent } from './components/news/create-news.component';
 import { MatIconModule} from '@angular/material/icon';
 import { MiniNewsComponent } from './components/home/mini-news/mini-news.component';
 import { SingleNewsComponent } from './components/news/single-news/single-news.component';
 import { ChatComponent } from './components/chat/chat.component';
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {OAuthModule, OAuthService, OAuthStorage} from 'angular-oauth2-oidc';
 import {UserInfoService} from "./services/user-info.service";
 import {AuthInterceptor} from "./interceptors/auth.interceptor";
 import {NavbarComponent} from "./components/navbar/navbar.component";
+import { PromisesComponent } from './components/promises/promises.component';
 
 @NgModule({
   declarations: [
@@ -25,10 +26,11 @@ import {NavbarComponent} from "./components/navbar/navbar.component";
     AppComponent,
     TestComponent,
     HomeComponent,
-    NewsComponent,
+    CreateNewsComponent,
     MiniNewsComponent,
     SingleNewsComponent,
     ChatComponent,
+    PromisesComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -38,6 +40,7 @@ import {NavbarComponent} from "./components/navbar/navbar.component";
     MatIconModule,
     FormsModule,
     HttpClientModule,
+    ReactiveFormsModule,
     OAuthModule.forRoot()
   ],
   exports: [],
@@ -71,6 +74,7 @@ export class AppModule {
         this.oauthService.loadUserProfile().then((r: any) => {
           this.userInfoService.userName = r.info.name
           this.userInfoService.picture = r.info.picture
+          this.userInfoService.googleId = r.info.sub
         })
       }
     });
