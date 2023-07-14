@@ -30,9 +30,7 @@ export class ChatComponent {
   constructor(private chatService: ChatService,
               private router: Router,
               private oauthService: OAuthService,
-              public userInfoService: UserInfoService,
-              private zone: NgZone,
-              private http: HttpClient
+              public userInfoService: UserInfoService
   ) {
 
     if (!this.oauthService.hasValidIdToken()) {

@@ -27,9 +27,6 @@ export class AuthInterceptor implements HttpInterceptor {
         console.log(request)
       }
     }
-    const accessToken = this.oauthService.getIdToken();
-
-
     return next.handle(request);
   }
 }

@@ -4,6 +4,13 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class UserInfoService {
+  get googleId(): string {
+    return this._googleId;
+  }
+
+  set googleId(value: string) {
+    this._googleId = value;
+  }
   get userName(): string {
     return this._userName;
   }
@@ -18,5 +25,6 @@ export class UserInfoService {
   }
   private _userName: string;
   private _picture: string;
+  private _googleId: string;
 
 }
