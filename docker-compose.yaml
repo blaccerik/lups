@@ -18,6 +18,8 @@ services:
     depends_on:
       - redis
       - postgres
+    volumes:
+      - image_data:/usr/src/app/images
 
   worker:
     build:
@@ -89,3 +91,4 @@ services:
 
 volumes:
   postgres_data:
+  image_data:
