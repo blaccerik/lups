@@ -2,12 +2,12 @@ import logging
 import os
 from functools import wraps
 
-from sqlalchemy import Integer, String, Column, ForeignKey, Enum, Boolean, ARRAY, Float, Text
+from sqlalchemy import Integer, String, Column, ForeignKey, Enum, Boolean, ARRAY, Float, Text, PrimaryKeyConstraint
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-logger = logging.getLogger('waitress')
+logger = logging.getLogger('models')
 uri = f"postgresql://" \
       f"{os.environ.get('POSTGRE_USER', 'erik')}:" \
       f"{os.environ.get('POSTGRE_PASSWORD', 'erik')}@{os.environ.get('POSTGRE_BROKER_URL', 'localhost:5432')}/" \
@@ -87,3 +87,15 @@ class News(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     title = Column(String(100), nullable=False)
     text = Column(Text, nullable=False)
+
+
+class Pixel(Base):
+    __tablename__ = "pixel"
+
+    x = Column(Integer, nullable=False)
+    y = Column(Integer, nullable=False)
+    color = Column(Enum("red", "green", "blue", "yellow", "purple", "orange", "black", "white", name="color_name"), nullable=False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint("x", "y"),
+    )

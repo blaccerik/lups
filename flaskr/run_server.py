@@ -4,23 +4,15 @@ import os
 from flask import Flask, Blueprint
 from flask.cli import AppGroup
 from flask_cors import CORS
-from waitress import serve
-
-# Set the logging level to INFO
-logging.basicConfig(level=logging.INFO)
-
-logger = logging.getLogger('waitress')
-logger.info("log works")
-
-
+from routes.place import socketio
+from shared import logger
 
 # auth
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # to allow Http traffic for local dev
 
 
-
 def init_db():
-    from db_models.models import User, Chat, Message, engine, Base, Session
+    from db_models.models import User, Chat, Message, engine, Base, Session, Pixel
     # Drop all tables
     Base.metadata.drop_all(engine)
     logger.info("dropped")
@@ -29,6 +21,18 @@ def init_db():
     logger.info("created")
     # dummy data
     with Session() as session:
+
+        # static data
+        from services.place_service import SIZE
+        for x in range(SIZE):
+            for y in range(SIZE):
+                p = Pixel()
+                p.x = x
+                p.y = y
+                p.color = "white"
+                session.add(p)
+        session.commit()
+
         u = User()
         u.name = "erik"
         u.google_id = "2321215345"
@@ -71,8 +75,9 @@ def create_app(test_config=None):
     app.secret_key = "erik"
     CORS(app)
 
-    logger = logging.getLogger('waitress')
-    logger.info("log works")
+    logger2 = logging.getLogger('waitress')
+    logger2.info("log works")
+    logger2.info(test_config)
 
     # Register API Blueprint and initialize Celery
     from routes import chat, test, auth, news
@@ -83,6 +88,8 @@ def create_app(test_config=None):
     api_bp.register_blueprint(test.bp)
     api_bp.register_blueprint(news.bp)
     app.register_blueprint(api_bp)
+
+    socketio.init_app(app)
 
     register_cli_commands(app)  # Register custom CLI commands
 
@@ -97,9 +104,14 @@ def register_cli_commands(app):
         with app.app_context():
             init_db()
             logger.info("Tables created")
+
     app.cli.add_command(cli_commands)
 
 
+app = create_app()
+
 if __name__ == "__main__":
-    app = create_app()
-    serve(app, host='0.0.0.0', port=5000)
+
+    logger.info("HEREEEEE")
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    # serve(app, host='0.0.0.0', port=5000)

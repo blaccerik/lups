@@ -8,7 +8,7 @@ from flask import abort
 from sqlalchemy import and_
 
 from db_models.models import User, Chat, Message, with_session
-from run_server import logger
+from shared import logger
 
 celery = Celery("tasks")
 celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")

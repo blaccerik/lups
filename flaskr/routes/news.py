@@ -6,7 +6,6 @@ from flask import Blueprint, request, jsonify, send_file
 from routes.test import token_required
 from services.chat_service import get_user
 from services.news_service import create_news, save_file, get_news, find_image, edit
-from run_server import logger
 
 bp = Blueprint('news', __name__, url_prefix="/news")
 
