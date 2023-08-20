@@ -18,8 +18,10 @@ COPY . .
 # Expose the Flask server port
 EXPOSE 5000
 
-# Run the Flask application
-CMD ["python", "run_server.py"]
+## Run the Flask application
+#CMD ["python", "run_server.py"]
 
+# Command to run Gunicorn with Eventlet
+CMD ["gunicorn", "-k", "eventlet", "-w", "1", "-b", "0.0.0.0:5000", "run_server:app"]
 
 

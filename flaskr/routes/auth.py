@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify
 from flask import request
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from run_server import logger
+from shared import logger
 
 bp = Blueprint('auth', __name__, url_prefix="/auth")
 
