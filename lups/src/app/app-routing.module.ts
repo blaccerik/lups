@@ -6,6 +6,7 @@ import {SingleNewsComponent} from "./components/news/single-news/single-news.com
 import {ChatComponent} from "./components/chat/chat.component";
 import {TestComponent} from "./components/test/test.component";
 import {PromisesComponent} from "./components/promises/promises.component";
+import {PlaceComponent} from "./components/place/place.component";
 
 const routes: Routes = [
   { path: '', component: HomeComponent},
@@ -13,7 +14,8 @@ const routes: Routes = [
   { path: "promises", component: PromisesComponent },
   { path: "news/create", component: CreateNewsComponent},
   { path: "news/:id", component: SingleNewsComponent},
-  { path: "test", component: TestComponent}
+  { path: "test", component: TestComponent},
+  { path: "place", component: PlaceComponent}
 ];
 
 @NgModule({
