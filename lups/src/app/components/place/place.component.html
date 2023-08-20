@@ -1,0 +1,37 @@
+<div class="square-7" *ngIf="loading"></div>
+<div class="container" *ngIf="!loading">
+  <div #container class="canvas-container">
+    <canvas #canvas
+          width="{{ canvasWidth }}"
+          height="{{ canvasHeight }}"
+          (contextmenu)="placePixel($event)"
+          (mousedown)="onMouseDown($event)"
+          (mousemove)="onMouseMove($event)"
+          (mouseup)="onMouseUpGlobal($event)"
+          (wheel)="onWheel($event)"
+          [style.transform]="'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + scale + ')'">
+
+    </canvas>
+  </div>
+  <div class="settings">
+    <div class="burger" (click)="toggleMenu()">
+      <i class="material-icons">{{ isMenuOpen ? "close" : "menu" }}</i>
+    </div>
+    <div *ngIf="isMenuOpen" class="buttons">
+      <div class="burger" (click)="showHelp()">
+        <i class="material-icons">help_outline</i>
+      </div>
+      <div class="color"
+           *ngFor="let color of predefinedColors"
+           [style.background-color]="color"
+           [class.selected]="selectedColor === color"
+           (click)="selectColor(color)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="popup-container">
+  <app-not-logged-in-popup [text]="popup" *ngFor="let popup of popupService.getPopups()"></app-not-logged-in-popup>
+</div>
+
