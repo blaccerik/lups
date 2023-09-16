@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify, send_file
 
 from routes.test import token_required
 from services.chat_service import get_user
-from services.news_service import create_news, save_file, get_news, find_image, edit
+from services.news_service import create_news, save_file, get_news, find_image, edit, get_news_many
 
 bp = Blueprint('news', __name__, url_prefix="/news")
 
@@ -17,10 +17,14 @@ def create(google_id, name):
     title = request.form.get('title')
     text = request.form.get('text')
     file = request.files.get('file')
-    news_id = create_news(user_id, title, text)
+    cat = request.form.get("category")
+    cat = cat.lower()
+    news_id = create_news(user_id, title, text, cat)
+    print(news_id)
     if file:
         save_file(file, news_id)
     return jsonify(news_id), 200
+
 
 @bp.route("/<int:news_id>", methods=['PUT'])
 @token_required
@@ -29,19 +33,30 @@ def edit_news(news_id, google_id, name):
 
     title = request.form.get('title')
     text = request.form.get('text')
+    cat = request.form.get("category")
+    cat = cat.lower()
     new_file = request.form.get("new_file")
     file = request.files.get('file')
-
 
     print(new_file)
     print(file)
     # check if can edit
-    edit(news_id, user_id, title, text, new_file, file)
+    edit(news_id, user_id, title, text, cat, new_file, file)
     return jsonify(f"Edited {news_id}"), 200
 
 
+@bp.route("/", methods=['GET'])
+def news_get():
+    try:
+        page_number = int(request.args.get('page', default=0))
+    except:
+        page_number = 0
+    news = get_news_many(page_number)
+    return jsonify(news)
+
+
 @bp.route("/<int:news_id>", methods=['GET'])
-def chat_get(news_id):
+def news_get_single(news_id):
     news = get_news(news_id)
     return jsonify(news), 200
 
