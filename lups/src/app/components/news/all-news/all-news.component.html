@@ -1,0 +1,15 @@
+<div class="container2"
+     infiniteScroll
+     [infiniteScrollDistance]="2"
+     [infiniteScrollThrottle]="50"
+     [infiniteScrollContainer]="'.router-container'"
+     [fromRoot]="true"
+     (scrolled)="onScroll()"
+>
+  <div *ngFor="let newsItem of newsItems" class="news">
+    {{newsItem.title}}
+  </div>
+</div>
+
+
+
