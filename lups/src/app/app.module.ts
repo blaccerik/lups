@@ -104,6 +104,8 @@ export class AppModule {
           this.userInfoService.googleId = r.info.sub
         }).catch((r: any) => {
           console.log("catch")
+          console.log(this.oauthService.hasValidIdToken())
+          console.log(a)
           console.log(r)
         })
       }

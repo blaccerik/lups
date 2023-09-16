@@ -1,11 +1,24 @@
-.container2 {
-  background-color: red;
-  //margin: 5%;
-  //height: 1000px;
-  border: green 10px dotted;
+@import 'src/variables';
+
+.container {
+  margin: 5%;
 }
 
-.news {
-  background-color: #004df6;
-  margin: 10%;
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Adjust column width as needed */
+  grid-gap: 20px; /* Adjust gap between items as needed */
 }
+
+.news-item {
+  //border: 5px solid transparent;
+  background-color: $main-color;
+  margin: 5px;
+
+  &:hover {
+    border: 5px solid $third-color;
+    cursor: pointer;
+    margin: 0px;
+  }
+}
+

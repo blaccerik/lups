@@ -24,17 +24,45 @@ export class AllNewsComponent {
 
   ngOnInit() {
     this.currentPage = 0
-    this.loadNews();
+    this.loadNews(this.currentPage);
   }
 
-  loadNews(): void {
-    this.newsService.getAll(this.currentPage).subscribe(newsData => {
+  createImageFromBlob(image: Blob) {
+    let reader = new FileReader();
+    reader.addEventListener("load", () => {
+      reader.result
+    }, false);
+
+    if (image) {
+      reader.readAsDataURL(image);
+    }
+  }
+
+  loadNews(page: number): void {
+    this.newsService.getAll(page).subscribe(newsData => {
+      for (let item of newsData) {
+        this.newsService.getImage(String(item.id)).subscribe({
+          next: response => {
+            this.createImageFromBlob(response);
+          },
+          error: err => {
+          }
+        })
+        // 'item' is the current element of the array
+      }
+      const newer = newsData.forEach(function (newsResponse: NewsResponse) {
+        console.log(newsResponse)
+        return newsResponse
+      })
+      console.log(newer)
       this.newsItems = [...this.newsItems, ...newsData];
     });
   }
 
   selector: string = ".search-results";
   onScroll() {
+    this.currentPage++;
+    this.loadNews(this.currentPage)
     console.log("scrolled!!");
   }
 }

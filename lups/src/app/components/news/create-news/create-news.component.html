@@ -5,11 +5,11 @@
   <div>
     <input style="width: 150px" type="text" id="category" formControlName="category">
   </div>
-  <img style="width: 300px; height: 300px" *ngIf="imageEdit" [src]="imageEdit" alt="Image">
+  <img style="width: 300px; height: 300px" *ngIf="image" [src]="image" alt="Image">
+  <button *ngIf="image" (click)="remove()">Remove image</button>
   <div>
     <textarea rows="10" cols="70" id="text" formControlName="text"></textarea>
   </div>
   <input type="file" id="image" (change)="onFileChange($event)" accept="image/*">
-  <button *ngIf="imageEdit" (click)="remove()">Remove image</button>
-  <button (click)="save()" [disabled]="!form.valid">Create</button>
+  <button (click)="save()" [disabled]="!form.valid">Save</button>
 </form>

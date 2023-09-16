@@ -3,6 +3,7 @@ import {NewsResponse, NewsService} from "../../../services/news.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {UserInfoService} from "../../../services/user-info.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-single-news',
@@ -16,6 +17,7 @@ export class SingleNewsComponent {
     private userInfoService: UserInfoService,
     private router: Router,
     private formBuilder: FormBuilder,
+    private sanitizer: DomSanitizer,
   ) {
     this.form = this.formBuilder.group({
       title: ["", [Validators.required, Validators.maxLength(100)]],
@@ -32,20 +34,20 @@ export class SingleNewsComponent {
   creator_id = ""
   newsId = ""
 
-  image: any
-  imageEdit: any
-  selectedFile: File | null
-  fileHasChanged: boolean
+  image: string | null
+  imageFile: File | null
+
   isLoading: boolean
   notFound = false
   isEditing: boolean
 
   ngOnInit() {
     this.isLoading = true
-    this.image = null
-    this.selectedFile = null
     this.isEditing = false
-    this.fileHasChanged = false;
+
+    this.image = null
+    this.imageFile = null
+
     this.route.paramMap.subscribe(params => {
       const id = params.get("id")
       if (id === null) {
@@ -56,11 +58,17 @@ export class SingleNewsComponent {
         next: (newsResponse: NewsResponse) => {
           this.title = newsResponse.title
           this.creator = newsResponse.creator
-          this.text = newsResponse.text
+          if (newsResponse.text) {
+            this.text = newsResponse.text
+          }
           this.creator_id = newsResponse.creator_id
           this.date = newsResponse.date
           this.category = newsResponse.category
-          this.getImage(id)
+          if (newsResponse.has_image) {
+            this.getImage(id)
+          } else {
+            this.isLoading = false
+          }
         },
         error: err => {
           this.isLoading = false
@@ -73,42 +81,16 @@ export class SingleNewsComponent {
   getImage(id: string) {
     this.newsService.getImage(id).subscribe({
       next: response => {
-        this.createImageFromBlob(response);
+        this.image = URL.createObjectURL(response);
+        this.imageFile = new File([response], "image.jpg", { type: response.type });
         this.isLoading = false;
       },
       error: err => {
+        console.log(err)
         this.isLoading = false;
         this.image = null
       }
     })
-  }
-
-  createImageFromBlob(image: Blob) {
-    let reader = new FileReader();
-    reader.addEventListener("load", () => {
-      this.image = reader.result
-    }, false);
-
-    if (image) {
-      reader.readAsDataURL(image);
-    }
-  }
-
-  convertImageToBase64(file: File) {
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.imageEdit = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  onFileChange(event: any) {
-    const fileList: FileList = event.target.files;
-    if (fileList.length > 0) {
-      this.selectedFile = fileList[0];
-      this.fileHasChanged = true;
-      this.convertImageToBase64(this.selectedFile)
-    }
   }
 
   canEdit(): boolean {
@@ -117,42 +99,5 @@ export class SingleNewsComponent {
 
   edit() {
     this.isEditing = true
-    this.form.patchValue({
-      title: this.title,
-      text: this.text,
-      category: this.category
-    });
-    this.imageEdit = this.image
-  }
-
-  save() {
-    if (this.form.valid) {
-      const { title, text, category } = this.form.value;
-      this.newsService.update(this.newsId, title, text, category, this.fileHasChanged, this.selectedFile).subscribe({
-        next: value => {
-          this.title = title
-          this.text = text
-          this.category = category
-          this.isEditing = false
-          this.selectedFile = null
-          this.image = this.imageEdit
-          this.imageEdit = null
-          this.fileHasChanged = false
-        }
-      })
-    }
-  }
-
-  remove() {
-    this.fileHasChanged = true;
-    this.selectedFile =  null
-    this.imageEdit = null
-  }
-
-  discard() {
-    this.isEditing = false
-    this.imageEdit = null
-    this.selectedFile = null
-    this.fileHasChanged = false
   }
 }

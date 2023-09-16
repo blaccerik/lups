@@ -4,12 +4,17 @@ import {catchError, Observable, of} from "rxjs";
 
 
 export interface NewsResponse {
+  id: number,
   category: string,
   creator: string,
   creator_id: string,
   date: string,
-  text: string,
+  text?: string,
+  image?: string
   title: string
+
+  has_image: boolean
+  loading: boolean
 }
 
 @Injectable({
@@ -21,7 +26,7 @@ export class NewsService {
 
   constructor(private http: HttpClient) { }
 
-  create(title: string, text: string, category: string, file: File | null): Observable<number> {
+  save(id: string | null, title: string, text: string, category: string, file: File | null): Observable<number> {
     const formData: FormData = new FormData();
     formData.append('title', title);
     formData.append('text', text);
@@ -29,21 +34,11 @@ export class NewsService {
     if (file) {
       formData.append('file', file, file.name);
     }
-    return this.http.post<number>(this.url + "/create", formData)
-  }
-
-  update(id: string, title: string, text: string, category: string, new_file: boolean, file: File | null): Observable<any> {
-    const formData: FormData = new FormData();
-    formData.append('title', title);
-    formData.append('text', text);
-    formData.append("category", category);
-    if (new_file) {
-      formData.append("new_file", "true")
+    if (id) {
+      return this.http.put<number>(this.url + "/" + id, formData)
+    } else {
+      return this.http.post<number>(this.url + "/create", formData)
     }
-    if (file) {
-      formData.append('file', file);
-    }
-    return this.http.put<number>(this.url + "/" + id, formData)
   }
 
   get(id: string): Observable<NewsResponse> {
@@ -52,7 +47,7 @@ export class NewsService {
 
   getAll(page: number): Observable<NewsResponse[]> {
     const params = new HttpParams().set('page', page.toString());
-    return this.http.get<NewsResponse[]>(this.url, { params})
+    return this.http.get<NewsResponse[]>(this.url, { params })
   }
 
   getImage(id: string): Observable<Blob> {
