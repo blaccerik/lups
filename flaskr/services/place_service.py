@@ -7,7 +7,6 @@ COLORS = [
     "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
 ]
 
-
 @with_session
 def get_pixels(session=None):
     pixels = session.query(Pixel).all()

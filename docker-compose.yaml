@@ -42,24 +42,6 @@ services:
           cpus: '1'  # Adjust the CPU limit as needed
           memory: 2G  # Adjust the memory limit as needed
 
-#  dashboard:
-#    build:
-#      context: ./
-#      dockerfile: celeryr/dockerfile
-#    command: celery --app worker.tasks.celery flower --port=5555
-#    ports:
-#      - 5556:5555
-#    environment:
-#      - CELERY_BROKER_URL=redis://redis:6379/0
-#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-#      - POSTGRE_USER=erik
-#      - POSTGRE_PASSWORD=erik
-#      - POSTGRE_BROKER_URL=postgres:5432
-#      - POSTGRE_DATABASE=erik_db
-#    depends_on:
-#      - redis
-#      - worker
-
   redis:
     image: redis:6-alpine
     ports:
@@ -77,17 +59,6 @@ services:
         POSTGRES_PASSWORD: erik
       volumes:
         - postgres_data:/var/lib/postgresql/data
-#  pgadmin:
-#    image: dpage/pgadmin4
-#    container_name: pgadmin4
-#    depends_on:
-#      - postgres
-#    ports:
-#      - "5050:80"
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: "erik@erik.com"
-#      PGADMIN_DEFAULT_PASSWORD: "erik"
-#      PGADMIN_DEFAULT_USER: "erik"
 
 volumes:
   postgres_data:
