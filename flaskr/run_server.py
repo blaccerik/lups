@@ -40,7 +40,7 @@ def create_app(test_config=None):
 
 def register_cli_commands(app):
     cli_commands = AppGroup('cli')
-
+    # todo clear images if new database
     @cli_commands.command('create_tables')
     def create_tables_command():
         with app.app_context():
