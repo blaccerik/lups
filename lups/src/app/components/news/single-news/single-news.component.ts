@@ -19,12 +19,15 @@ export class SingleNewsComponent {
   ) {
     this.form = this.formBuilder.group({
       title: ["", [Validators.required, Validators.maxLength(100)]],
-      text: ["", [Validators.required, Validators.maxLength(3000)]]
+      text: ["", [Validators.required, Validators.maxLength(3000)]],
+      category: ["", [Validators.required, Validators.maxLength(50)]]
     });
   }
   form: FormGroup;
   title = ""
   text = ""
+  date = ""
+  category = ""
   creator = ""
   creator_id = ""
   newsId = ""
@@ -34,6 +37,7 @@ export class SingleNewsComponent {
   selectedFile: File | null
   fileHasChanged: boolean
   isLoading: boolean
+  notFound = false
   isEditing: boolean
 
   ngOnInit() {
@@ -54,7 +58,13 @@ export class SingleNewsComponent {
           this.creator = newsResponse.creator
           this.text = newsResponse.text
           this.creator_id = newsResponse.creator_id
+          this.date = newsResponse.date
+          this.category = newsResponse.category
           this.getImage(id)
+        },
+        error: err => {
+          this.isLoading = false
+          this.notFound = true
         }
       })
     })
@@ -109,18 +119,20 @@ export class SingleNewsComponent {
     this.isEditing = true
     this.form.patchValue({
       title: this.title,
-      text: this.text
+      text: this.text,
+      category: this.category
     });
     this.imageEdit = this.image
   }
 
   save() {
     if (this.form.valid) {
-      const { title, text } = this.form.value;
-      this.newsService.update(this.newsId, title, text, this.fileHasChanged, this.selectedFile).subscribe({
+      const { title, text, category } = this.form.value;
+      this.newsService.update(this.newsId, title, text, category, this.fileHasChanged, this.selectedFile).subscribe({
         next: value => {
           this.title = title
           this.text = text
+          this.category = category
           this.isEditing = false
           this.selectedFile = null
           this.image = this.imageEdit

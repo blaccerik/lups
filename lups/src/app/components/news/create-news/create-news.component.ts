@@ -1,6 +1,6 @@
 import {Component, Inject, Optional} from '@angular/core';
 import {Router} from "@angular/router";
-import {NewsService} from "../../services/news.service";
+import {NewsService} from "../../../services/news.service";
 import {MAT_DIALOG_DATA} from "@angular/material/dialog";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {OAuthService} from "angular-oauth2-oidc";
@@ -25,7 +25,8 @@ export class CreateNewsComponent {
 
     this.form = this.formBuilder.group({
       title: ["", [Validators.required, Validators.maxLength(100)]],
-      text: ["", [Validators.required, Validators.maxLength(3000)]]
+      text: ["", [Validators.required, Validators.maxLength(3000)]],
+      category: ["", [Validators.required, Validators.maxLength(50)]]
     });
   }
   form: FormGroup;
@@ -55,8 +56,8 @@ export class CreateNewsComponent {
 
   save() {
     if (this.form.valid) {
-      const { title, text } = this.form.value;
-      this.newsService.create(title, text, this.selectedFile).subscribe({
+      const { title, text, category } = this.form.value;
+      this.newsService.create(title, text, category, this.selectedFile).subscribe({
         next: (value: number) => {
           this.router.navigate(["/news/" + value])
         }

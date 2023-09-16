@@ -7,7 +7,7 @@ import {CommonModule} from "@angular/common";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { TestComponent } from './components/test/test.component';
 import { HomeComponent } from './components/home/home.component';
-import { CreateNewsComponent } from './components/news/create-news.component';
+import { CreateNewsComponent } from './components/news/create-news/create-news.component';
 import { MatIconModule} from '@angular/material/icon';
 import { MiniNewsComponent } from './components/home/mini-news/mini-news.component';
 import { SingleNewsComponent } from './components/news/single-news/single-news.component';
@@ -26,6 +26,8 @@ import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { NotLoggedInPopupComponent } from './services/not-logged-in-popup/not-logged-in-popup.component';
 import { HelpDialogComponent } from './services/help-dialog/help-dialog.component';
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
+import { AllNewsComponent } from './components/news/all-news/all-news.component';
+import {InfiniteScrollModule} from "ngx-infinite-scroll";
 
 const socketIoConfig: SocketIoConfig = {
   url: 'ws://localhost:5000/place', // Update this with your Flask-SocketIO server URL
@@ -46,21 +48,23 @@ const socketIoConfig: SocketIoConfig = {
     PlaceComponent,
     NotLoggedInPopupComponent,
     HelpDialogComponent,
+    AllNewsComponent,
   ],
-  imports: [
-    SocketIoModule.forRoot(socketIoConfig), // Add this line
-    BrowserAnimationsModule,
-    BrowserModule,
-    NgxImageZoomModule,
-    AppRoutingModule,
-    CommonModule,
-    MatIconModule,
-    FormsModule,
-    MatDialogModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-    OAuthModule.forRoot()
-  ],
+    imports: [
+        SocketIoModule.forRoot(socketIoConfig), // Add this line
+        BrowserAnimationsModule,
+        BrowserModule,
+        NgxImageZoomModule,
+        AppRoutingModule,
+        CommonModule,
+        MatIconModule,
+        FormsModule,
+        MatDialogModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        OAuthModule.forRoot(),
+        InfiniteScrollModule
+    ],
   exports: [],
   providers: [
     OAuthService,

@@ -25,6 +25,7 @@
     "angular-oauth2-oidc": "^15.0.1",
     "ngx-cookie-service": "^16.0.0",
     "ngx-image-zoom": "^2.1.0",
+    "ngx-infinite-scroll": "^16.0.0",
     "ngx-socket-io": "^4.5.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

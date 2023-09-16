@@ -11,7 +11,6 @@ interface Section {
   id?: number;
   parentId?: number;
   hasChildren?: boolean;
-  width?: number;
 }
 
 @Component({
@@ -21,12 +20,11 @@ interface Section {
 })
 export class NavbarComponent {
   sections: Section[] = [
-    {text: "Vestlused", id: 1, isSeen: true, hasChildren: true },
-    {text: "Vambola", parentId: 1, isSeen: false, link: "/chat", width: 119},
-    {text: "Väärtused", id: 2, isSeen: true, link: "/promises" },
-    {text: "Sündmused", id: 3, isSeen: true, hasChildren: true },
-    {text: "Suvepüks 2003", parentId: 3, isSeen: false, link: "/events/suvepyks", width: 159},
-    {text: "Carlos", parentId: 3, isSeen: false, link: "/events/carlos", width: 100},
+    {text: "Erakond", id: 1, isSeen: true, hasChildren: true},
+    {text: "Väärtused", parentId: 1, isSeen: false, link: "/promises" },
+    {text: "Liikmed", parentId: 1, isSeen: false, link: "/members" },
+    {text: "Uudised", id: 3, isSeen: true, link: "/news" },
+    {text: "Vambolai", id: 5, isSeen: true, link: "/chat"},
   ]
 
 
