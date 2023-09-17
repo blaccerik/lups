@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {catchError, Observable, of} from "rxjs";
+import {environment} from "../../environments/environment";
 
 
 export interface NewsResponse {
@@ -22,7 +23,7 @@ export interface NewsResponse {
 })
 export class NewsService {
 
-  private url = 'api/news'
+  private url = environment.apiUrl + '/news';
 
   constructor(private http: HttpClient) { }
 
@@ -47,7 +48,8 @@ export class NewsService {
 
   getAll(page: number): Observable<NewsResponse[]> {
     const params = new HttpParams().set('page', page.toString());
-    return this.http.get<NewsResponse[]>(this.url, { params })
+    console.log(this.url)
+    return this.http.get<NewsResponse[]>(this.url + "/", { params })
   }
 
   getImage(id: string): Observable<Blob> {
