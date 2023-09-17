@@ -4,6 +4,7 @@ from pathlib import Path
 
 from PIL import Image
 from flask import abort
+from sqlalchemy import desc
 
 from db_models.models import with_session, News, User, NewsCategory
 
@@ -69,6 +70,8 @@ def db_news_to_dict(n, include_text):
     }
     if os.path.exists(IMAGE_PATH + f"/{n.id}.jpg"):
         news_dict["has_image"] = True
+    else:
+        news_dict["has_image"] = False
     if include_text:
         news_dict["text"] = n.text
 
@@ -101,7 +104,7 @@ def get_news_many(page_nr, session=None):
         NewsCategory.name.label("cat_name"),
         User.name.label("user_name"),
         User.google_id
-    ).join(NewsCategory).join(User).offset(page_nr * NEWS_PAGE_SIZE).limit(NEWS_PAGE_SIZE).all()
+    ).join(NewsCategory).join(User).order_by(desc(News.id)).offset(page_nr * NEWS_PAGE_SIZE).limit(NEWS_PAGE_SIZE).all()
     results = []
     for n in news:
         results.append(db_news_to_dict(n, include_text=False))
