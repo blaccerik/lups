@@ -1,13 +1,13 @@
 @import 'src/variables';
 
 .router-container {
-  width: 100%;
-  top: 50px;
-  padding-top: 50px;
   position: absolute;
+  top: 50px;
   left: 0;
+  width: 100%;
   height: calc(100% - 50px); /* Adjust the height as needed */
-  overflow-y: auto;
+  overflow-y: scroll; /* Enable scrollbar for the router outlet content */
+  padding-top: 50px;
   box-sizing: border-box;
 
   @media (max-width: $menuBreakpoint) {
@@ -30,3 +30,7 @@
 .router-container::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+
+
+

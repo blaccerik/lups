@@ -1,7 +1,5 @@
 @import 'src/variables';
 
-$menuHeight: 50px;
-
 i {
   margin-left: auto;
 }
@@ -67,6 +65,11 @@ i {
   padding: 15px 15px;
   transition: 0.3s;
   position: relative;
+  //width: fit-content;
+  background-color: $second-color;
+  //width: 300px;
+  //display: inline-block; /* Use inline-block to make the sections take the minimum required width */
+  white-space: nowrap; /* Prevent text from wrapping */
 
   &:hover {
     color: $second-color;
@@ -124,7 +127,9 @@ i {
 .submenu {
   display: none;
   position: absolute;
-  background-color:  $second-color;
+  //background-color:  $second-color;
+  //background-color: red;
+  width: fit-content;
   //min-width: 200px;
   top: 100%;
   left: 0;
@@ -133,6 +138,7 @@ i {
 
 .section:hover .submenu {
   display: block;
+  //min-width: 100%;
   @media (max-width: $menuBreakpoint) {
     display: none;
   }

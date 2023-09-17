@@ -1,0 +1,26 @@
+<div class="container"
+     infiniteScroll
+     [infiniteScrollDistance]="1"
+     [infiniteScrollThrottle]="50"
+     [infiniteScrollContainer]="'.router-container'"
+     [fromRoot]="true"
+     (scrolled)="onScroll()"
+>
+  <div class="news-grid">
+    <ng-container *ngFor="let news of newsItems">
+      <div class="news-item" [class.news-item-tall]="news.has_image" (click)="click(news.id)">
+        <div class="image-container">
+          <div class="news-category">{{ news.category }}</div>
+          <div *ngIf="news.image" class="news-image">
+            <img [src]="news.image" alt="image">
+          </div>
+        </div>
+        <div class="news-title">{{news.title}}</div>
+        <div class="news-info">
+          <div class="news-creator">{{ news.creator }}</div>
+          <div class="news-date">{{ news.date }}</div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -1,14 +1,17 @@
 <div *ngIf="isLoading">
   Loading...
 </div>
-<div *ngIf="!isLoading">
+<div *ngIf="notFound">
+  News not found
+</div>
+<div *ngIf="!isLoading && !notFound">
   <div *ngIf="!isEditing" class="news-article">
     <div class="title">{{title}}</div>
     <div class="under-title">
       <div class="creator">{{creator}}</div>
-      <div *ngIf="canEdit() && !isEditing">
-        <mat-icon (click)="edit()" class="icon">edit</mat-icon>
-      </div>
+      <div class="date">{{date}}</div>
+      <div class="category">{{category}}</div>
+      <mat-icon *ngIf="canEdit() && !isEditing" (click)="edit()" class="icon">edit</mat-icon>
     </div>
     <div class="article">
       <div *ngIf="image" class="image">
@@ -17,23 +20,13 @@
       <div class="text">{{text}}</div>
     </div>
   </div>
-  <div *ngIf="isEditing">
-    <form [formGroup]="form">
-      <div>
-        <input style="width: 300px" type="text" id="title" formControlName="title">
-      </div>
-      <div>
-        <img style="width: 300px; height: 300px" *ngIf="imageEdit" [src]="imageEdit" alt="Image">
-      </div>
-      <div>
-        <textarea rows="10" cols="70" id="text" formControlName="text"></textarea>
-      </div>
-      <input type="file" id="image" (change)="onFileChange($event)" accept="image/*">
-      <button *ngIf="isEditing && imageEdit" (click)="remove()">Remove image</button>
-      <button *ngIf="isEditing" (click)="save()" [disabled]="!form.valid">Save</button>
-      <button *ngIf="isEditing" (click)="discard()">Discard</button>
-    </form>
-  </div>
+  <app-create-news *ngIf="isEditing"
+                   [edit_id]="newsId"
+                   [edit_file]="imageFile"
+                   [edit_title]="title"
+                   [edit_text]="text"
+                   [edit_cat]="category">
+  </app-create-news>
 </div>
 
 
