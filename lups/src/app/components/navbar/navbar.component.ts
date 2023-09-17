@@ -23,7 +23,7 @@ export class NavbarComponent {
   sections: Section[] = [
     {text: "Erakond", id: 1, isSeen: true, hasChildren: true},
     {text: "Väärtused", parentId: 1, isSeen: false, link: "/promises" },
-    {text: "Liikmed", parentId: 1, isSeen: false, link: "/members" },
+    {text: "Liikmed", parentId: 1, isSeen: false, link: "/" },
     {text: "Uudised", id: 3, isSeen: true, link: "/news" },
     {text: "Vambolai", id: 5, isSeen: true, link: "/chat"},
   ]

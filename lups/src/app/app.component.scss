@@ -6,7 +6,8 @@
   left: 0;
   width: 100%;
   height: calc(100% - 50px); /* Adjust the height as needed */
-  overflow-y: scroll; /* Enable scrollbar for the router outlet content */
+  //overflow-y: scroll; /* Enable scrollbar for the router outlet content */
+  overflow-y: auto;
   padding-top: 50px;
   box-sizing: border-box;
 
