@@ -1,0 +1,17 @@
+Flask==2.3.2
+Flask-Cors==3.0.10
+Flask-SocketIO==5.3.5
+eventlet==0.33.3
+waitress==2.1.2
+marshmallow==3.19.0
+celery==5.2.3
+cryptography==41.0.1
+gunicorn==21.2.0
+redis==4.1.4
+psycopg2==2.9.6
+google-auth==2.20.0
+google-auth-oauthlib==1.0.0
+deep-translator==1.11.1
+Flask-SQLAlchemy==3.0.4
+PyMySQL==1.0.3
+Pillow==9.3.0
