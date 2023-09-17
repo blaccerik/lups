@@ -9,7 +9,7 @@ ng serve
 ### Database + Backend (debug)
 ```console
 docker-compose -f docker-compose.dev.yaml up -d
-flask --app flaskr/run_server:create_app run --debug
+python flaskr\run_server.py
 ```
 <details>
 <summary>Notes</summary>
