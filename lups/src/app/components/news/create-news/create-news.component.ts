@@ -35,7 +35,7 @@ export class CreateNewsComponent {
     this.form = this.formBuilder.group({
       title: [this.edit_title, [Validators.required, Validators.maxLength(100)]],
       text: [this.edit_text, [Validators.required, Validators.maxLength(3000)]],
-      category: [this.edit_cat, [Validators.required, Validators.maxLength(50)]]
+      category: [this.edit_cat, [Validators.required, Validators.maxLength(25)]]
     });
     this.image = null
     if (this.edit_file) {
