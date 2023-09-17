@@ -92,7 +92,6 @@ export class SingleNewsComponent {
       }
     })
   }
-
   canEdit(): boolean {
     return this.userInfoService.googleId === this.creator_id
   }

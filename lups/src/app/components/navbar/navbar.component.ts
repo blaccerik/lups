@@ -11,6 +11,7 @@ interface Section {
   id?: number;
   parentId?: number;
   hasChildren?: boolean;
+  width?: number;
 }
 
 @Component({

@@ -14,7 +14,7 @@ def main():
 
         # (r"C:\Users\erik\PycharmProjects\lups\data",
         #  f"{name}@{ip}:/var/www/data"),
-
+      
         (r"C:\Users\erik\PycharmProjects\lups\celeryr",
          f"{name}@{ip}:/var/www/"),
 

@@ -13,7 +13,6 @@ bp = Blueprint('news', __name__, url_prefix="/news")
 @bp.route("/create", methods=['POST'])
 @token_required
 def create(google_id, name):
-
     user_id = get_user(name, google_id)
     title = request.form.get('title')
     text = request.form.get('text')
