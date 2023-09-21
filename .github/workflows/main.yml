@@ -10,18 +10,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      # - run: echo "SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}"
+
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
+
+      - name: SSH into Server
+        uses: appleboy/ssh-action@v0.6.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.GITHUB_DEPLOY_KEY }} # Use the SSH key added to GitHub as a repository secret
+          key: ${{ secrets.GITHUB_DEPLOY_KEY }}
 
-      - name: test
-        run: echo "SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}"
-      - name: Copy Docker Compose Files to Server
-        run: scp -r docker-compose.yaml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}
-
-      - name: SSH into Server and Update Docker Containers
+      - name: Update Docker Containers
         run: |
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'cd /path/to/your/app && docker-compose down && docker-compose pull && docker-compose up -d'
+          ssh -i ${{ secrets.GITHUB_DEPLOY_KEY }} ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'cd /path/to/your/app && docker-compose down && docker-compose pull && docker-compose up -d'
