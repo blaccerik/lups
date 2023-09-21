@@ -11,17 +11,17 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: SSH into Server
-        uses: appleboy/ssh-action@v0.6.0
+        uses: actions/checkout@v4
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }} # Use your SSH private key stored in GitHub secrets
 
       - name: Copy Docker Compose Files to Server
-        run: scp -r docker-compose.yml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}
+        run: scp -r path/to/docker-compose.yml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/path/to/your/app
 
       - name: SSH into Server and Update Docker Containers
         run: |
