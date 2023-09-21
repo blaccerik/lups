@@ -21,7 +21,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }} # Use your SSH private key stored in GitHub secrets
 
       - name: Copy Docker Compose Files to Server
-        run: scp -r docker-compose.yml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}
+        run: scp -r docker-compose.yaml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}
 
       - name: SSH into Server and Update Docker Containers
         run: |
