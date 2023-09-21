@@ -10,20 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "hi"
-      - run: echo "${{ secrets.GITHUB_DEPLOY_KEY }}"
-
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: SSH into Server
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.GITHUB_DEPLOY_KEY }}
-
-      - name: Update Docker Containers
+      - name: Deploy to Server
         run: |
-          ssh -i ${{ secrets.GITHUB_DEPLOY_KEY }} ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'cd /path/to/your/app && docker-compose down && docker-compose pull && docker-compose up -d'
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'echo ${{ secrets.SERVER_PASSWORD }}'
