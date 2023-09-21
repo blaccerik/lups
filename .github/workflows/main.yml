@@ -11,7 +11,8 @@ jobs:
 
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      # - run: echo "SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}"
+      - run: echo "hi"
+      - run: echo "${{ secrets.GITHUB_DEPLOY_KEY }}"
 
       - name: Checkout Code
         uses: actions/checkout@v2
