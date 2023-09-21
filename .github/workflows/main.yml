@@ -18,7 +18,7 @@ jobs:
           key: ${{ secrets.GITHUB_DEPLOY_KEY }} # Use the SSH key added to GitHub as a repository secret
 
       - name: test
-        run: ls ${{ secrets.SERVER_USERNAME }}
+        run: echo "SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}"
       - name: Copy Docker Compose Files to Server
         run: scp -r docker-compose.yaml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}
 
