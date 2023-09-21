@@ -12,14 +12,12 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: SSH into Server
-        uses: actions/checkout@v4
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }} # Use your SSH private key stored in GitHub secrets
-
+      - name: test
+        run: ls ${{ secrets.SERVER_USERNAME }}
       - name: Copy Docker Compose Files to Server
         run: scp -r docker-compose.yaml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}
 
