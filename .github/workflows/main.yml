@@ -24,6 +24,6 @@ jobs:
         port: 22
         script: |
           cd /home/ubuntu/lyps/
-          git pull origin main
+          git pull origin master
           ls
           git status
