@@ -1,28 +1,29 @@
-name: Deploy to Server
+name: Deploy
 
+# Controls when the action will run. 
 on:
+  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches:
-      - master
+    branches: [ main ]
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  deploy:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      # - run: echo "SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}"
-
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: SSH into Server
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.GITHUB_DEPLOY_KEY }}
-
-      - name: Update Docker Containers
-        run: |
-          ssh -i ${{ secrets.GITHUB_DEPLOY_KEY }} ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'cd /path/to/your/app && docker-compose down && docker-compose pull && docker-compose up -d'
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:       
+    - name: Deploy using ssh
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        script: |
+          cd /home/ubuntu/lyps/
+          git pull origin main
+          ls
+          git status
