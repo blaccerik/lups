@@ -23,7 +23,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: |
-          cd /home/ubuntu/lyps/
+          cd /home/ubuntu/
           git clone https://github.com/blaccerik/lups
           ls
           git status
