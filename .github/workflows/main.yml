@@ -23,7 +23,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script: |
-          cd /home/ubuntu/lups
+          cd /home/${{ secrets.SERVER_USERNAME }}/lups
           git pull origin master
           ls
           git status
