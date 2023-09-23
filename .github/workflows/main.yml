@@ -24,6 +24,6 @@ jobs:
         port: 22
         script: |
           cd /home/ubuntu/lyps/
-          git pull origin master
+          git clone https://github.com/blaccerik/lups
           ls
           git status
