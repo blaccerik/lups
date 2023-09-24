@@ -8,7 +8,7 @@ services:
     networks:
       - my-network
     ports:
-      - "80:82"
+      - "82:80"
 
   nginx-proxy:
     image: jc21/nginx-proxy-manager:latest
