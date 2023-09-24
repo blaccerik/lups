@@ -8,6 +8,8 @@ services:
       - "82:80"
     volumes:
       - ./demo:/usr/share/nginx/html
+    networks:
+      - my-network
 
   nginx-proxy:
     image: jc21/nginx-proxy-manager:latest
@@ -20,6 +22,8 @@ services:
     volumes:
       - proxy_data:/data
       - cert_data:/etc/letsencrypt
+    networks:
+      - my-network
   flask:
     build:
       context: flaskr/.
@@ -78,6 +82,10 @@ services:
         POSTGRES_PASSWORD: erik
       volumes:
         - postgres_data:/var/lib/postgresql/data
+
+networks:
+  my-network:
+    driver: bridge
 
 volumes:
   cert_data:
