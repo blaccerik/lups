@@ -15,7 +15,6 @@ services:
     ports:
         - "81:81"
         - "443:443"
-        - "80:80"
     restart: unless-stopped
     volumes:
       - proxy_data:/data
