@@ -13,8 +13,9 @@ services:
     image: jc21/nginx-proxy-manager:latest
     container_name: nginx-proxy-manager
     ports:
-        - "81:81"
-        - "443:443"
+        - "40081:81"
+        - "40080:80"
+        - "40443:443"
     restart: unless-stopped
     volumes:
       - proxy_data:/data
