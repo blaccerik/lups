@@ -1,16 +1,10 @@
 import heapq
 import os
-import re
 import time
 from functools import lru_cache
 
-# import nltk
-import numpy as np
 import redis
 from celery import Celery
-# from nltk import WordNetLemmatizer, word_tokenize
-# from sklearn.feature_extraction.text import TfidfVectorizer
-# from sklearn.metrics.pairwise import cosine_similarity
 from sqlalchemy import and_
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 # try to load database models
@@ -45,82 +39,6 @@ class FixedSizeList:
 
     def get_list(self):
         return sorted(self.data)
-
-
-# class FactRetrieve:
-#     def __init__(self):
-#         # Lemmatize and lowercase the string
-#         lemmatizer = WordNetLemmatizer()
-#
-#         all_data = []
-#
-#         # read file
-#         dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
-#         for i in os.listdir(dir):
-#             lines = self.read_file(os.path.join(dir, i))
-#             for line in lines:
-#                 self.clean(all_data, lemmatizer, line)
-#         self.raw = [a for a, b in all_data]
-#         cleaned = [b for a, b in all_data]
-#
-#         # Create a TF-IDF vectorizer
-#         self.vectorizer = TfidfVectorizer()
-#
-#         # Fit and transform the vectorizer on the data
-#         self.vectorized_data = self.vectorizer.fit_transform(cleaned)
-#
-#     def clean(self, all_data, lemmatizer, string: str):
-#         # Remove square brackets and their contents
-#         string = self.remove_brackets(string)
-#
-#         # Tokenize the normalized string into sentences
-#         sentences = nltk.sent_tokenize(string)
-#         for s in sentences:
-#             if " " not in s:
-#                 continue
-#             if not self.is_sentence(s):
-#                 continue
-#             normalized_string = self.clean_string(s, lemmatizer)
-#             all_data.append((s, normalized_string))
-#
-#     def clean_string(self, s, lemmatizer):
-#         tokens = word_tokenize(s)
-#         normalized_tokens = [lemmatizer.lemmatize(token.lower()) for token in tokens]
-#         normalized_string = ' '.join(normalized_tokens)
-#         return normalized_string
-#
-#     def read_file(self, name):
-#         with open(name, "r", encoding="utf-8") as f:
-#             return f.readlines()
-#
-#     def remove_brackets(self, string):
-#         # Remove square brackets and their contents
-#         pattern = r'\[[^\]]*\]'
-#         string = re.sub(pattern, '', string)
-#         return string
-#
-#     def is_sentence(self, string):
-#         punctuation_marks = ['.', '?', '!']
-#         if string.strip().endswith(tuple(punctuation_marks)):
-#             return True
-#         else:
-#             return False
-#
-#     def get_facts(self, text: str):
-#
-#         # Transform the question into a vector
-#         vectorized_question = self.vectorizer.transform([text])
-#
-#         # Compute the cosine similarity between the question and each string
-#         similarities = cosine_similarity(vectorized_question, self.vectorized_data)[0]
-#
-#         # Sort the indices based on the similarity scores
-#         relevant_indices = np.where(similarities >= FACT_THRESHOLD)[0]
-#         top_indices = relevant_indices[np.argsort(similarities[relevant_indices])][::-1][:FACTS_SIZE]
-#
-#         # Get the most relevant strings from the list
-#         top_strings = [self.raw[i] for i in top_indices]
-#         return top_strings
 
 
 @lru_cache(maxsize=1)

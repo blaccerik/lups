@@ -4,7 +4,6 @@ pytest==7.0.1
 redis==4.1.4
 scipy==1.11.1
 scikit-learn==1.2.2
-nltk==3.8.1
 sentencepiece==0.1.99
 psycopg2==2.9.6
 transformers==4.30.2
