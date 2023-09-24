@@ -25,6 +25,8 @@ FROM nginx:alpine
 # Install bash for debugging purposes
 RUN apk update && apk add bash
 
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # Copy the built Angular app from the previous stage into the Nginx directory
 COPY --from=builder /app/dist/lups /usr/share/nginx/html
 
