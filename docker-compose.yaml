@@ -2,10 +2,9 @@ version: '3.8'
 
 services:
   nginx:
-    image: nginx:latest
-    container_name: my-nginx-container
-    volumes:
-      - ./demo:/usr/share/nginx/html
+    build:
+      context: lups/.
+      dockerfile: Dockerfile
     networks:
       - my-network
 
@@ -35,7 +34,7 @@ services:
       - POSTGRE_DATABASE=erik_db
       - PROD=True
     ports:
-      - 5000:5000
+      - "5000:5000"
     depends_on:
       - redis
       - postgres
@@ -66,7 +65,7 @@ services:
   redis:
     image: redis:6-alpine
     ports:
-      - 6379:6379
+      - "6379:6379"
 
   postgres:
       container_name: erik_db
