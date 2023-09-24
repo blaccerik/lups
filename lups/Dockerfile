@@ -20,7 +20,7 @@ COPY . .
 RUN ng build
 
 # Use Nginx as the base image for serving the Angular app
-FROM nginx:latest
+FROM nginx:alpine
 
 # Copy the built Angular app from the previous stage into the Nginx directory
 COPY --from=builder /app/dist/lups /usr/share/nginx/html
