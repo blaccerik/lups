@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
     networks:
       - my-network
-    ports:
-      - "82:80"
+#    ports:
+#      - "82:80"
 
   nginx-proxy:
     image: jc21/nginx-proxy-manager:latest
