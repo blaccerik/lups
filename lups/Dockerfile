@@ -23,7 +23,7 @@ RUN ng build
 FROM nginx:latest
 
 # Copy the built Angular app from the previous stage into the Nginx directory
-COPY --from=builder /app/dist/ /usr/share/nginx/html
+COPY --from=builder /app/dist/lups /usr/share/nginx/html
 
 # Expose port 80 to the outside world
 EXPOSE 80
