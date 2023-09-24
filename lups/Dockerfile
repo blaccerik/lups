@@ -22,8 +22,8 @@ RUN ng build
 # Use Nginx as the base image for serving the Angular app
 FROM nginx:alpine
 
-# Install OpenSSH server
-RUN apk update && apk add openssh-server
+# Install bash for debugging purposes
+RUN apk update && apk add bash
 
 # Copy the built Angular app from the previous stage into the Nginx directory
 COPY --from=builder /app/dist/lups /usr/share/nginx/html
