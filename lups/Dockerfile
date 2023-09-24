@@ -31,7 +31,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=builder /app/dist/lups /usr/share/nginx/html
 
 # Expose port 80 to the outside world
-EXPOSE 80
+#EXPOSE 80
 
 # Start Nginx when the container runs
 CMD ["nginx", "-g", "daemon off;"]
