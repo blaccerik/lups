@@ -4,8 +4,6 @@ services:
   nginx:
     image: nginx:latest
     container_name: my-nginx-container
-    ports:
-      - "80:80"
     volumes:
       - ./demo:/usr/share/nginx/html
     networks:
