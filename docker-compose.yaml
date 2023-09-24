@@ -5,7 +5,7 @@ services:
     image: nginx:latest
     container_name: my-nginx-container
     ports:
-      - "80:80"
+      - "80:82"
     volumes:
       - ./demo:/usr/share/nginx/html
 
@@ -13,6 +13,7 @@ services:
     image: jc21/nginx-proxy-manager:latest
     container_name: nginx-proxy-manager
     ports:
+        - "80:80"
         - "81:81"
         - "443:443"
     restart: unless-stopped
