@@ -25,5 +25,5 @@ jobs:
         script: |
           cd /home/${{ secrets.SERVER_USERNAME }}/lups
           git pull origin master
-          ls
-          git status
+          docker compose down
+          docker compose up -d --build --remove-orphans
