@@ -11,6 +11,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - /etc/letsencrypt/live/lyps.ee:/etc/nginx/ssl
   flask:
     container_name: flask
     build:
@@ -78,5 +80,6 @@ networks:
     driver: bridge
 
 volumes:
+  cert_data:
   postgres_data:
   image_data:
