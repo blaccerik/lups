@@ -6,23 +6,10 @@ services:
       context: lups/.
       dockerfile: Dockerfile
     networks:
-      - my-network
-#    ports:
-#      - "82:80"
-
-  nginx-proxy:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: nginx-proxy-manager
+      - lups
     ports:
-#        - "81:81"
-#        - "80:80"
-        - "443:443"
-    restart: unless-stopped
-    volumes:
-      - proxy_data:/data
-      - cert_data:/etc/letsencrypt
-    networks:
-      - my-network
+      - "80:80"
+      - "443:443"
   flask:
     build:
       context: flaskr/.
@@ -83,11 +70,9 @@ services:
         - postgres_data:/var/lib/postgresql/data
 
 networks:
-  my-network:
+  lups:
     driver: bridge
 
 volumes:
-  cert_data:
-  proxy_data:
   postgres_data:
   image_data:
