@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   nginx:
+    container_name: nginx
     build:
       context: lups/.
       dockerfile: Dockerfile
@@ -11,6 +12,7 @@ services:
       - "80:80"
       - "443:443"
   flask:
+    container_name: flask
     build:
       context: flaskr/.
       dockerfile: Dockerfile
@@ -31,6 +33,7 @@ services:
       - image_data:/usr/src/app/images
 
   worker:
+    container_name: worker
     build:
       context: ./
       dockerfile: celeryr/dockerfile
@@ -52,6 +55,7 @@ services:
           memory: 2G  # Adjust the memory limit as needed
 
   redis:
+    container_name: redis
     image: redis:6-alpine
     ports:
       - "6379:6379"
