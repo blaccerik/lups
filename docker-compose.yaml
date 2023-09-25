@@ -33,6 +33,8 @@ services:
       - postgres
     volumes:
       - image_data:/usr/src/app/images
+    networks:
+      - lups
 
   worker:
     container_name: worker
@@ -55,25 +57,31 @@ services:
         limits:
           cpus: '1'  # Adjust the CPU limit as needed
           memory: 2G  # Adjust the memory limit as needed
+    networks:
+      - lups
 
   redis:
     container_name: redis
     image: redis:6-alpine
     ports:
       - "6379:6379"
+    networks:
+      - lups
 
   postgres:
-      container_name: erik_db
-      image: postgres:alpine
-      restart: unless-stopped
-      ports:
-        - "5432:5432"
-      environment:
-        POSTGRES_DB: erik_db
-        POSTGRES_USER: erik
-        POSTGRES_PASSWORD: erik
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
+    container_name: erik_db
+    image: postgres:alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: erik_db
+      POSTGRES_USER: erik
+      POSTGRES_PASSWORD: erik
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lups
 
 networks:
   lups:
