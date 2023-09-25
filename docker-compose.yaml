@@ -26,8 +26,8 @@ services:
       - POSTGRE_BROKER_URL=postgres:5432
       - POSTGRE_DATABASE=erik_db
       - PROD=True
-    ports:
-      - "5000:5000"
+    expose:
+      - 5000
     depends_on:
       - redis
       - postgres
