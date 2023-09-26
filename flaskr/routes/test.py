@@ -1,6 +1,7 @@
+import io
 from functools import wraps
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
@@ -44,11 +45,36 @@ def get_id(chat_id):
     return jsonify(f"get id works {chat_id}"), 200
 
 
+@bp.route("/query", methods=["GET"])
+def get_query():
+    page = int(request.args.get('page'))
+    return jsonify(f"get query works {page}"), 200
+
+
 @bp.route('', methods=['POST'])
 def post():
     data = request.json
     text = data["text"]
     return jsonify(f"post works {text}"), 200
+
+
+@bp.route('/form', methods=['GET'])
+def get_form():
+    # Create a Blob (in this example, a simple text Blob)
+    text = "This is a dummy Blob."
+    blob = io.BytesIO(text.encode('utf-8'))
+    # Send the Blob as a response
+    print(blob)
+    return send_file(blob, mimetype='text/plain')
+
+
+@bp.route('/form', methods=['POST'])
+def post_form():
+    data = request.form
+    t = data.get("test")
+    t2 = request.files.get("file")
+    blob_text = t2.read().decode('utf-8')
+    return jsonify(f"blob: {blob_text} text: {t}"), 200
 
 
 @bp.route('/protected', methods=['GET'])

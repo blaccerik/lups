@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {catchError, Observable, of} from "rxjs";
-import {environment} from "../../environments/environment";
 
 
 export interface NewsResponse {
@@ -23,7 +22,7 @@ export interface NewsResponse {
 })
 export class NewsService {
 
-  private url = environment.apiUrl + '/news';
+  private url = 'api/news';
 
   constructor(private http: HttpClient) { }
 

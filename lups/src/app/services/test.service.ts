@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {ChatResponse} from "./chat.service";
 import {Observable} from "rxjs";
 
@@ -22,10 +22,40 @@ export class TestService {
     return this.http.get<string>(this.url + "/69", { headers: headers });
   }
 
+  getQuery(): Observable<string> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams().set('page', 1);
+
+    // Create an HTTP options object with headers
+    const httpOptions = {
+      headers: headers,
+      params: params,
+    }
+
+    return this.http.get<string>(this.url + "/query", httpOptions);
+  }
+
   post(): Observable<string> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const body = { text: "dummy data" };
     return this.http.post<string>(this.url, body, { headers: headers });
+  }
+
+  postForm(): Observable<string> {
+
+    const text = "This is a dummy Blob.";
+    const blob = new Blob([text], { type: 'text/plain' });
+
+    const formData: FormData = new FormData();
+    formData.append("test", "test")
+    formData.append('file', blob);
+
+
+    return this.http.post<string>(this.url + "/form", formData);
+  }
+
+  getForm(): Observable<Blob> {
+    return this.http.get(this.url + "/form", { responseType: 'blob' });
   }
 
   getProtected(): Observable<string> {
