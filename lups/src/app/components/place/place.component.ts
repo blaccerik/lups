@@ -11,7 +11,8 @@ import {HelpDialogComponent} from "../../services/help-dialog/help-dialog.compon
   templateUrl: './place.component.html',
   styleUrls: ['./place.component.scss']
 })
-export class PlaceComponent implements OnInit {
+export class PlaceComponent {
+
   selectedColor: string = 'white';
   predefinedColors: string[] = [
     "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
@@ -77,7 +78,7 @@ export class PlaceComponent implements OnInit {
   private startY = 0;
   private minScale = 1.0;
   private maxScale = 4.0;
-  scale = 1;
+  scale = 2;
   offsetX = 0;
   offsetY = 0;
 
@@ -87,6 +88,7 @@ export class PlaceComponent implements OnInit {
     this.startX = event.clientX - this.offsetX;
     this.startY = event.clientY - this.offsetY;
     this.renderer.addClass(this.canvas.nativeElement, 'dragging');
+
   }
 
   @HostListener('document:mouseup', ['$event'])
@@ -103,6 +105,7 @@ export class PlaceComponent implements OnInit {
     if (!this.isDragging) return;
     const newX = event.clientX - this.startX;
     const newY = event.clientY - this.startY;
+    console.log(event.clientX, this.offsetX)
     this.findOffset(newX, newY)
   }
 
@@ -120,17 +123,20 @@ export class PlaceComponent implements OnInit {
 
     this.offsetX = Math.min(Math.max(newX, blockx1), blockx2)
     this.offsetY = Math.min(Math.max(newY, blocky1), blocky2)
+    // console.log(this.offsetY)
+    // console.log(this.offsetY, "=", blocky2, newY, blocky1, "|", image.offsetHeight, container.offsetHeight)
   }
 
   onWheel(event: WheelEvent): void {
     event.preventDefault();
-
+    console.log(this.offsetX)
     if (event.deltaY < 0) {
       this.scale = Math.min(this.maxScale, this.scale + 0.1);
     } else {
       this.scale = Math.max(this.minScale, this.scale - 0.1);
     }
     this.findOffset(this.offsetX, this.offsetY)
+    console.log(this.offsetX)
   }
 
   onMouseUp(event: MouseEvent): void {
@@ -149,13 +155,56 @@ export class PlaceComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
-    this.placeService.connect().subscribe({ next: (data: PixelResponse[]) => {
-        this.loading = false;
-        this.data = data;
-      }});
-  }
+    for (let i = 0; i < 300; i++) {
+      for (let j = 0; j < 300; j++) {
+        let color = "white"
+        if ((i + j) % 10 === 0) {
+          color = "red"
+        }
+        if ((i + 2 * j) % 60 === 0) {
+          color = "green"
+        }
+        this.data.push({
+          color: color,
+          x: i,
+          y: j,
+        })
+      }
+    }
+    for (let i = 0; i < 300; i++) {
+      this.data.push({
+        color: "black",
+        x: i,
+        y: 10
 
-  generatePixels() {
+      })
+
+      this.data.push({
+        color: "black",
+        x: 10,
+        y: i
+
+      })
+
+      this.data.push({
+        color: "purple",
+        x: 290,
+        y: i
+
+      })
+
+      this.data.push({
+        color: "blue",
+        x: 150,
+        y: i
+
+      })
+    }
+    this.loading = false
+    // this.placeService.connect().subscribe({ next: (data: PixelResponse[]) => {
+    //     this.loading = false;
+    //     this.data = data;
+    //   }});
   }
 
   selectColor(color: string): void {
@@ -164,10 +213,10 @@ export class PlaceComponent implements OnInit {
 
   // Method to receive events from the server
   receiveEventFromServer() {
-    this.placeService.receiveMyResponse().subscribe((response: PixelResponse) => {
-      this.context.fillStyle = response.color
-      this.context.fillRect(response.x * this.pixelSize, response.y * this.pixelSize, this.pixelSize, this.pixelSize);
-    });
+    // this.placeService.receiveMyResponse().subscribe((response: PixelResponse) => {
+    //   this.context.fillStyle = response.color
+    //   this.context.fillRect(response.x * this.pixelSize, response.y * this.pixelSize, this.pixelSize, this.pixelSize);
+    // });
   }
 
   isMenuOpen = false;
@@ -188,3 +237,5 @@ export class PlaceComponent implements OnInit {
     // });
   }
 }
+
+

@@ -1,25 +1,27 @@
 version: '3.8'
 
 services:
-#  flask:
-#    build:
-#      context: flaskr/.
-#      dockerfile: Dockerfile
-#    environment:
-#      - CELERY_BROKER_URL=redis://redis:6379/0
-#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-#      - POSTGRE_USER=erik
-#      - POSTGRE_PASSWORD=erik
-#      - POSTGRE_BROKER_URL=postgres:5432
-#      - POSTGRE_DATABASE=erik_db
-#      - PROD=True
-#    ports:
-#      - 5000:5000
-#    depends_on:
-#      - redis
-#      - postgres
-#    volumes:
-#      - image_data:/usr/src/app/images
+  flask:
+    build:
+      context: flaskr/.
+      dockerfile: Dockerfile
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - POSTGRE_USER=erik
+      - POSTGRE_PASSWORD=erik
+      - POSTGRE_BROKER_URL=postgres:5432
+      - POSTGRE_DATABASE=erik_db
+      - PROD=True
+    networks:
+      - lups
+    ports:
+      - 5000:5000
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - image_data:/usr/src/app/images
 
   worker:
     build:
@@ -36,6 +38,8 @@ services:
     depends_on:
       - redis
       - postgres
+    networks:
+      - lups
     deploy:
       resources:
         limits:
@@ -59,24 +63,32 @@ services:
     depends_on:
       - redis
       - worker
+    networks:
+      - lups
 
   redis:
     image: redis:6-alpine
-    ports:
-      - 6379:6379
+    expose:
+      - 6379
+    networks:
+      - lups
+    volumes:
+      - redis_data:/data
 
   postgres:
       container_name: erik_db
       image: postgres:alpine
       restart: unless-stopped
-      ports:
-        - "5432:5432"
+      expose:
+        - 5432
       environment:
         POSTGRES_DB: erik_db
         POSTGRES_USER: erik
         POSTGRES_PASSWORD: erik
       volumes:
         - postgres_data:/var/lib/postgresql/data
+      networks:
+        - lups
 
   pgadmin:
     image: dpage/pgadmin4
@@ -89,7 +101,14 @@ services:
       PGADMIN_DEFAULT_EMAIL: "erik@erik.com"
       PGADMIN_DEFAULT_PASSWORD: "erik"
       PGADMIN_DEFAULT_USER: "erik"
+    networks:
+      - lups
+
+networks:
+  lups:
+    driver: bridge
 
 volumes:
   postgres_data:
   image_data:
+  redis_data:

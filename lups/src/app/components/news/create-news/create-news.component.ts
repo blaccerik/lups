@@ -31,7 +31,6 @@ export class CreateNewsComponent {
   image: string | null
 
   ngOnInit() {
-    console.log(this.edit_id)
     this.form = this.formBuilder.group({
       title: [this.edit_title, [Validators.required, Validators.maxLength(100)]],
       text: [this.edit_text, [Validators.required, Validators.maxLength(3000)]],
