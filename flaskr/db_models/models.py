@@ -8,11 +8,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 
-logger = logging.getLogger('models')
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('model')
 uri = f"postgresql://" \
       f"{os.environ.get('POSTGRE_USER', 'erik')}:" \
       f"{os.environ.get('POSTGRE_PASSWORD', 'erik')}@{os.environ.get('POSTGRE_BROKER_URL', 'localhost:5432')}/" \
-      f"{os.environ.get('POSTGRE_DATABASE', 'erik_db')}"
+      f"{os.environ.get('POSTGRE_DATABASE', 'postgres')}"
 logger.info(f"Database uri: {uri}")
 
 engine = create_engine(uri)

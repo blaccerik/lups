@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   flask:
+    container_name: flask
     build:
       context: flaskr/.
       dockerfile: Dockerfile
@@ -11,7 +12,7 @@ services:
       - POSTGRE_USER=erik
       - POSTGRE_PASSWORD=erik
       - POSTGRE_BROKER_URL=postgres:5432
-      - POSTGRE_DATABASE=erik_db
+      - POSTGRE_DATABASE=postgres
       - PROD=True
     networks:
       - lups
@@ -24,6 +25,7 @@ services:
       - image_data:/usr/src/app/images
 
   worker:
+    container_name: worker
     build:
       context: ./
       dockerfile: celeryr/dockerfile
@@ -34,7 +36,7 @@ services:
       - POSTGRE_USER=erik
       - POSTGRE_PASSWORD=erik
       - POSTGRE_BROKER_URL=postgres:5432
-      - POSTGRE_DATABASE=erik_db
+      - POSTGRE_DATABASE=postgres
     depends_on:
       - redis
       - postgres
@@ -47,6 +49,7 @@ services:
           memory: 2G  # Adjust the memory limit as needed
 
   dashboard:
+    container_name: dashboard
     build:
       context: ./
       dockerfile: celeryr/dockerfile
@@ -59,7 +62,7 @@ services:
       - POSTGRE_USER=erik
       - POSTGRE_PASSWORD=erik
       - POSTGRE_BROKER_URL=postgres:5432
-      - POSTGRE_DATABASE=erik_db
+      - POSTGRE_DATABASE=postgres
     depends_on:
       - redis
       - worker
@@ -67,6 +70,7 @@ services:
       - lups
 
   redis:
+    container_name: redis
     image: redis:6-alpine
     expose:
       - 6379
@@ -76,13 +80,13 @@ services:
       - redis_data:/data
 
   postgres:
-      container_name: erik_db
+      container_name: postgres
       image: postgres:alpine
       restart: unless-stopped
       expose:
         - 5432
       environment:
-        POSTGRES_DB: erik_db
+        POSTGRES_DB: postgres
         POSTGRES_USER: erik
         POSTGRES_PASSWORD: erik
       volumes:
@@ -92,7 +96,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin4
+    container_name: pgadmin
     depends_on:
       - postgres
     ports:

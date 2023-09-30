@@ -4,4 +4,4 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger('gunicorn')
-logger.info("log works")
+logger.info("log works shared")

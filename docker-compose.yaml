@@ -24,7 +24,7 @@ services:
       - POSTGRE_USER=erik
       - POSTGRE_PASSWORD=erik
       - POSTGRE_BROKER_URL=postgres:5432
-      - POSTGRE_DATABASE=erik_db
+      - POSTGRE_DATABASE=postgres
       - PROD=True
     expose:
       - 5000
@@ -48,7 +48,7 @@ services:
       - POSTGRE_USER=erik
       - POSTGRE_PASSWORD=erik
       - POSTGRE_BROKER_URL=postgres:5432
-      - POSTGRE_DATABASE=erik_db
+      - POSTGRE_DATABASE=postgres
     depends_on:
       - redis
       - postgres
@@ -71,13 +71,13 @@ services:
       - lups
 
   postgres:
-    container_name: erik_db
+    container_name: postgres
     image: postgres:alpine
     restart: unless-stopped
     expose:
       - 5432
     environment:
-      POSTGRES_DB: erik_db
+      POSTGRES_DB: postgres
       POSTGRES_USER: erik
       POSTGRES_PASSWORD: erik
     volumes:
