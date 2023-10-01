@@ -48,7 +48,7 @@ export class PlaceService {
 
     // Create the socketOptions with the updated extraHeaders
     const socketOptions = {
-      url: "http://lyps.ee/ws/place",  // Use the same URL as the existing socket
+      url: "https://lyps.ee/ws/place",  // Use the same URL as the existing socket
       options: {
         extraHeaders: extraHeaders  // Assign the extraHeaders object
       }
