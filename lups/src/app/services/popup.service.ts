@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import {NotLoggedInPopupComponent} from "./not-logged-in-popup/not-logged-in-popup.component";
 
 @Injectable({
   providedIn: 'root'

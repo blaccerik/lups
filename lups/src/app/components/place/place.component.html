@@ -1,16 +1,15 @@
 <div class="square-7" *ngIf="loading"></div>
 <div class="container" *ngIf="!loading">
-  <div #container class="canvas-container">
-    <canvas #canvas
-          width="{{ canvasWidth }}"
-          height="{{ canvasHeight }}"
+  <div #canvasContainer class="canvas-container">
+    <canvas #canvasElement
+          width="1200"
+          height="1200"
           (contextmenu)="placePixel($event)"
           (mousedown)="onMouseDown($event)"
           (mousemove)="onMouseMove($event)"
           (mouseup)="onMouseUpGlobal($event)"
           (wheel)="onWheel($event)"
           [style.transform]="'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + scale + ')'">
-
     </canvas>
   </div>
   <div class="settings">
@@ -34,4 +33,3 @@
 <div class="popup-container">
   <app-not-logged-in-popup [text]="popup" *ngFor="let popup of popupService.getPopups()"></app-not-logged-in-popup>
 </div>
-

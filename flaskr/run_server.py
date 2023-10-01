@@ -22,13 +22,14 @@ def create_app(test_config=None):
     logger2.info("log works")
 
     # Register API Blueprint and initialize Celery
-    from routes import chat, test, auth, news
+    from routes import chat, test, auth, news, place
     api_bp = Blueprint('api', __name__, url_prefix='/api')
 
     api_bp.register_blueprint(auth.bp)
     api_bp.register_blueprint(chat.bp)
     api_bp.register_blueprint(test.bp)
     api_bp.register_blueprint(news.bp)
+    api_bp.register_blueprint(place.bp)
     app.register_blueprint(api_bp)
 
     socketio.init_app(app)

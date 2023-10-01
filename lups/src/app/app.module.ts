@@ -24,7 +24,7 @@ import {PlaceService} from "./services/place.service";
 import {SocketIoConfig, SocketIoModule} from "ngx-socket-io";
 import { NgxImageZoomModule } from 'ngx-image-zoom';
 import { NotLoggedInPopupComponent } from './services/not-logged-in-popup/not-logged-in-popup.component';
-import { HelpDialogComponent } from './services/help-dialog/help-dialog.component';
+import { HelpDialogComponent } from './components/place/help-dialog/help-dialog.component';
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import { AllNewsComponent } from './components/news/all-news/all-news.component';
 import {InfiniteScrollModule} from "ngx-infinite-scroll";

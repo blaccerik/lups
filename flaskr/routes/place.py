@@ -1,22 +1,27 @@
-from flask import request
+from flask import Blueprint, jsonify
 from flask_socketio import SocketIO, emit
 
 from routes.test import token_required
 from services.place_service import get_pixels, edit_pixel
-from shared import logger
 
 socketio = SocketIO(async_mode='eventlet', cors_allowed_origins="*")
+bp = Blueprint('place', __name__, url_prefix="/place")
 
 
-@socketio.on('connect', namespace="/place")
-def handle_connect():
+@bp.route("", methods=['GET'])
+def get_all_pixels():
     data = get_pixels()
-    print('WebSocket client connected')
-    # data = {
-    #     "hi": 4
-    # }
-    # print(data)
-    emit("init", data)
+    return jsonify(data), 200
+
+# @socketio.on('connect', namespace="/place")
+# def handle_connect():
+#     data = get_pixels()
+#     print('WebSocket client connected')
+#     # data = {
+#     #     "hi": 4
+#     # }
+#     # print(data)
+#     emit("init", data)
 
 
 # Define a custom WebSocket event handler for a custom event

@@ -14,6 +14,26 @@
   overflow: hidden;
 }
 
+.test {
+  z-index: 99;
+  position: absolute;
+  width: 500px;
+  height: 25px;
+  background-color: yellow;
+}
+
+.test2 {
+  width: 400px;
+  background-color: #6fffc7;
+  top: 25px;
+}
+
+.test3 {
+  width: 200px;
+  background-color: #ff04e5;
+  top: 50px;
+}
+
 
 canvas {
   position: absolute;
@@ -75,5 +95,3 @@ canvas {
     align-items: center;
   }
 }
-
-

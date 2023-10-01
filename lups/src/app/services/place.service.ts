@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import {Observable} from "rxjs";
 import {OAuthService} from "angular-oauth2-oidc";
+import {HttpClient} from "@angular/common/http";
+import {NewsResponse} from "./news.service";
 
 
 export interface PixelResponse {
@@ -16,6 +18,7 @@ export interface PixelResponse {
 export class PlaceService {
 
   constructor(private socket: Socket,
+              private http: HttpClient,
               private oauthService: OAuthService) {}
 
   sendData(x: number, y: number, color: string) {
@@ -53,7 +56,8 @@ export class PlaceService {
 
     this.socket.disconnect(); // Disconnect from the previous socket, if any
     this.socket = new Socket(socketOptions);
-    return this.socket.fromEvent("init")
+
+    return this.http.get<PixelResponse[]>("api/place")
   }
 
   // Disconnect from the WebSocket server

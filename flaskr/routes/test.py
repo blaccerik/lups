@@ -61,10 +61,8 @@ def post():
 @bp.route('/form', methods=['GET'])
 def get_form():
     # Create a Blob (in this example, a simple text Blob)
-    text = "This is a dummy Blob."
+    text = "Blob from server"
     blob = io.BytesIO(text.encode('utf-8'))
-    # Send the Blob as a response
-    print(blob)
     return send_file(blob, mimetype='text/plain')
 
 
