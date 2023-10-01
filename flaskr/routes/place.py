@@ -36,7 +36,9 @@ def handle_my_event(data, google_id, name):
     x = data["x"]
     y = data["y"]
     color = data["color"]
+    logger.info(f"edit {data}")
     response = edit_pixel(x, y, color, google_id)
+    logger.info(response)
     if response:
         emit('update_response', data, broadcast=True)
     else:
