@@ -6,7 +6,7 @@ from flask.cli import AppGroup
 from flask_cors import CORS
 
 from db_models.models import init_db, populate_db
-from routes.place import socketio
+from routes.websocket import socketio
 from shared import logger
 
 # auth
