@@ -1,11 +1,12 @@
 from sqlalchemy.exc import NoResultFound
 
-from db_models.models import User, Chat, Message, Pixel, with_session
+from db_models.models import Pixel, with_session
 
 SIZE = 300
 COLORS = [
     "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
 ]
+
 
 @with_session
 def get_pixels(session=None):

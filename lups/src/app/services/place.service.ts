@@ -53,7 +53,7 @@ export class PlaceService {
         extraHeaders: extraHeaders  // Assign the extraHeaders object
       }
     };
-
+    console.log(this.socket.ioSocket.io.uri)
     this.socket.disconnect(); // Disconnect from the previous socket, if any
     this.socket = new Socket(socketOptions);
 

@@ -30,7 +30,7 @@ import { AllNewsComponent } from './components/news/all-news/all-news.component'
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
 
 const socketIoConfig: SocketIoConfig = {
-  url: 'ws://localhost:5000/place', // Update this with your Flask-SocketIO server URL
+  url: 'http://localhost:5000/ws/place', // Update this with your Flask-SocketIO server URL
   options: {},
 };
 
