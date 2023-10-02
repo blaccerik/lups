@@ -52,7 +52,9 @@ export class PlaceComponent implements OnInit {
 
   @HostListener('window:resize', ['$event'])
   onWindowResize(event: Event) {
-    this.findOffset(this.offsetX, this.offsetY)
+    if (this.canvas) {
+      this.findOffset(this.offsetX, this.offsetY)
+    }
   }
 
   onMouseDown(event: MouseEvent): void {

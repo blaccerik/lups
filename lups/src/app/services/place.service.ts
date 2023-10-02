@@ -47,13 +47,15 @@ export class PlaceService {
     }
 
     // Create the socketOptions with the updated extraHeaders
+    // "wss://lyps.ee/ws/place",
     const socketOptions = {
-      url: "wss://lyps.ee/ws/place",  // Use the same URL as the existing socket
+      url: this.socket.ioSocket.io.uri,  // Use the same URL as the existing socket
       options: {
         extraHeaders: extraHeaders  // Assign the extraHeaders object
       }
     };
     console.log(this.socket.ioSocket.io.uri)
+    console.log(socketOptions.url)
     this.socket.disconnect(); // Disconnect from the previous socket, if any
     this.socket = new Socket(socketOptions);
 
