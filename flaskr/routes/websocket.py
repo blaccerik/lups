@@ -12,14 +12,14 @@ socketio = SocketIO(async_mode='eventlet', cors_allowed_origins="*")
 
 # Define a custom WebSocket event handler for a custom event
 @socketio.on('update', namespace="/ws/place")
-def handle_my_event(data):
+@token_required
+def handle_my_event(data, google_id, name):
     loggerws.info(data)
     x = data["x"]
     y = data["y"]
     color = data["color"]
     logger.info(f"edit {data}")
-    # response = edit_pixel(x, y, color, google_id)
-    response = True
+    response = edit_pixel(x, y, color, google_id)
     logger.info(response)
     if response:
         emit('update_response', data, broadcast=True)
