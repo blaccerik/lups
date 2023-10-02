@@ -197,10 +197,10 @@ export class PlaceComponent implements OnInit {
 
     if (!this.context) return;
 
-    if (!this.authService.hasValidIdToken()) {
-      this.popupService.addPopup("You are not logged in");
-      return;
-    }
+    // if (!this.authService.hasValidIdToken()) {
+    //   this.popupService.addPopup("You are not logged in");
+    //   return;
+    // }
 
     if (!this.canPlacePixel()) {
       this.popupService.addPopup("Placing too fast");
