@@ -8,9 +8,8 @@ from shared import logger
 
 loggerws = logging.getLogger("websocket")
 loggerws.info("weboscketere")
-socketio = SocketIO(async_mode='eventlet', cors_allowed_origins=[
-    "http://localhost:63342/"
-])
+socketio = SocketIO(async_mode='eventlet', cors_allowed_origins="http://localhost:63342")
+
 
 # Define a custom WebSocket event handler for a custom event
 @socketio.on('update', namespace="/ws/place")
