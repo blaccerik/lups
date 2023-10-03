@@ -1,9 +1,8 @@
-import { Injectable } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
+import {Injectable} from '@angular/core';
+import {Socket} from 'ngx-socket-io';
 import {Observable} from "rxjs";
 import {OAuthService} from "angular-oauth2-oidc";
 import {HttpClient} from "@angular/common/http";
-import {NewsResponse} from "./news.service";
 
 
 export interface PixelResponse {
@@ -39,26 +38,24 @@ export class PlaceService {
   connect(): Observable<PixelResponse[]> {
     // Create the extraHeaders object
     const extraHeaders: { [key: string]: string } = {};
-
     if (this.oauthService.hasValidIdToken()) {
       const accessToken = this.oauthService.getIdToken();
       extraHeaders['Authorization'] = `Bearer ${accessToken}`
 
     }
-
-    // Create the socketOptions with the updated extraHeaders
-    // "wss://lyps.ee/ws/place",
     const socketOptions = {
-      url: "wss://lyps.ee/ws/place",  // Use the same URL as the existing socket
+      url: this.socket.ioSocket.io.uri,
       options: {
         extraHeaders: extraHeaders  // Assign the extraHeaders object
       }
     };
     console.log(this.socket.ioSocket.io.uri)
-    console.log(socketOptions.url)
     this.socket.disconnect(); // Disconnect from the previous socket, if any
     this.socket = new Socket(socketOptions);
-
+    this.socket.on('connect', () => {
+      console.log('Connected to the server.');
+      // You can perform actions here when the connection is successful.
+    });
     return this.http.get<PixelResponse[]>("api/place")
   }
 

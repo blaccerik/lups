@@ -28,9 +28,10 @@ import { HelpDialogComponent } from './components/place/help-dialog/help-dialog.
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import { AllNewsComponent } from './components/news/all-news/all-news.component';
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
+import { environment } from '../environments/environment';
 
 const socketIoConfig: SocketIoConfig = {
-  url: 'wss://lyps.ee/ws/place', // Update this with your Flask-SocketIO server URL
+  url: environment.wsUrl, // Update this with your Flask-SocketIO server URL
   options: {},
 };
 
