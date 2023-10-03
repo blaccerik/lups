@@ -14,9 +14,10 @@
 body {
   //background-color: $main-color;
   //background-image: url("assets/paper.png");
-  background-image: url("assets/img_2.png");
+  background-image: url("assets/background.jpg");
+  background-size: cover;
   background-repeat: no-repeat;
-  background-size: 100%;
+  //background-size: 100%;
   //background-repeat: repeat;
   font-family: Loominguline, sans-serif;
 }
