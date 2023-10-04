@@ -1,14 +1,5 @@
 import {PixelResponse, PlaceService} from "../../services/place.service";
-import {
-  Component,
-  HostListener,
-  ViewChild,
-  ElementRef,
-  Renderer2,
-  OnInit,
-  AfterViewInit,
-  ChangeDetectorRef
-} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {OAuthService} from "angular-oauth2-oidc";
 import {PopupService} from "../../services/popup.service";
 import {MatDialog} from "@angular/material/dialog";
@@ -88,9 +79,6 @@ export class PlaceComponent implements OnInit {
     this.findOffset(x, y);
   }
 
-  onMouseUp(event: MouseEvent): void {
-    this.isDragging = false;
-  }
 
   constructor(
     private placeService: PlaceService,
@@ -101,65 +89,49 @@ export class PlaceComponent implements OnInit {
     private renderer: Renderer2) { }
 
   ngOnInit(): void {
+    // connect with websocket
     this.placeService.connect().subscribe({
-    next: (value: PixelResponse[]) => {
-      this.loading = false;
-      // setup objects
-      this.cdRef.detectChanges(); // Trigger change detection
-      const canvas = this.canvasElement.nativeElement;
-      const container = this.containerRef.nativeElement
-      const context = canvas.getContext('2d');
-      if (!context) {
-        return
+      next: value => {
+        this.loadPixels()
+    },
+      error: err => {
+        console.log(err)
       }
-      this.container = container
-      this.canvas = canvas
-      this.context = context
+    })
 
-      // draw canvas
-      for (const pixelResponse of value) {
-        this.context.fillStyle = pixelResponse.color
-        this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
-      }
-    }})
-
-    this.placeService.receiveMyResponse().subscribe((response: PixelResponse) => {
-      this.context.fillStyle = response.color
-      this.context.fillRect(response.x * this.pixelSize, response.y * this.pixelSize, this.pixelSize, this.pixelSize);
-    });
   }
 
-  private loadCanvas(): void {
-    this.context.fillStyle = 'white';
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  private loadPixels() {
+    this.placeService.getPixels().subscribe({
+      next: (value: PixelResponse[]) => {
+        this.loading = false;
+        // setup objects
+        this.cdRef.detectChanges(); // Trigger change detection
+        const canvas = this.canvasElement.nativeElement;
+        const container = this.containerRef.nativeElement
+        const context = canvas.getContext('2d');
+        if (!context) {
+          return
+        }
+        this.container = container
+        this.canvas = canvas
+        this.context = context
 
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
-    const squareSize = 100;
+        // draw canvas
+        for (const pixelResponse of value) {
+          this.context.fillStyle = this.indexToColor(pixelResponse.c)
+          this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
+        }
+        // start listening to websocket
+        this.placeService.receiveMyResponse().subscribe((response: PixelResponse) => {
+          this.context.fillStyle = response.color
+          this.context.fillRect(response.x * this.pixelSize, response.y * this.pixelSize, this.pixelSize, this.pixelSize);
+        });
+      }})
+  }
 
-    this.context.fillStyle = 'blue';
-    this.context.fillRect(centerX - squareSize / 2, centerY - squareSize / 2, squareSize, squareSize);
-
-    this.context.fillStyle = "black"
-    this.context.fillRect(0, 10, 1200, 2)
-    this.context.fillRect(10, 0, 2, 1200)
-    this.context.fillRect(0, 1190, 1200, 2)
-    this.context.fillRect(1190, 0, 2, 1200)
-    this.context.fillRect(1100, 0, 2, 1200)
-    for (let i = 0; i < 60; i++) {
-      this.context.fillStyle = "blue"
-      this.context.fillRect(i * 20, 0, 2, 1200)
-    }
-    this.context.fillStyle = "red"
-    this.context.fillRect(420, 0, 2, 1200)
-    this.context.fillStyle = "green"
-    this.context.fillRect(440, 0, 2, 1200)
-
-    this.context.fillStyle = "orange"
-    this.context.fillRect(600, 0, 2, 1200)
-
-    this.context.fillStyle = "orange"
-    this.context.fillRect(800, 0, 2, 1200)
+  private indexToColor(index: number): string {
+    return this.predefinedColors[index]
   }
 
   selectColor(color: string): void {

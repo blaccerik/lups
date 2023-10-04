@@ -7,14 +7,13 @@ COLORS = [
     "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
 ]
 
-
 @with_session
 def get_pixels(session=None):
     pixels = session.query(Pixel).all()
     return [{
         "x": p.x,
         "y": p.y,
-        "color": p.color
+        "c": COLORS.index(p.color)
     } for p in pixels]
 
 

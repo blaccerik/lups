@@ -25,7 +25,9 @@ export class NavbarComponent {
     {text: "Väärtused", parentId: 1, isSeen: false, link: "/promises" },
     {text: "Liikmed", parentId: 1, isSeen: false, link: "/" },
     {text: "Uudised", id: 3, isSeen: true, link: "/news" },
-    {text: "Vambolai", id: 5, isSeen: true, link: "/chat"},
+    {text: "Meelelahutus", id: 4, isSeen: true, hasChildren: true},
+    {text: "Lõuend", parentId: 4 , isSeen: false, link: "/place"},
+    {text: "Vambolai", parentId: 4, isSeen: false, link: "/chat"},
   ]
 
 

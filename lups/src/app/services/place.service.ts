@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Socket} from 'ngx-socket-io';
-import {Observable} from "rxjs";
+import {Observable, Observer} from "rxjs";
 import {OAuthService} from "angular-oauth2-oidc";
 import {HttpClient} from "@angular/common/http";
 
@@ -8,6 +8,7 @@ import {HttpClient} from "@angular/common/http";
 export interface PixelResponse {
   x: number,
   y: number,
+  c: number,
   color: string
 }
 
@@ -35,27 +36,38 @@ export class PlaceService {
   }
 
   // Connect to the WebSocket server
-  connect(): Observable<PixelResponse[]> {
-    // Create the extraHeaders object
-    const extraHeaders: { [key: string]: string } = {};
-    if (this.oauthService.hasValidIdToken()) {
-      const accessToken = this.oauthService.getIdToken();
-      extraHeaders['Authorization'] = `Bearer ${accessToken}`
-
-    }
-    const socketOptions = {
-      url: this.socket.ioSocket.io.uri,
-      options: {
-        extraHeaders: extraHeaders  // Assign the extraHeaders object
+  connect(): Observable<string> {
+    return new Observable((observer) => {
+      // Create the extraHeaders object
+      const extraHeaders: { [key: string]: string } = {};
+      if (this.oauthService.hasValidIdToken()) {
+        const accessToken = this.oauthService.getIdToken();
+        extraHeaders['Authorization'] = `Bearer ${accessToken}`;
       }
-    };
-    console.log(this.socket.ioSocket.io.uri)
-    this.socket.disconnect(); // Disconnect from the previous socket, if any
-    this.socket = new Socket(socketOptions);
-    this.socket.on('connect', () => {
-      console.log('Connected to the server.');
-      // You can perform actions here when the connection is successful.
+      const socketOptions = {
+        url: this.socket.ioSocket.io.uri,
+        options: {
+          extraHeaders: extraHeaders  // Assign the extraHeaders object
+        }
+      };
+      // Disconnect from the previous socket, if any
+      console.log(this.socket.ioSocket.io.uri);
+      this.socket.disconnect();
+      this.socket = new Socket(socketOptions);
+      this.socket.on('connect', () => {
+        console.log('Connected to the server.');
+        observer.next('Socket connection successful'); // Emit a success value
+        observer.complete(); // Complete the observable
+      });
+
+      this.socket.on('connect_error', (error: any) => {
+        console.error('Socket connection error:', error);
+        observer.error('Socket connection error'); // Emit an error value
+      });
     });
+  }
+
+  getPixels(): Observable<PixelResponse[]> {
     return this.http.get<PixelResponse[]>("api/place")
   }
 
