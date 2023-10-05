@@ -1,3 +1,33 @@
-.container {
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+}
 
+.popup-title {
+  margin: 0;
+}
+
+.popup-content {
+  text-align: left;
+  padding: 16px;
+}
+
+/* Style the close button */
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+/* Optional: Customize the close button icon */
+mat-icon {
+  font-size: 24px;
+  color: #333; /* Adjust the color as needed */
+}
+
+/* Optional: Adjust the close button position */
+button {
+  margin-right: -8px;
 }

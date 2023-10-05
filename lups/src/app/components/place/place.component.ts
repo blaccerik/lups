@@ -156,7 +156,7 @@ export class PlaceComponent implements OnInit {
 
   private canPlacePixel(): boolean {
     const currentTime = Date.now();
-    if (currentTime - this.lastPixelPlacementTimestamp >= 500) {
+    if (currentTime - this.lastPixelPlacementTimestamp >= 50) {
       this.lastPixelPlacementTimestamp = currentTime;
       return true;
     } else {
@@ -200,7 +200,9 @@ export class PlaceComponent implements OnInit {
   }
 
   showHelp() {
-    this.dialog.open(HelpDialogComponent);
+    this.dialog.open(HelpDialogComponent, {
+      autoFocus: false, // Prevents dialog from auto-closing on click inside
+    });
   }
 }
 

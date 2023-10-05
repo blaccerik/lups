@@ -29,6 +29,7 @@ import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import { AllNewsComponent } from './components/news/all-news/all-news.component';
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
 import { environment } from '../environments/environment';
+import {MatButtonModule} from "@angular/material/button";
 
 const socketIoConfig: SocketIoConfig = {
   url: environment.wsUrl, // Update this with your Flask-SocketIO server URL
@@ -64,7 +65,8 @@ const socketIoConfig: SocketIoConfig = {
         HttpClientModule,
         ReactiveFormsModule,
         OAuthModule.forRoot(),
-        InfiniteScrollModule
+        InfiniteScrollModule,
+        MatButtonModule
     ],
   exports: [],
   providers: [

@@ -49,8 +49,8 @@ services:
   redis:
     container_name: redis
     image: redis:6-alpine
-    expose:
-      - 6379
+    ports:
+      - "6379:6379"
     networks:
       - lups
     volumes:
