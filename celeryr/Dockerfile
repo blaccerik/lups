@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.10.2-slim-buster
+FROM python:3.10.9-slim-buster
 
 # set work directory
 WORKDIR /usr/src/app
@@ -13,14 +13,11 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 
 # install dependencies
 RUN pip install --upgrade pip
-COPY celeryr/requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # copy model
-COPY celeryr/t5-model worker/t5-model
-
-# copy db models
-COPY flaskr/db_models/models.py worker/models.py
+COPY t5-model worker/t5-model
 
 # copy project
-COPY celeryr/worker worker
+COPY worker worker

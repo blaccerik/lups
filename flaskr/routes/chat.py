@@ -1,5 +1,3 @@
-import time
-
 from flask import Blueprint, jsonify, request, Response
 from routes.test import token_required
 from schemas.schemas import ChatResponseSchema

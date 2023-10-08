@@ -41,7 +41,7 @@ services:
     container_name: worker
     build:
       context: ./
-      dockerfile: celeryr/dockerfile
+      dockerfile: celeryr/Dockerfile
     command: celery --app worker.tasks.celery worker --concurrency=1
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0

@@ -1,51 +1,6 @@
 version: '3.8'
 
 services:
-  worker:
-    container_name: worker
-    build:
-      context: ./
-      dockerfile: celeryr/dockerfile
-    command: celery --app worker.tasks.celery worker --concurrency=1
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - POSTGRE_USER=erik
-      - POSTGRE_PASSWORD=erik
-      - POSTGRE_BROKER_URL=postgres:5432
-      - POSTGRE_DATABASE=postgres
-    depends_on:
-      - redis
-      - postgres
-    networks:
-      - lups
-    deploy:
-      resources:
-        limits:
-          cpus: '1'  # Adjust the CPU limit as needed
-          memory: 2G  # Adjust the memory limit as needed
-
-  dashboard:
-    container_name: dashboard
-    build:
-      context: ./
-      dockerfile: celeryr/dockerfile
-    command: celery --app worker.tasks.celery flower --port=5555
-    ports:
-      - 5556:5555
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - POSTGRE_USER=erik
-      - POSTGRE_PASSWORD=erik
-      - POSTGRE_BROKER_URL=postgres:5432
-      - POSTGRE_DATABASE=postgres
-    depends_on:
-      - redis
-      - worker
-    networks:
-      - lups
-
   redis:
     container_name: redis
     image: redis:6-alpine
@@ -91,5 +46,4 @@ networks:
 
 volumes:
   postgres_data:
-  image_data:
   redis_data:
