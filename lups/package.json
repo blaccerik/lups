@@ -23,6 +23,7 @@
     "@angular/router": "^16.0.0",
     "@coreui/angular": "^4.5.0",
     "angular-oauth2-oidc": "^15.0.1",
+    "angular-websocket": "^2.0.1",
     "ngx-cookie-service": "^16.0.0",
     "ngx-image-zoom": "^2.1.0",
     "ngx-infinite-scroll": "^16.0.0",

@@ -1,27 +1,48 @@
-from fastapi import Depends, FastAPI
-from sqlalchemy.orm import Session
+import logging
+import sys
 
-from routers import items, websocket, chat
-from utils.celery_config import celery_app
-from utils.database import get_db
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from routers import items, websocket, news, place, chat
+from services.place_service import read_pixels
+from utils.database import SessionLocal
+from utils.redis_database import get_client
+
+logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 # Create an instance of FastAPI
 app = FastAPI()
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=origins,
+    allow_headers=origins,
+)
 
 app.include_router(items.router)
 app.include_router(websocket.router)
 app.include_router(chat.router)
+app.include_router(place.router)
+app.include_router(news.router)
 
 
-# Define a route (endpoint) and its response
-@app.get("/")
-async def read_root(db: Session = Depends(get_db)):
-    return {"message": "Hello, World!"}
-
-
-@app.get("/time")
-async def time():
-    task_name = "simple_task"
-    task = celery_app.send_task(task_name)
-    result = task.get()
-    return result
+@app.on_event("startup")
+async def startup_event():
+    redis_client = get_client()
+    postgres_client = SessionLocal()
+    e = await redis_client.get("erik")
+    print(e)
+    pixels = read_pixels(postgres_client)
+    print(len(pixels))
+    postgres_client.close()
+    await redis_client.close()
+    # with get_session() as session:
+    #     pixels = read_pixels(session)
+    #     for pixel in pixels:
+    #         # Use the x and y coordinates as the field names in Redis
+    #         field_name = f"{pixel.x}_{pixel.y}"
+    #         # Store the pixel color as the field value
+    #         redis_client.hset('pixels', field_name, pixel.color)

@@ -89,45 +89,42 @@ export class PlaceComponent implements OnInit {
     private renderer: Renderer2) { }
 
   ngOnInit(): void {
-    // connect with websocket
-    this.placeService.connect().subscribe({
-      next: value => {
-        this.loadPixels()
-    },
-      error: err => {
-        console.log(err)
-      }
-    })
 
+    this.placeService.connect().subscribe(
+      (e) => {
+        console.log(e)
+      }
+    );
+    this.placeService.send()
   }
 
   private loadPixels() {
-    this.placeService.getPixels().subscribe({
-      next: (value: PixelResponse[]) => {
-        this.loading = false;
-        // setup objects
-        this.cdRef.detectChanges(); // Trigger change detection
-        const canvas = this.canvasElement.nativeElement;
-        const container = this.containerRef.nativeElement
-        const context = canvas.getContext('2d');
-        if (!context) {
-          return
-        }
-        this.container = container
-        this.canvas = canvas
-        this.context = context
-
-        // draw canvas
-        for (const pixelResponse of value) {
-          this.context.fillStyle = this.indexToColor(pixelResponse.c)
-          this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
-        }
-        // start listening to websocket
-        this.placeService.receiveMyResponse().subscribe((response: PixelResponse) => {
-          this.context.fillStyle = response.color
-          this.context.fillRect(response.x * this.pixelSize, response.y * this.pixelSize, this.pixelSize, this.pixelSize);
-        });
-      }})
+    // this.placeService.getPixels().subscribe({
+    //   next: (value: PixelResponse[]) => {
+    //     this.loading = false;
+    //     // setup objects
+    //     this.cdRef.detectChanges(); // Trigger change detection
+    //     const canvas = this.canvasElement.nativeElement;
+    //     const container = this.containerRef.nativeElement
+    //     const context = canvas.getContext('2d');
+    //     if (!context) {
+    //       return
+    //     }
+    //     this.container = container
+    //     this.canvas = canvas
+    //     this.context = context
+    //
+    //     // draw canvas
+    //     for (const pixelResponse of value) {
+    //       this.context.fillStyle = this.indexToColor(pixelResponse.c)
+    //       this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
+    //     }
+    //     // // start listening to websocket
+    //     // this.placeService.receiveMyResponse().subscribe((response: PixelResponse) => {
+    //     //   this.context.fillStyle = response.color
+    //     //   this.context.fillRect(response.x * this.pixelSize, response.y * this.pixelSize, this.pixelSize, this.pixelSize);
+    //     // });
+    //   }})
   }
 
   private indexToColor(index: number): string {
@@ -192,7 +189,7 @@ export class PlaceComponent implements OnInit {
     this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize + 3, 1, 1);
 
     // send request to backend
-    this.placeService.sendData(x, y, this.selectedColor)
+    // this.placeService.sendData(x, y, this.selectedColor)
   }
 
   toggleMenu() {

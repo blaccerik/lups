@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, Column, String, Integer
+from sqlalchemy import create_engine, Column, String, Integer, ForeignKey, Boolean, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
@@ -21,17 +21,21 @@ def get_session():
     session = SessionLocal()
     try:
         yield session
-        session.commit()
     except Exception as e:
         session.rollback()
         raise e
     finally:
-        print("close")
         session.close()
 
 
-class Item(Base):
-    __tablename__ = "items"
+class DBMessage(Base):
+    __tablename__ = 'messages'
+    id = Column(Integer, primary_key=True)
+    chat_id = Column(Integer, ForeignKey('chats.id'), nullable=False)
+    message_ee = Column(String(100), nullable=False)
+    message_en = Column(String(100), nullable=False)
+    type = Column(Enum("user", "bot", name="message_type_enum"), nullable=False)
+    deleted = Column(Boolean, nullable=False, default=False)
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
+    def __repr__(self):
+        return f"Message(id={self.id}, chat_id={self.chat_id}, message='{self.message_ee}', type={self.type})"

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from services.crud import create_user
 from utils.database import get_db
-from schemas.schemas import Item, ItemCreate
+from utils.schemas import Item, ItemCreate
 
 router = APIRouter(prefix="/api/items")
 

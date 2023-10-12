@@ -1,13 +1,11 @@
-import fastapi.security
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from datetime import datetime, timedelta
-from typing import Annotated
 
-from schemas.schemas import User
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+from utils.schemas import User
+
 oauth2_scheme = HTTPBearer()
 
 YOUR_CLIENT_ID = '437646142767-evt2pt3tn4pbrjcea6pd71quq07h82j7.apps.googleusercontent.com'

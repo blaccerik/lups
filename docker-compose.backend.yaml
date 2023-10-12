@@ -20,7 +20,7 @@ services:
     container_name: worker
     build:
       context: celeryr
-    command: celery --app worker.tasks worker --concurrency=1
+    command: celery --app worker.tasks worker --concurrency=1 --pool solo
     environment:
       - REDIS_BROKER_URL=redis://redis:6379/0
       - POSTGRES_USER=erik

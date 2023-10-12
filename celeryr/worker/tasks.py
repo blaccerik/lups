@@ -2,8 +2,11 @@ import os
 import time
 
 from celery import Celery
+from sqlalchemy import and_
 # from worker.database import get_session, Item, SessionLocal
 from transformers import T5Tokenizer, T5ForConditionalGeneration
+
+from worker.database import get_session, DBMessage
 
 # Python 3.10.9
 DATABASE_URI = os.environ.get("REDIS_BROKER_URL", 'redis://localhost:6379/0')
@@ -17,26 +20,51 @@ celery_app = Celery(
 model = None
 tokenizer = None
 
+MESSAGES_SIZE = 5
+
 # size is in tokens
 MAX_OUTPUT_LENGTH = 50
 MAX_INPUT_LENGTH = 512
 
 
+def load_model():
+    model_dir = os.path.dirname(os.path.abspath(__file__))
+    model_dir = os.path.join(model_dir, "t5-model")
+    print(model_dir)
+    print(os.listdir(model_dir))
+    tokenizer = T5Tokenizer.from_pretrained(model_dir)
+    model = T5ForConditionalGeneration.from_pretrained(model_dir)
+    return model, tokenizer
+
 @celery_app.on_after_configure.connect
 def setup_model(sender, **kwargs):
     global model
     global tokenizer
+    print("start loading")
     s = time.time()
-    model_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    model_dir = os.path.join(model_dir, "t5-model")
-    tokenizer = T5Tokenizer.from_pretrained(model_dir)
-    model = T5ForConditionalGeneration.from_pretrained(model_dir)
+    model, tokenizer = load_model()
     e = time.time()
     print(f"models loaded: {e - s}")
+    print("use model")
+    s = time.time()
+    res = use_model("what color is the sky")
+    print(res)
+    e = time.time()
+    print(f"model used: {e - s}")
 
+
+def get_chat(chat_id):
+    with get_session() as session:
+        messages = session.query(DBMessage).filter(and_(
+            DBMessage.chat_id == chat_id,
+            DBMessage.deleted == False
+        )).all()[-MESSAGES_SIZE:]
+    return messages
 
 def use_model(prompt):
-    global model, tokenizer
+    global model  # Use the global model variable
+    global tokenizer  # Use the global tokenizer variable
+    # model, tokenizer = load_model()
     try:
         input_ids = tokenizer(prompt, return_tensors="pt").input_ids
         # if gets too long cut out front
@@ -66,7 +94,21 @@ def use_model(prompt):
     return output_text
 
 
-@celery_app.task(name="simple_task")
+def format_chat(messages) -> str:
+    text = ""
+    for m in messages:
+        if m.type == "user":
+            text += f"User: {m.message_en}\n "
+        else:
+            text += f"Vambola: {m.message_en}\n "
+    text += "Vambola: "
+    return text
+
+@celery_app.task(name="get_message", time_limit=60)
 def simple_task(chat_id):
-    res = use_model("hello")
+    messages = get_chat(chat_id)
+    text = format_chat(messages)
+    print(f"input: {[text]}")
+    res = use_model(text)
+    print(f"output: {res}")
     return res

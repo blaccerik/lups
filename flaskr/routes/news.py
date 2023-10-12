@@ -4,7 +4,7 @@ from PIL import Image
 from flask import Blueprint, request, jsonify, send_file
 
 from routes.test import token_required
-from services.chat_service import get_user
+from services.chat_service import read_user
 from services.news_service import add_news, save_file, get_news, find_image, get_news_many
 
 bp = Blueprint('news', __name__, url_prefix="/news")
@@ -13,7 +13,7 @@ bp = Blueprint('news', __name__, url_prefix="/news")
 @bp.route("/create", methods=['POST'])
 @token_required
 def create(google_id, name):
-    user_id = get_user(name, google_id)
+    user_id = read_user(name, google_id)
     title = request.form.get('title')
     text = request.form.get('text')
     file = request.files.get('file')
@@ -27,7 +27,7 @@ def create(google_id, name):
 @token_required
 def edit_news(news_id, google_id, name):
 
-    user_id = get_user(name, google_id)
+    user_id = read_user(name, google_id)
     title = request.form.get('title')
     text = request.form.get('text')
     cat = request.form.get("category")
