@@ -1,5 +1,6 @@
 import logging
 import sys
+import time
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,16 +34,16 @@ app.include_router(news.router)
 async def startup_event():
     redis_client = get_client()
     postgres_client = SessionLocal()
-    e = await redis_client.get("erik")
-    print(e)
-    pixels = read_pixels(postgres_client)
-    print(len(pixels))
+    t1 = time.time()
+    old = await redis_client.hgetall("pixels")
+    # todo dont keep this on for prod mode
+    print(len(old))
+    if len(old) != 90000:
+        pixels = read_pixels(postgres_client)
+        for pixel in pixels:
+            field_name = f"{pixel['x']}_{pixel['y']}"
+            await redis_client.hset('pixels', field_name, pixel['c'])
+    t2 = time.time()
+    print(t2 - t1)
     postgres_client.close()
     await redis_client.close()
-    # with get_session() as session:
-    #     pixels = read_pixels(session)
-    #     for pixel in pixels:
-    #         # Use the x and y coordinates as the field names in Redis
-    #         field_name = f"{pixel.x}_{pixel.y}"
-    #         # Store the pixel color as the field value
-    #         redis_client.hset('pixels', field_name, pixel.color)
