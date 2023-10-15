@@ -1,11 +1,12 @@
 import json
 import os
 import time
-import httpx
-import requests
-from newsdataapi import NewsDataApiClient
-from bs4 import BeautifulSoup
 import uuid
+from datetime import datetime
+
+import requests
+from bs4 import BeautifulSoup
+from newsdataapi import NewsDataApiClient
 
 
 def read_key():
@@ -40,24 +41,32 @@ def read_news():
         with open(f"test/{i}", "r", encoding="utf-8") as file:
             data = json.load(file)
             for res in data.get("results", []):
-                process_news(res)
-                return
+                news_id = process_news(res)
 
 
 def process_news(result):
     title = result["title"]
     link = result["link"]
+    date = result["pubDate"]
+    date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S").date()
+    date = date.strftime("%d.%m.%Y")
+
+    source = result["source_id"]
     creator = result["creator"]
-    keywords = result["keywords"]
+
     content = result["content"]
     desc = result["description"]
-    image_url = result["image_url"]
+
     category = result["category"]
-    source = result["source_id"]
-    if image_url is None:
-        image_url = fetch_image_url(link, source)
-    if image_url:
-        fetch_image(image_url)
+    keywords = result["keywords"]
+
+    image_url = result["image_url"]
+    id = result["article_id"]
+    # if image_url is None:
+    #     image_url = fetch_image_url(link, source)
+    # if image_url:
+    #     fetch_image(image_url)
+    return id
 
 
 SOURCES = ["ohtuleht", "postimees", "telegramet", "saartehaal", "onlinele"]
