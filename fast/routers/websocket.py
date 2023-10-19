@@ -44,14 +44,3 @@ async def websocket_endpoint(websocket: WebSocket, db: Session = Depends(get_db)
         connected_clients.remove(websocket)
 
 
-async def send_dummy_message():
-    while True:
-        await asyncio.sleep(1)  # Wait for 1 second
-        message = {"message": "Dummy Message"}
-        j = json.dumps(message)
-        # print(len(connected_clients))
-        for client in connected_clients:
-            await client.send_text(j)
-loop = asyncio.get_event_loop()
-
-loop.create_task(send_dummy_message())
