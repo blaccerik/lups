@@ -3,6 +3,7 @@ import {webSocket} from "rxjs/webSocket";
 import {map, Observable, retry, Subject} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
+import {environment} from "../../environments/environment";
 
 export interface PixelResponse {
   x: number,
@@ -27,12 +28,13 @@ export class PlaceService {
     if (this.oauthService.hasValidIdToken()) {
       token = this.oauthService.getIdToken();
     }
-    this.subject = webSocket(`ws://localhost:8000/api/place/ws?authorization=${token}`);
+    console.log(environment.wsUrl)
+    this.subject = webSocket(`${environment.wsUrl}?authorization=${token}`);
 
     // get websocket
     this.subject.pipe(retry({delay: 1000})).subscribe((message: any) => {
       this.messagesSubject.next({
-        color: this.predefinedColors[message.c],
+        color: message.color,
         x: message.x,
         y: message.y
       })

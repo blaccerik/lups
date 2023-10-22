@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import {computed, NgModule} from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import {HomeComponent} from "./components/home/home.component";
 import {CreateNewsComponent} from "./components/news/create-news/create-news.component";
@@ -8,6 +8,7 @@ import {TestComponent} from "./components/test/test.component";
 import {PromisesComponent} from "./components/promises/promises.component";
 import {PlaceComponent} from "./components/place/place.component";
 import {AllNewsComponent} from "./components/news/all-news/all-news.component";
+import {SupertestComponent} from "./supertest/supertest.component";
 
 const routes: Routes = [
   { path: '', component: HomeComponent},
@@ -17,7 +18,8 @@ const routes: Routes = [
   { path: "news/create", component: CreateNewsComponent},
   { path: "news/:id", component: SingleNewsComponent},
   { path: "test", component: TestComponent},
-  { path: "place", component: PlaceComponent}
+  { path: "place", component: PlaceComponent},
+  { path: "callback", component: SupertestComponent}
 ];
 
 @NgModule({

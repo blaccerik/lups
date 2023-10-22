@@ -8,6 +8,6 @@ from utils.database import get_db
 router = APIRouter(prefix="/api/news")
 
 @router.get("/")
-async def get_news(page: int, db: Session = Depends(get_db)):
+async def get_news(page=0, db: Session = Depends(get_db)):
     news = read_all_news(page, db)
     return news

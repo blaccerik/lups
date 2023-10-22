@@ -39,9 +39,11 @@ async def startup_event():
     # todo dont keep this on for prod mode
     if len(old) != 90000:
         pixels = read_pixels(postgres_client)
+        pixel_data = {}
         for pixel in pixels:
-            field_name = f"{pixel['x']}_{pixel['y']}"
-            await redis_client.hset('pixels', field_name, pixel['c'])
+            field_name = f"{pixel.x}_{pixel.y}"
+            pixel_data[field_name] = pixel.color
+        await redis_client.hmset('pixels', pixel_data)
     t2 = time.time()
     print("time taken", t2 - t1)
     postgres_client.close()

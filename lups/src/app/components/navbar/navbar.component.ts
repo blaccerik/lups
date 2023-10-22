@@ -44,6 +44,8 @@ export class NavbarComponent {
 
   login() {
     this.isMenuOpen = false;
+    // Store the original URL in local storage before initiating the login
+    localStorage.setItem('originalUrl', window.location.pathname);
     this.authService.initLoginFlow('google');
   }
 
