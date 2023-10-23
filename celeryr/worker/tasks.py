@@ -38,19 +38,21 @@ def load_model():
 
 @celery_app.on_after_configure.connect
 def setup_model(sender, **kwargs):
-    global model
-    global tokenizer
-    print("start loading")
-    s = time.time()
-    model, tokenizer = load_model()
-    e = time.time()
-    print(f"models loaded: {e - s}")
-    print("use model")
-    s = time.time()
-    res = use_model("what color is the sky")
-    print(res)
-    e = time.time()
-    print(f"model used: {e - s}")
+    print(sender)
+    # global model
+    # global tokenizer
+    # print("start loading")
+    # s = time.time()
+    # model, tokenizer = load_model()
+    # e = time.time()
+    # print(f"models loaded: {e - s}")
+    # print("use model")
+    # s = time.time()
+    # res = use_model("what color is the sky")
+    # print(res)
+    # e = time.time()
+    # print(f"model used: {e - s}")
+
 
 
 def get_chat(chat_id):
@@ -112,3 +114,9 @@ def simple_task(chat_id):
     res = use_model(text)
     print(f"output: {res}")
     return res
+
+@celery_app.task(name="test")
+def test():
+    print("hi")
+
+

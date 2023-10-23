@@ -29,9 +29,14 @@ export class AppComponent {
           this.userInfoService.userName = r.info.name
           this.userInfoService.picture = r.info.picture
           this.userInfoService.googleId = r.info.sub
-          this.router.navigate([localStorage.getItem("originalUrl")]).then(r => {
-            console.log(r)
-          })
+          const url = localStorage.getItem("originalUrl")
+          if (url) {
+            localStorage.removeItem("originalUrl")
+            this.router.navigate([url]).then(r => {
+              console.log(r)
+            })
+          }
+
         }).catch((error: any) => {
           console.log("catch")
           console.log("error", error)

@@ -4,7 +4,7 @@ from redis.client import Redis
 from sqlalchemy.orm import Session
 
 from models.models import DBPixel
-from utils.schemas import Pixel
+from utils.schemas import PixelSmall, PixelLarge
 
 SIZE = 300
 COLORS = [
@@ -12,14 +12,14 @@ COLORS = [
 ]
 
 
-def read_pixels(session: Session) -> List[Pixel]:
+def read_pixels(session: Session) -> List[PixelLarge]:
     pixels = session.query(DBPixel).all()
-    return [Pixel(x=p.x, y=p.y, c=COLORS.index(p.color)) for p in pixels]
+    return [PixelLarge(x=p.x, y=p.y, color=p.color) for p in pixels]
 
 
-async def read_pixels_redis(redis_client: Redis) -> List[Pixel]:
+async def read_pixels_redis(redis_client: Redis) -> List[PixelSmall]:
     pixels = await redis_client.hgetall("pixels")
-    return [Pixel(
+    return [PixelSmall(
         x=int(k.split("_")[0]),
         y=int(k.split("_")[1]),
         c=COLORS.index(v)

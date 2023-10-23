@@ -32,13 +32,22 @@ class MessagePost(BaseModel):
 
 
 class News(BaseModel):
-    user_id: int
+    creator_id: int
+    creator: str
+    id: int
     title: str
+    date: str
     text: str
     category: str
+    has_image: bool
 
 
-class Pixel(BaseModel):
+class PixelSmall(BaseModel):
     x: int
     y: int
     c: int
+
+class PixelLarge(BaseModel):
+    x: int
+    y: int
+    color: str

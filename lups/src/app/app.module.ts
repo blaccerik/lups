@@ -30,7 +30,6 @@ import {AllNewsComponent} from './components/news/all-news/all-news.component';
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
 import {environment} from '../environments/environment';
 import {MatButtonModule} from "@angular/material/button";
-import { SupertestComponent } from './supertest/supertest.component';
 
 const socketIoConfig: SocketIoConfig = {
   url: environment.wsUrl, // Update this with your Flask-SocketIO server URL
@@ -51,8 +50,7 @@ const socketIoConfig: SocketIoConfig = {
     PlaceComponent,
     NotLoggedInPopupComponent,
     HelpDialogComponent,
-    AllNewsComponent,
-    SupertestComponent,
+    AllNewsComponent
   ],
   imports: [
     BrowserAnimationsModule,

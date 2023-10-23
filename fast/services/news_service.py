@@ -1,14 +1,14 @@
-# running locally
-from PIL import Image
 import os
 import sys
 from pathlib import Path
 
+from PIL import Image
 from fastapi import HTTPException
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from models.models import DBNews, DBNewsCategory, DBUser
+from utils.schemas import News
 
 if sys.platform == "win32":
     IMAGE_PATH = f"{Path(os.path.abspath(__file__)).parent.parent.parent}/images"
@@ -16,27 +16,33 @@ else:
     IMAGE_PATH = "/usr/src/app/images"
 
 NEWS_PAGE_SIZE = 15
+NEWS_CATEGORIES = [
+    "Eesti",
+    "Majandus",
+    "Auto",
+    "Tervis"
+]
 
-def db_news_to_dict(n, include_text):
+
+def db_news_to_news(n, include_text) -> News:
     date = n.date.strftime("%d.%m.%Y")
-    news_dict = {
-        "id": n.id,
-        "title": n.title,
-        "date": date,
-        "category": n.cat_name,
-        "creator": n.user_name,
-        "creator_id": n.google_id
-    }
-    if os.path.exists(IMAGE_PATH + f"/{n.id}.jpg"):
-        news_dict["has_image"] = True
-    else:
-        news_dict["has_image"] = False
+    news = News(
+        creator_id=n.google_id,
+        creator=n.name,
+        id=n.id,
+        title=n.title,
+        date=date,
+        category=n.cat_name,
+        text="",
+        has_image=os.path.exists(IMAGE_PATH + f"/{n.id}.jpg")
+    )
     if include_text:
-        news_dict["text"] = n.text
+        news.text = n.text
 
-    return news_dict
+    return news
 
-def read_all_news(page_nr, session: Session):
+
+def read_all_news(page_nr: int, session: Session):
     news = session.query(
         DBNews.id,
         DBNews.title,
@@ -44,11 +50,10 @@ def read_all_news(page_nr, session: Session):
         DBNewsCategory.name.label("cat_name"),
         DBUser.name.label("user_name"),
         DBUser.google_id
-    ).join(DBNewsCategory).join(DBUser).order_by(desc(DBNews.id)).offset(page_nr * NEWS_PAGE_SIZE).limit(NEWS_PAGE_SIZE).all()
-    results = []
-    for n in news:
-        results.append(db_news_to_dict(n, include_text=False))
-    return results
+    ).join(DBNewsCategory).join(DBUser).order_by(desc(DBNews.id)).offset(page_nr * NEWS_PAGE_SIZE).limit(
+        NEWS_PAGE_SIZE).all()
+    return [db_news_to_news(n, include_text=False) for n in news]
+
 
 def read_news(news_id: int, session: Session):
     news = session.query(
@@ -63,7 +68,8 @@ def read_news(news_id: int, session: Session):
     print(news, news_id)
     if news is None:
         raise HTTPException(status_code=404, detail="News not found")
-    return db_news_to_dict(news, include_text=True)
+    return db_news_to_news(news, include_text=True)
+
 
 # def create_news(
 #         user_id: int,
@@ -115,9 +121,11 @@ def save_file(file, news_id: int):
     resized_image = image.resize((300, 300))
     resized_image.save(IMAGE_PATH + f"/{news_id}.jpg")
 
+
 def remove_file(news_id: int):
     if os.path.exists(IMAGE_PATH + f"/{news_id}.jpg"):
         os.remove(IMAGE_PATH + f"/{news_id}.jpg")
+
 
 def find_image(news_id: int):
     # try to find image

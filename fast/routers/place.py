@@ -9,13 +9,13 @@ from redis.client import Redis
 from services.place_service import COLORS, update_pixel, read_pixels_redis
 from utils.auth import get_current_user_with_token
 from utils.redis_database import get_redis
-from utils.schemas import Pixel
+from utils.schemas import PixelSmall
 
 router = APIRouter(prefix="/api/place")
 connected_clients = []
 
 
-@router.get("/", response_model=List[Pixel])
+@router.get("/", response_model=List[PixelSmall])
 async def get_pixels(redis_client: Redis = Depends(get_redis)):
     return await read_pixels_redis(redis_client)
 
