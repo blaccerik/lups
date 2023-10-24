@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # copy model
-COPY t5-model worker/t5-model
+COPY t5-model t5-model
 
 # copy project
 COPY worker worker

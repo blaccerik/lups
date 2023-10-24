@@ -9,10 +9,9 @@ celery_app = Celery('my_celery_app',
                     backend=DATABASE_URI,  # Replace with your Redis server configuration
                     )
 
-# Configure the beat schedule to run the task every 10 seconds.
 celery_app.conf.beat_schedule = {
-    'run-task-every-10-seconds': {
-        'task': 'test',
-        'schedule': timedelta(seconds=10),
+    'run-task': {
+        'task': 'get_news',
+        'schedule': 30,
     },
 }

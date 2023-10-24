@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, PrimaryKeyConstraint, Date, Text, func
 from sqlalchemy.orm import relationship
 
-from utils.database import Base, engine, get_db
+from utils.database import Base, engine, get_db, SessionLocal
 
 
 class Item(Base):
@@ -17,7 +17,7 @@ class DBUser(Base):
 
     # len is 20
     google_id = Column(String(25), nullable=False, unique=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(100), nullable=False)
 
     def __repr__(self):
         return f"User(id={self.id}, name='{self.name}')"
@@ -62,16 +62,26 @@ class DBPixel(Base):
 class DBNews(Base):
     __tablename__ = 'news'
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    title = Column(String(100), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    title = Column(Text, nullable=False)
     text = Column(Text, nullable=False)
     date = Column(Date, default=func.current_date(), nullable=False)
 
     # Define a foreign key reference to the NewsCategory table
     category_id = Column(Integer, ForeignKey('news_categories.id'), nullable=False)
 
-    # Establish a many-to-one relationship with NewsCategory
     category = relationship('DBNewsCategory', back_populates='news')
+    extra = relationship('DBNewsExtra', back_populates='news')
+
+
+class DBNewsExtra(Base):
+    __tablename__ = 'news_extra'
+    id = Column(Integer, ForeignKey('news.id'), primary_key=True)
+    link = Column(String, nullable=False)
+    creator = Column(String(100), nullable=False)
+    article_id = Column(String(32), unique=True, nullable=False)
+
+    news = relationship('DBNews', back_populates='extra')
 
 
 class DBNewsCategory(Base):
@@ -84,20 +94,43 @@ class DBNewsCategory(Base):
 
 
 def init_db():
+    print("start")
     # Drop all tables
     Base.metadata.drop_all(engine)
     print("dropped")
     # Create all tables
     Base.metadata.create_all(engine)
     print("created")
-    with get_db() as session:
-        # static data
-        from services.place_service import SIZE
-        for x in range(SIZE):
-            for y in range(SIZE):
-                p = DBPixel()
-                p.x = x
-                p.y = y
-                p.color = "white"
-                session.add(p)
-        session.commit()
+
+    postgres_client = SessionLocal()
+
+    # static data
+    from services.place_service import SIZE
+    for x in range(SIZE):
+        for y in range(SIZE):
+            p = DBPixel()
+            p.x = x
+            p.y = y
+            p.color = "white"
+            postgres_client.add(p)
+    postgres_client.commit()
+
+
+    translate = {
+        "top": "top",
+        "business": "äri",
+        "world": "maailm",
+        "sports": "sport",
+        "entertainment": "meelelahutus",
+        "health": "tervis",
+        "food": "toit",
+        "other": "muu"
+    }
+    for i in translate.values():
+        cat = DBNewsCategory()
+        cat.name = i
+        postgres_client.add(cat)
+
+
+    postgres_client.close()
+    print("done")

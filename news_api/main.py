@@ -62,6 +62,7 @@ def process_news(result):
 
     image_url = result["image_url"]
     id = result["article_id"]
+    print(creator)
     # if image_url is None:
     #     image_url = fetch_image_url(link, source)
     # if image_url:
@@ -118,6 +119,6 @@ def fetch_image(url):
 
 
 if __name__ == '__main__':
-    key = read_key()
-    main(key)
-    # read_news()
+    # key = read_key()
+    # main(key)
+    read_news()
