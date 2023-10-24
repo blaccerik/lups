@@ -1,5 +1,6 @@
 from enum import Enum
 
+from fastapi import UploadFile
 from pydantic import BaseModel
 
 
@@ -32,7 +33,7 @@ class MessagePost(BaseModel):
 
 
 class News(BaseModel):
-    creator_id: int
+    creator_id: int | None
     creator: str
     id: int
     title: str
@@ -40,6 +41,10 @@ class News(BaseModel):
     text: str
     category: str
     has_image: bool
+    link: str | None
+
+class NewsId(BaseModel):
+    id: int
 
 
 class PixelSmall(BaseModel):
