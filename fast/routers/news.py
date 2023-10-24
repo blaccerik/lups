@@ -31,13 +31,27 @@ async def get_news_image(news_id: int):
 
 
 @router.post("/create", response_model=NewsId)
-async def upload_image_and_title(
+async def post_news(
         title: str = Form(),
         text: str = Form(),
         category: str = Form(),
-        image: UploadFile = File(),
+        image: UploadFile = File(default=None),
         current_user: User = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
     user_id = read_user(current_user, db)
-    return create_news(user_id, title, text, category, image.file, db)
+    return create_news(user_id, title, text, category, image, db)
+
+
+@router.put("/{news_id}", response_model=NewsId)
+async def put_news(
+        news_id: int,
+        title: str = Form(),
+        text: str = Form(),
+        category: str = Form(),
+        image: UploadFile = File(default=None),
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
+    user_id = read_user(current_user, db)
+    return create_news(user_id, title, text, category, image, db, news_id)

@@ -1,10 +1,9 @@
 import os
 import sys
 from pathlib import Path
-from tempfile import TemporaryFile
 
 from PIL import Image
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from models.models import DBNews, DBNewsCategory, DBUser, DBNewsExtra
@@ -116,7 +115,7 @@ def create_news(
         title: str,
         text: str,
         category: str,
-        file: TemporaryFile,
+        file: UploadFile,
         session: Session,
         news_id=None) -> NewsId:
     # check if can edit
@@ -144,7 +143,7 @@ def create_news(
     session.add(n)
     session.commit()
     if file:
-        save_file(file, n.id)
+        save_file(file.file, n.id)
     else:
         remove_file(n.id)
     return NewsId(id=n.id)

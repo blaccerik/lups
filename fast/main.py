@@ -1,5 +1,3 @@
-import logging
-import sys
 import time
 
 from fastapi import FastAPI
@@ -9,8 +7,6 @@ from routers import items, news, place, chat
 from services.place_service import read_pixels
 from utils.database import SessionLocal
 from utils.redis_database import get_client
-
-logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 # Create an instance of FastAPI
 app = FastAPI()
