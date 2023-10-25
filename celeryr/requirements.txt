@@ -7,5 +7,5 @@ sentencepiece==0.1.99
 psycopg2==2.9.6
 transformers==4.30.2
 torch==2.0.1
-cachetools==5.3.1
+beautifulsoup4==4.12.2
 SQLAlchemy==2.0.16

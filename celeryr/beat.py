@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 
 from celery import Celery
+from celery.schedules import crontab
 
 DATABASE_URI = os.environ.get("REDIS_BROKER_URL", 'redis://localhost:6379/0')
 celery_app = Celery('my_celery_app',
@@ -12,6 +13,6 @@ celery_app = Celery('my_celery_app',
 celery_app.conf.beat_schedule = {
     'run-task': {
         'task': 'get_news',
-        'schedule': 30,
+        'schedule': crontab(hour=16,minute=18),
     },
 }

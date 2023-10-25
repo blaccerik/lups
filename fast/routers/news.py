@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/news")
 
 
 @router.get("/", response_model=List[News])
-async def get_news(page=0, db: Session = Depends(get_db)):
+async def get_news(page: int = 0, db: Session = Depends(get_db)):
     return read_all_news(page, db)
 
 

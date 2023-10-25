@@ -39,7 +39,8 @@ def db_news_to_news(n, include_text) -> News:
         date=date,
         category=n.category_name,
         text="",
-        has_image=os.path.exists(IMAGE_PATH + f"/{n.id}.jpg")
+        has_image=os.path.exists(IMAGE_PATH + f"/{n.id}.jpg"),
+        link=None
     )
     if include_text:
         news.text = n.text

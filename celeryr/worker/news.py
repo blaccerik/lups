@@ -160,6 +160,7 @@ def process_news(result, session: Session):
         image_url = fetch_image_url(link, source)
     if image_url:
         fetch_image(image_url, dbnews.id)
+    print(dbnews.id)
     session.add(dbextra)
 
 

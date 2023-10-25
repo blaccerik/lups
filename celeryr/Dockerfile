@@ -15,9 +15,15 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install newsdataapi
 
 # copy model
 COPY t5-model t5-model
+
+# copy beat
+COPY beat.py beat.py
+
+COPY worker/key.txt key.txt
 
 # copy project
 COPY worker worker
