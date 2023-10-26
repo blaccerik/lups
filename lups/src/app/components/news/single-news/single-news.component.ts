@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {NewsResponse, NewsService} from "../../../services/news.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {UserInfoService} from "../../../services/user-info.service";
@@ -25,6 +25,7 @@ export class SingleNewsComponent {
       category: ["", [Validators.required, Validators.maxLength(50)]]
     });
   }
+
   form: FormGroup;
   title = ""
   text = ""
@@ -82,7 +83,7 @@ export class SingleNewsComponent {
     this.newsService.getImage(id).subscribe({
       next: response => {
         this.image = URL.createObjectURL(response);
-        this.imageFile = new File([response], "image.jpg", { type: response.type });
+        this.imageFile = new File([response], "image.jpg", {type: response.type});
         this.isLoading = false;
       },
       error: err => {
@@ -92,6 +93,7 @@ export class SingleNewsComponent {
       }
     })
   }
+
   canEdit(): boolean {
     return this.userInfoService.googleId === this.creator_id
   }

@@ -1,8 +1,6 @@
-import {Component, ElementRef, HostListener} from '@angular/core';
+import {Component, ElementRef} from '@angular/core';
 import {NewsResponse, NewsService} from "../../../services/news.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {UserInfoService} from "../../../services/user-info.service";
-import {FormBuilder, Validators} from "@angular/forms";
 
 
 @Component({
@@ -17,7 +15,8 @@ export class AllNewsComponent {
     private newsService: NewsService,
     private router: Router,
     private el: ElementRef
-  ) {}
+  ) {
+  }
 
   currentPage: number
   newsItems: NewsResponse[] = []
@@ -66,6 +65,7 @@ export class AllNewsComponent {
   }
 
   selector: string = ".search-results";
+
   onScroll() {
     this.currentPage++;
     this.loadNews(this.currentPage)

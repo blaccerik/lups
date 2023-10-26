@@ -147,4 +147,5 @@ def create_news(
         save_file(file.file, n.id)
     else:
         remove_file(n.id)
+    print(n.id)
     return NewsId(id=n.id)

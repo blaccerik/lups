@@ -33,7 +33,7 @@ class MessagePost(BaseModel):
 
 
 class News(BaseModel):
-    creator_id: int | None
+    creator_id: str | None
     creator: str
     id: int
     title: str

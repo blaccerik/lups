@@ -1,15 +1,53 @@
-<form [formGroup]="form">
-  <div>
-    <input style="width: 300px" type="text" id="title" formControlName="title">
-  </div>
-  <div>
-    <input style="width: 150px" type="text" id="category" formControlName="category">
-  </div>
-  <img style="width: 300px; height: 300px" *ngIf="image" [src]="image" alt="Image">
-  <button *ngIf="image" (click)="remove()">Remove image</button>
-  <div>
-    <textarea rows="10" cols="70" id="text" formControlName="text"></textarea>
-  </div>
-  <input type="file" id="image" (change)="onFileChange($event)" accept="image/*">
-  <button (click)="save()" [disabled]="!form.valid">Save</button>
-</form>
+<div class="container">
+  <form [formGroup]="form">
+
+    <mat-form-field class="w-100p" appearance="outline">
+      <mat-label>Pealkiri</mat-label>
+      <input id="title" matInput type="text" formControlName="title"/>
+      <mat-error *ngIf="hasError('title', 'required')">
+        Puudu
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="w-100p" appearance="outline">
+      <mat-label>Kategooria</mat-label>
+      <mat-select formControlName="category">
+        <mat-option value="munn">munn</mat-option>
+        <mat-option value="türa">türa</mat-option>
+      </mat-select>
+      <mat-error *ngIf="hasError('category', 'required')">
+        Puudu
+      </mat-error>
+    </mat-form-field>
+
+    <mat-card class="image-section" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Vali pilt</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="image-upload">
+          <label for="image" class="custom-file-upload">
+            <mat-icon>attach_file</mat-icon>
+            Choose Image
+          </label>
+          <input type="file" id="image" (change)="onFileChange($event)" accept="image/*" hidden>
+        </div>
+        <img class="rounded-image" *ngIf="image" [src]="image" alt="Image">
+        <mat-card-actions *ngIf="image">
+          <button mat-raised-button color="warn" (click)="remove()">Remove Image</button>
+        </mat-card-actions>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-form-field class="w-100p" appearance="outline">
+      <mat-label>Tekst</mat-label>
+      <textarea id="text" matInput type="text" formControlName="text" rows="10" cols="70"></textarea>
+      <mat-error *ngIf="hasError('text', 'required')">
+        Puudu
+      </mat-error>
+    </mat-form-field>
+
+    <button (click)="save()" mat-raised-button [disabled]="form.invalid">Salvesta</button>
+
+  </form>
+</div>
