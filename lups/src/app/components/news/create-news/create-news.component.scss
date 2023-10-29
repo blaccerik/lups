@@ -1,0 +1,43 @@
+.container {
+  background-color: white;
+  margin: 5%;
+  padding: 5%;
+}
+
+.w-100p {
+  width: 100%;
+}
+
+.image-section {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.custom-file-upload {
+  cursor: pointer;
+  padding: 10px 20px;
+  border: 2px dashed #ccc;
+  background-color: #f9f9f9;
+  display: inline-block;
+  text-align: center;
+  border-radius: 5px;
+  color: #666;
+  transition: border 0.3s;
+}
+
+.custom-file-upload:hover {
+  border: 2px dashed #666;
+}
+
+.image-upload {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1rem 0;
+}
+
+.rounded-image {
+  width: 100%;
+  border-radius: 8px; /* You can adjust the border-radius value as needed */
+}
+

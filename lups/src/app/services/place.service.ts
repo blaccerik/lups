@@ -1,14 +1,13 @@
 import {Injectable} from '@angular/core';
-import {Socket} from 'ngx-socket-io';
-import {Observable, Observer} from "rxjs";
-import {OAuthService} from "angular-oauth2-oidc";
+import {webSocket} from "rxjs/webSocket";
+import {map, Observable, retry, Subject} from "rxjs";
 import {HttpClient} from "@angular/common/http";
-
+import {OAuthService} from "angular-oauth2-oidc";
+import {environment} from "../../environments/environment";
 
 export interface PixelResponse {
   x: number,
   y: number,
-  c: number,
   color: string
 }
 
@@ -17,62 +16,55 @@ export interface PixelResponse {
 })
 export class PlaceService {
 
-  constructor(private socket: Socket,
-              private http: HttpClient,
-              private oauthService: OAuthService) {}
+  private subject: any;
+  private messagesSubject = new Subject<PixelResponse>();
+  predefinedColors = [
+    "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
+  ];
 
-  sendData(x: number, y: number, color: string) {
-    const data = {
-      x: x,
-      y: y,
-      color: color
+  constructor(private http: HttpClient, private oauthService: OAuthService) {
+
+    let token = ""
+    if (this.oauthService.hasValidIdToken()) {
+      token = this.oauthService.getIdToken();
     }
-    this.socket.emit("update", data)
-  }
+    console.log(environment.wsUrl)
+    this.subject = webSocket(`${environment.wsUrl}?authorization=${token}`);
 
-  // Method to listen to a custom event from the server
-  receiveMyResponse(): Observable<PixelResponse> {
-    return this.socket.fromEvent('update_response');
-  }
-
-  // Connect to the WebSocket server
-  connect(): Observable<string> {
-    return new Observable((observer) => {
-      // Create the extraHeaders object
-      const extraHeaders: { [key: string]: string } = {};
-      if (this.oauthService.hasValidIdToken()) {
-        const accessToken = this.oauthService.getIdToken();
-        extraHeaders['Authorization'] = `Bearer ${accessToken}`;
-      }
-      const socketOptions = {
-        url: this.socket.ioSocket.io.uri,
-        options: {
-          extraHeaders: extraHeaders  // Assign the extraHeaders object
-        }
-      };
-      // Disconnect from the previous socket, if any
-      console.log(this.socket.ioSocket.io.uri);
-      this.socket.disconnect();
-      this.socket = new Socket(socketOptions);
-      this.socket.on('connect', () => {
-        console.log('Connected to the server.');
-        observer.next('Socket connection successful'); // Emit a success value
-        observer.complete(); // Complete the observable
-      });
-
-      this.socket.on('connect_error', (error: any) => {
-        console.error('Socket connection error:', error);
-        observer.error('Socket connection error'); // Emit an error value
-      });
-    });
+    // get websocket
+    this.subject.pipe(retry({delay: 1000})).subscribe((message: any) => {
+      this.messagesSubject.next({
+        color: message.color,
+        x: message.x,
+        y: message.y
+      })
+    })
   }
 
   getPixels(): Observable<PixelResponse[]> {
-    return this.http.get<PixelResponse[]>("api/place")
+    return this.http.get<any>("api/place").pipe(
+      map(data => {
+        // Transform the data here
+        return data.map((message: any) => {
+          return {
+            color: this.predefinedColors[message.c],
+            x: message.x,
+            y: message.y
+          };
+        });
+      })
+    );
   }
 
-  // Disconnect from the WebSocket server
-  disconnect() {
-    this.socket.disconnect();
+  connect(): any {
+    return this.messagesSubject.asObservable();
+  }
+
+  send(x: number, y: number, color: string) {
+    this.subject.next({
+      x: x,
+      y: y,
+      color: color
+    })
   }
 }

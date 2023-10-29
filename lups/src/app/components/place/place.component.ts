@@ -12,11 +12,10 @@ import {HelpDialogComponent} from "./help-dialog/help-dialog.component";
   styleUrls: ['./place.component.scss']
 })
 export class PlaceComponent implements OnInit {
-
-  selectedColor: string = 'white';
-  predefinedColors: string[] = [
+  predefinedColors = [
     "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
   ];
+  selectedColor: string = 'white';
   private context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement
   private container: HTMLDivElement
@@ -89,19 +88,6 @@ export class PlaceComponent implements OnInit {
     private renderer: Renderer2) { }
 
   ngOnInit(): void {
-    // connect with websocket
-    this.placeService.connect().subscribe({
-      next: value => {
-        this.loadPixels()
-    },
-      error: err => {
-        console.log(err)
-      }
-    })
-
-  }
-
-  private loadPixels() {
     this.placeService.getPixels().subscribe({
       next: (value: PixelResponse[]) => {
         this.loading = false;
@@ -119,19 +105,18 @@ export class PlaceComponent implements OnInit {
 
         // draw canvas
         for (const pixelResponse of value) {
-          this.context.fillStyle = this.indexToColor(pixelResponse.c)
+          this.context.fillStyle = pixelResponse.color
           this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
         }
-        // start listening to websocket
-        this.placeService.receiveMyResponse().subscribe((response: PixelResponse) => {
-          this.context.fillStyle = response.color
-          this.context.fillRect(response.x * this.pixelSize, response.y * this.pixelSize, this.pixelSize, this.pixelSize);
-        });
-      }})
-  }
 
-  private indexToColor(index: number): string {
-    return this.predefinedColors[index]
+        // connect to websocket
+        this.placeService.connect().subscribe(
+          (pixelResponse: PixelResponse) => {
+            this.context.fillStyle = pixelResponse.color
+            this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
+          }
+        );
+      }})
   }
 
   selectColor(color: string): void {
@@ -156,7 +141,7 @@ export class PlaceComponent implements OnInit {
 
   private canPlacePixel(): boolean {
     const currentTime = Date.now();
-    if (currentTime - this.lastPixelPlacementTimestamp >= 50) {
+    if (currentTime - this.lastPixelPlacementTimestamp >= 500) {
       this.lastPixelPlacementTimestamp = currentTime;
       return true;
     } else {
@@ -192,7 +177,7 @@ export class PlaceComponent implements OnInit {
     this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize + 3, 1, 1);
 
     // send request to backend
-    this.placeService.sendData(x, y, this.selectedColor)
+    this.placeService.send(x, y, this.selectedColor)
   }
 
   toggleMenu() {

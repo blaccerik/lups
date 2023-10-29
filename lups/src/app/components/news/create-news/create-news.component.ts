@@ -1,7 +1,6 @@
-import {Component, Inject, Input, Optional} from '@angular/core';
-import {NavigationExtras, Router} from "@angular/router";
-import {NewsService} from "../../../services/news.service";
-import {MAT_DIALOG_DATA} from "@angular/material/dialog";
+import {Component, Input} from '@angular/core';
+import {Router} from "@angular/router";
+import {NewsId, NewsService} from "../../../services/news.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {OAuthService} from "angular-oauth2-oidc";
 
@@ -17,6 +16,7 @@ export class CreateNewsComponent {
   @Input() edit_cat: string;
   @Input() edit_id: string;
 
+
   constructor(
     private newsService: NewsService,
     private router: Router,
@@ -27,6 +27,7 @@ export class CreateNewsComponent {
       this.oauthService.initLoginFlow('google');
     }
   }
+
   form: FormGroup;
   image: string | null
 
@@ -57,17 +58,20 @@ export class CreateNewsComponent {
 
   save() {
     if (this.form.valid) {
-      const { title, text, category } = this.form.value;
+      const {title, text, category} = this.form.value;
       this.newsService.save(this.edit_id, title, text, category, this.edit_file).subscribe({
-        next: (value: number) => {
-          const currentUrl = this.router.url;
-          this.router.navigate(["/news/" + value]).then(r => {
+        next: (value: NewsId) => {
+          this.router.navigate(["/news/" + value.id]).then(r => {
             if (!r) {
               window.location.reload()
             }
-           })
+          })
         }
       })
     }
+  }
+
+  hasError(path: string, errorCode: string) {
+    return this.form && this.form.hasError(errorCode, path);
   }
 }

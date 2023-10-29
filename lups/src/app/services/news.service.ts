@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {catchError, Observable, of} from "rxjs";
+import {Observable} from "rxjs";
 
 
 export interface NewsResponse {
@@ -17,6 +17,10 @@ export interface NewsResponse {
   loading: boolean
 }
 
+export interface NewsId {
+  id: number
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,20 +28,21 @@ export class NewsService {
 
   private url = 'api/news';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
-  save(id: string | null, title: string, text: string, category: string, file: File | null): Observable<number> {
+  save(id: string | null, title: string, text: string, category: string, file: File | null): Observable<NewsId> {
     const formData: FormData = new FormData();
     formData.append('title', title);
     formData.append('text', text);
     formData.append("category", category)
     if (file) {
-      formData.append('file', file, file.name);
+      formData.append('image', file, file.name);
     }
     if (id) {
-      return this.http.put<number>(this.url + "/" + id, formData)
+      return this.http.put<NewsId>(this.url + "/" + id, formData)
     } else {
-      return this.http.post<number>(this.url + "/create", formData)
+      return this.http.post<NewsId>(this.url + "/create", formData)
     }
   }
 
@@ -47,11 +52,10 @@ export class NewsService {
 
   getAll(page: number): Observable<NewsResponse[]> {
     const params = new HttpParams().set('page', page.toString());
-    console.log(this.url)
-    return this.http.get<NewsResponse[]>(this.url + "/", { params })
+    return this.http.get<NewsResponse[]>(this.url + "/", {params})
   }
 
   getImage(id: string): Observable<Blob> {
-    return this.http.get(this.url + "/" + id + "/image",  { responseType: 'blob' })
+    return this.http.get(this.url + "/" + id + "/image", {responseType: 'blob'})
   }
 }

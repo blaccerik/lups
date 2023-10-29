@@ -35,7 +35,7 @@ export class ChatService {
   }
 
   chats(): Observable<number[]> {
-    return this.http.get<number[]>(this.url)
+    return this.http.get<number[]>(this.url + "/")
   }
 
   delete(id: number): Observable<string> {
@@ -47,7 +47,7 @@ export class ChatService {
   }
 
   send(text: string, id: number): Observable<ChatResponse> {
-    const body = { text: text };
+    const body = { message: text };
     return this.http.post<ChatResponse>(this.url + "/" + id, body)
   }
 

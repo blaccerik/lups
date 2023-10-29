@@ -1,5 +1,4 @@
 export const environment = {
   production: false,
-  wsUrl: "ws://localhost:5000/ws/place",
-  apiUrl: '/api', // Use your local development server URL here
+  wsUrl: "ws://localhost:8000/api/place/ws",
 };
