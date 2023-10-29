@@ -25,4 +25,6 @@ def get_db():
 
 
 def create_db():
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(bind=engine)
+    print("done")
