@@ -15,20 +15,17 @@ import {ChatComponent} from './components/chat/chat.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {OAuthModule, OAuthService, OAuthStorage} from 'angular-oauth2-oidc';
-import {UserInfoService} from "./services/user-info.service";
 import {AuthInterceptor} from "./interceptors/auth.interceptor";
 import {NavbarComponent} from "./components/navbar/navbar.component";
 import {PromisesComponent} from './components/promises/promises.component';
 import {PlaceComponent} from './components/place/place.component';
 import {PlaceService} from "./services/place.service";
-import {SocketIoConfig, SocketIoModule} from "ngx-socket-io";
 import {NgxImageZoomModule} from 'ngx-image-zoom';
 import {NotLoggedInPopupComponent} from './services/not-logged-in-popup/not-logged-in-popup.component';
 import {HelpDialogComponent} from './components/place/help-dialog/help-dialog.component';
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {AllNewsComponent} from './components/news/all-news/all-news.component';
 import {InfiniteScrollModule} from "ngx-infinite-scroll";
-import {environment} from '../environments/environment';
 import {MatButtonModule} from "@angular/material/button";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatTabsModule} from "@angular/material/tabs";
@@ -42,11 +39,6 @@ import {MatChipsModule} from "@angular/material/chips";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatCardModule} from "@angular/material/card";
-
-const socketIoConfig: SocketIoConfig = {
-  url: environment.wsUrl, // Update this with your Flask-SocketIO server URL
-  options: {},
-};
 
 @NgModule({
   declarations: [
