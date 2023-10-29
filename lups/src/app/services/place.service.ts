@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
-import {webSocket} from "rxjs/webSocket";
-import {map, Observable, retry, Subject} from "rxjs";
+import {map, Observable, Subject} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
 import {environment} from "../../environments/environment";
@@ -42,7 +41,7 @@ export class PlaceService {
   }
 
   getPixels(): Observable<PixelResponse[]> {
-    return this.http.get<any>("api/place").pipe(
+    return this.http.get<any>("api/place/").pipe(
       map(data => {
         // Transform the data here
         return data.map((message: any) => {
