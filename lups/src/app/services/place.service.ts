@@ -29,16 +29,16 @@ export class PlaceService {
       token = this.oauthService.getIdToken();
     }
     console.log(environment.wsUrl)
-    this.subject = webSocket(`${environment.wsUrl}?authorization=${token}`);
-
-    // get websocket
-    this.subject.pipe(retry({delay: 1000})).subscribe((message: any) => {
-      this.messagesSubject.next({
-        color: message.color,
-        x: message.x,
-        y: message.y
-      })
-    })
+    // this.subject = webSocket(`${environment.wsUrl}?authorization=${token}`);
+    //
+    // // get websocket
+    // this.subject.pipe(retry({delay: 1000})).subscribe((message: any) => {
+    //   this.messagesSubject.next({
+    //     color: message.color,
+    //     x: message.x,
+    //     y: message.y
+    //   })
+    // })
   }
 
   getPixels(): Observable<PixelResponse[]> {

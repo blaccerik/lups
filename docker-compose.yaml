@@ -18,8 +18,8 @@ services:
     container_name: fastapi
     build:
       context: fast
-    ports:
-      - "8000:8000"
+    expose:
+      - 8000
     networks:
       - lups
     environment:
