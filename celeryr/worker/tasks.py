@@ -46,7 +46,7 @@ def simple_task(chat_id):
     return res
 
 
-@celery_app.task(name="get_news", time_limit=120)
+@celery_app.task(name="get_news", time_limit=600)
 def news():
     print("getting news")
     s = time.time()

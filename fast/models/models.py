@@ -123,7 +123,8 @@ def init_db():
         "entertainment": "meelelahutus",
         "health": "tervis",
         "food": "toit",
-        "other": "muu"
+        "other": "muu",
+        "environment": "keskkond"
     }
     for i in translate.values():
         cat = DBNewsCategory()

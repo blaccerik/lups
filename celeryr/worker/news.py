@@ -83,7 +83,8 @@ def cat_to_est(string):
         "sports": "sport",
         "entertainment": "meelelahutus",
         "health": "tervis",
-        "food": "toit"
+        "food": "toit",
+        "environment": "keskkond"
     }
     if string in translate:
         return translate[string]
@@ -160,7 +161,6 @@ def process_news(result, session: Session):
         image_url = fetch_image_url(link, source)
     if image_url:
         fetch_image(image_url, dbnews.id)
-    print(dbnews.id)
     session.add(dbextra)
 
 
