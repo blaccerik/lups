@@ -23,13 +23,14 @@ async def get_pixels(redis_client: Redis = Depends(get_redis)):
 @router.websocket("/ws")
 async def websocket_endpoint(authorization: str, websocket: WebSocket, redis_client: Redis = Depends(get_redis)):
     await websocket.accept()
+    print(websocket)
     user = await get_current_user_with_token(authorization)
     # Add the websocket to the list of connected clients
     connected_clients.append(websocket)
     try:
         while True:
             data = json.loads(await websocket.receive_text())
-
+            print(data)
             # user not logged in
             if not user:
                 continue

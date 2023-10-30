@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {map, Observable, Subject} from "rxjs";
+import {map, Observable, retry, Subject} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
 import {environment} from "../../environments/environment";
@@ -30,15 +30,15 @@ export class PlaceService {
     }
     console.log(environment.wsUrl)
     this.subject = webSocket(`${environment.wsUrl}?authorization=${token}`);
-    //
-    // // get websocket
-    // this.subject.pipe(retry({delay: 1000})).subscribe((message: any) => {
-    //   this.messagesSubject.next({
-    //     color: message.color,
-    //     x: message.x,
-    //     y: message.y
-    //   })
-    // })
+
+    // get websocket
+    this.subject.pipe(retry({delay: 1000})).subscribe((message: any) => {
+      this.messagesSubject.next({
+        color: message.color,
+        x: message.x,
+        y: message.y
+      })
+    })
   }
 
   getPixels(): Observable<PixelResponse[]> {
