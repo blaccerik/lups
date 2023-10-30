@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, PrimaryKeyConstraint, Date, Text, func
 from sqlalchemy.orm import relationship
 
-from utils.database import Base, engine, get_db, SessionLocal
+from utils.database import Base, engine, SessionLocal
 
 
 class Item(Base):
@@ -115,7 +115,6 @@ def init_db():
             postgres_client.add(p)
     postgres_client.commit()
 
-
     translate = {
         "top": "top",
         "business": "äri",
@@ -130,7 +129,7 @@ def init_db():
         cat = DBNewsCategory()
         cat.name = i
         postgres_client.add(cat)
-
+    postgres_client.commit()
 
     postgres_client.close()
     print("done")
