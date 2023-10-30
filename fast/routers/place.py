@@ -1,12 +1,10 @@
-import asyncio
 import json
-import random
 from typing import List
 
 from fastapi import APIRouter, Depends, WebSocket
 from redis.client import Redis
 
-from services.place_service import COLORS, update_pixel, read_pixels_redis
+from services.place_service import update_pixel, read_pixels_redis
 from utils.auth import get_current_user_with_token
 from utils.redis_database import get_redis
 from utils.schemas import PixelSmall
@@ -52,22 +50,3 @@ async def websocket_endpoint(authorization: str, websocket: WebSocket, redis_cli
     finally:
         # Remove the disconnected WebSocket from the list
         connected_clients.remove(websocket)
-
-
-async def send_dummy_message():
-    while True:
-        await asyncio.sleep(0.2)  # Wait for 1 second
-
-        j = json.dumps({
-            "color": random.choice(COLORS),
-            "x": random.randrange(0, 300),
-            "y": random.randrange(0, 300)
-        })
-        # print(len(connected_clients))
-        for client in connected_clients:
-            await client.send_text(j)
-
-
-loop = asyncio.get_event_loop()
-
-loop.create_task(send_dummy_message())
