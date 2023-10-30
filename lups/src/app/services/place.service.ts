@@ -3,6 +3,7 @@ import {map, Observable, Subject} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
 import {environment} from "../../environments/environment";
+import {webSocket} from "rxjs/webSocket";
 
 export interface PixelResponse {
   x: number,
@@ -28,7 +29,7 @@ export class PlaceService {
       token = this.oauthService.getIdToken();
     }
     console.log(environment.wsUrl)
-    // this.subject = webSocket(`${environment.wsUrl}?authorization=${token}`);
+    this.subject = webSocket(`${environment.wsUrl}?authorization=${token}`);
     //
     // // get websocket
     // this.subject.pipe(retry({delay: 1000})).subscribe((message: any) => {
