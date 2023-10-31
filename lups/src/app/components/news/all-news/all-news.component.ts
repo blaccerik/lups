@@ -9,6 +9,11 @@ import {ActivatedRoute, Router} from "@angular/router";
   styleUrls: ['./all-news.component.scss']
 })
 export class AllNewsComponent {
+  isSelected = "new"; // Initialize with the default selection
+
+  selectButton(button: string): void {
+    this.isSelected = button;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -75,3 +80,6 @@ export class AllNewsComponent {
     this.router.navigate(["/news/" + id])
   }
 }
+
+
+

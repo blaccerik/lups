@@ -1,7 +1,29 @@
 @import 'src/variables';
 
-.container {
-  margin: 5%;
+.menu {
+  background-color: $third-color;
+  border-radius: 10px;
+  border: 2px solid $second-color;
+  width: 50%;
+  position: fixed;
+  z-index: 5;
+  left: 2%;
+  top: calc($menuHeightLong + 2%);
+  padding: 1%;
+
+
+  @media (max-width: $menuBreakpoint) {
+    top: calc($menuHeight + 2%);
+  }
+}
+
+.button {
+  margin-right: 10px;
+  border: 2px solid $third-color;
+}
+
+.selected {
+  border: 2px solid $second-color;
 }
 
 .news-grid {

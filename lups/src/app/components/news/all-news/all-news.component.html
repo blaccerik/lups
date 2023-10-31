@@ -1,3 +1,13 @@
+
+
+<div class="menu">
+  <button class="button" mat-button [class.selected]="isSelected === 'new'" (click)="selectButton('new')">
+    <mat-icon>new_releases</mat-icon> Uued
+  </button>
+  <button class="button" mat-button [class.selected]="isSelected === 'top'" (click)="selectButton('top')">
+    <mat-icon>star</mat-icon> Top
+  </button>
+</div>
 <div class="container"
      infiniteScroll
      [infiniteScrollDistance]="1"
