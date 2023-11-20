@@ -5,7 +5,7 @@ redis==4.1.4
 scipy==1.11.1
 sentencepiece==0.1.99
 psycopg2==2.9.6
-transformers==4.30.2
-torch==2.0.1
+transformers
+torch
 beautifulsoup4==4.12.2
 SQLAlchemy==2.0.16
