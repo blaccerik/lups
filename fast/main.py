@@ -27,9 +27,13 @@ app.include_router(news.router)
 
 @app.on_event("startup")
 async def startup_event():
+    from models.models import init_db
+    init_db()
+
     # load pixels
     redis_client = get_client()
     postgres_client = SessionLocal()
+
     t1 = time.time()
     old = await redis_client.hgetall("pixels")
     # todo dont keep this on for prod mode
