@@ -23,7 +23,7 @@ RUN ng build
 FROM nginx:alpine
 
 # Install bash for debugging purposes
-RUN apk update && apk add bash
+# RUN apk update && apk add bash
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
