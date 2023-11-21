@@ -1,11 +1,11 @@
 celery==5.2.3
 flower==1.0.0
-pytest==7.0.1
 redis==4.1.4
-scipy==1.11.1
-sentencepiece==0.1.99
 psycopg2==2.9.6
 transformers
+llama-cpp-python
+newsdataapi
 torch
+huggingface_hub
 beautifulsoup4==4.12.2
 SQLAlchemy==2.0.16

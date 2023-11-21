@@ -13,13 +13,3 @@ def get_chat(chat_id):
         )).all()[-MESSAGES_SIZE:]
     return messages
 
-
-def format_chat(messages) -> str:
-    text = ""
-    for m in messages:
-        if m.type == "user":
-            text += f"User: {m.message_en}\n "
-        else:
-            text += f"Vambola: {m.message_en}\n "
-    text += "Vambola: "
-    return text

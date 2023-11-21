@@ -4,8 +4,9 @@ import time
 
 from celery import Celery
 
-from worker.chat import get_chat, format_chat
-from worker.model import load_model, use_model
+from worker.chat import get_chat
+from worker.model import use_model
+from worker.model_cpp import ModelLoader
 from worker.news import get_news
 
 # Python 3.10.9
@@ -23,27 +24,41 @@ def setup_model(sender, **kwargs):
     if "flower" in sys.argv:
         print("skipping model load")
         return
-    print("start loading")
+    # print("start loading")
+    # s = time.time()
+    # load_model()
+    # e = time.time()
+    # print(f"models loaded: {e - s}")
+    # print("use model")
+    # s = time.time()
+    # res = use_model("what color is the sky")
+    # print(res)
+    # e = time.time()
+    # print(f"model used: {e - s}")
     s = time.time()
-    load_model()
+    ml = ModelLoader()
     e = time.time()
-    print(f"models loaded: {e - s}")
-    print("use model")
-    s = time.time()
-    res = use_model("what color is the sky")
-    print(res)
-    e = time.time()
-    print(f"model used: {e - s}")
+    print(f"model loaded: {e - s}")
+    # ml.stream()
 
 
-@celery_app.task(name="get_message", time_limit=60)
+# @celery_app.task(name="get_message", time_limit=60)
+# def simple_task(chat_id):
+#     messages = get_chat(chat_id)
+#     text = format_chat(messages)
+#     print(f"input: {[text]}")
+#     res = use_model(text)
+#     print(f"output: {[res]}")
+#     return res
+
+
+@celery_app.task(name="get_response", time_limit=60)
 def simple_task(chat_id):
     messages = get_chat(chat_id)
-    text = format_chat(messages)
-    print(f"input: {[text]}")
-    res = use_model(text)
-    print(f"output: {[res]}")
-    return res
+    ml = ModelLoader()
+    text = ml.format_chat(messages)
+    output_text = ml.stream(text)
+    return output_text
 
 
 @celery_app.task(name="get_news", time_limit=600)

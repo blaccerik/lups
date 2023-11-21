@@ -98,8 +98,9 @@ def create_message(text_ee: str, chat_id: int, user_id: int, session: Session):
     session.add(m)
     session.commit()
 
-    task = celery_app.send_task("get_message", args=[chat.id])
+    task = celery_app.send_task("get_response", args=[chat.id])
     print(task)
+
     try:
         output_en = task.get()
     except Exception as e:
