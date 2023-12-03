@@ -40,7 +40,17 @@ export class AppComponent {
         }).catch((error: any) => {
           console.log("catch")
           console.log("error", error)
+
+          // todo reimplement this
+          localStorage.removeItem("id_token")
+          this.oauthService.revokeTokenAndLogout().then(r => {
+            this.router.navigate([""])
+          }).catch(e => {
+            console.log("very bad error", e)
+          })
         })
+      } else {
+        console.log("not valid")
       }
     });
   }

@@ -15,6 +15,16 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
+# # Dependency to get the database session
+# async def get_postgres():
+#     db = database
+#     try:
+#         await db.connect()
+#         yield db
+#     finally:
+#         await db.disconnect()
+
+
 # Dependency
 def get_db():
     db = SessionLocal()

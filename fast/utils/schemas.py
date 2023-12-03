@@ -1,6 +1,5 @@
 from enum import Enum
 
-from fastapi import UploadFile
 from pydantic import BaseModel
 
 
@@ -17,19 +16,75 @@ class User(BaseModel):
     name: str
 
 
-class MessageType(str, Enum):
+class AIModelType(Enum):
+    small = "small"  # TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF
+
+
+class LanguageType(Enum):
+    estonia = "estonia"
+    english = "english"
+
+
+class MessageOwner(Enum):
     user = "user"
-    bot = "bot"
+    model = "model"
+
+
+class OutputType(Enum):
+    error = "error"
+    data = "data"
+    message = "message"
+    stream_message = "stream_message"
+    completed = "completed"
+
+
+
+class InputType(Enum):
+    cancel = "cancel"
+    delete = "delete"
+    message = "message"
+
+
+class ChatInput(BaseModel):
+    type: InputType
+    ai_model_type: AIModelType
+    language_type: LanguageType
+    message_text: str
+    message_id: int
+
+
+class ChatOutput(BaseModel):
+    type: OutputType
+
+
+class ChatOutputData(ChatOutput):
+    queue_number: int
+
+
+class ChatOutputError(ChatOutput):
+    message_text: str
+
+
+class ChatOutputMessage(ChatOutput):
+    message_id: int
+    message_text: str
+    message_owner: MessageOwner
+    language_type: LanguageType
 
 
 class Message(BaseModel):
-    id: int
-    message: str
-    type: MessageType
+    message_id: int
+    message_text: str
+    message_owner: MessageOwner
+    language_type: LanguageType
 
 
-class MessagePost(BaseModel):
-    message: str
+class MessageSend(Message):
+    part: int  # set to -1 if message is complete. else shows message part number
+
+
+class MessageReceive(BaseModel):
+    text: str
 
 
 class News(BaseModel):
@@ -43,6 +98,7 @@ class News(BaseModel):
     has_image: bool
     link: str | None
 
+
 class NewsId(BaseModel):
     id: int
 
@@ -51,6 +107,7 @@ class PixelSmall(BaseModel):
     x: int
     y: int
     c: int
+
 
 class PixelLarge(BaseModel):
     x: int

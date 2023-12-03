@@ -1,13 +1,28 @@
-import { Injectable } from '@angular/core';
-import {HttpClient, HttpEvent} from "@angular/common/http";
-import {map, Observable} from "rxjs";
+import {Injectable} from '@angular/core';
+import {HttpClient} from "@angular/common/http";
+import {Observable, retry, Subject} from "rxjs";
 import {Message} from "../components/chat/chat.component";
+import {OAuthService} from "angular-oauth2-oidc";
+import {environment} from "../../environments/environment";
+import {webSocket} from "rxjs/webSocket";
 
 
-export interface ChatResponse {
-  id: number,
-  message: string,
+export interface ChatReceive {
   type: string
+  // data
+  queue_number: number
+  // message
+  message_id: number
+  message_text: string
+  message_owner: string
+}
+
+export interface ChatSend {
+  type: string
+  ai_model_type: string
+  language_type: string
+  message_text: string
+  message_id: number
 }
 
 @Injectable({
@@ -15,47 +30,35 @@ export interface ChatResponse {
 })
 export class ChatService {
   private url = 'api/chat';
+  private subject: any;
+  private messagesSubject = new Subject<ChatReceive>();
 
-  constructor(private http: HttpClient) { }
-
-  get(id: number): Observable<Message[]> {
-    return this.http.get<ChatResponse[]>(this.url + "/" + id).pipe(
-      map((chatResponses: ChatResponse[]) => {
-        return chatResponses.map((c: ChatResponse) => {
-          const m: Message = {
-            id: c.id,
-            message: c.message,
-            isLoading: false,
-            isUser: c.type === "user"
-          };
-          return m;
-        });
-      })
-    );
+  constructor(private http: HttpClient, private oauthService: OAuthService) {
+    if (!this.oauthService.hasValidIdToken()) {
+      return
+    }
   }
 
-  chats(): Observable<number[]> {
+  connect(chat_id: number): Observable<ChatReceive> {
+    const token = this.oauthService.getIdToken();
+    console.log("ws url", environment.wsUrl)
+    this.subject = webSocket(`${environment.wsUrl}/api/chat/${chat_id}?authorization=${token}`);
+    // get websocket
+    this.subject.pipe(retry({delay: 3000})).subscribe((chatReceive: ChatReceive) => {
+      this.messagesSubject.next(chatReceive)
+    })
+    return this.messagesSubject.asObservable();
+  }
+
+  getMessages(id: number): Observable<Message[]> {
+    return this.http.get<Message[]>(this.url + "/" + id)
+  }
+
+  getChats(): Observable<number[]> {
     return this.http.get<number[]>(this.url + "/")
   }
 
-  delete(id: number): Observable<string> {
-    return this.http.delete<string>(this.url + "/" + id)
-  }
-
-  create(text: string, id: number): Observable<string> {
-    return this.http.post<string>(this.url + "/create", null)
-  }
-
-  send(text: string, id: number): Observable<ChatResponse> {
-    const body = { message: text };
-    return this.http.post<ChatResponse>(this.url + "/" + id, body)
-  }
-
-  stream(): Observable<HttpEvent<any>>{
-    return this.http.get('api/chat/stream', {
-      responseType: 'text',
-      observe: 'events',
-      reportProgress: true,
-    })
+  send(chatSend: ChatSend): void {
+    this.subject.next(chatSend)
   }
 }

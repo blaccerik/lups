@@ -2,48 +2,48 @@ version: '3.8'
 
 services:
 
-  worker:
-    container_name: worker
-    build:
-      context: celeryr
-    command: celery --app worker.tasks worker --concurrency=1 --pool solo
-    environment:
-      - REDIS_BROKER_URL=redis://redis:6379/0
-      - POSTGRES_USER=erik
-      - POSTGRES_PASSWORD=erik
-      - POSTGRES_BROKER_URL=postgres:5432
-      - POSTGRES_DATABASE=postgres
-    depends_on:
-      - redis
-      - postgres
-    networks:
-      - lups
-    deploy:
-      resources:
-        limits:
-          cpus: '1'  # Adjust the CPU limit as needed
-          memory: 2G  # Adjust the memory limit as needed
-    volumes:
-      - image_data:/usr/src/app/images
+#  worker:
+#    container_name: worker
+#    build:
+#      context: celeryr
+#    command: celery --app worker.tasks worker --concurrency=1 --pool solo
+#    environment:
+#      - REDIS_BROKER_URL=redis://redis:6379/0
+#      - POSTGRES_USER=erik
+#      - POSTGRES_PASSWORD=erik
+#      - POSTGRES_BROKER_URL=postgres:5432
+#      - POSTGRES_DATABASE=postgres
+#    depends_on:
+#      - redis
+#      - postgres
+#    networks:
+#      - lups
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '1'  # Adjust the CPU limit as needed
+#          memory: 2G  # Adjust the memory limit as needed
+#    volumes:
+#      - image_data:/usr/src/app/images
 
-  dashboard:
-    container_name: dashboard
-    build:
-      context: celeryr
-    command: celery --app worker.tasks flower --port=5555
-    ports:
-      - "5555:5555"
-    environment:
-      - REDIS_BROKER_URL=redis://redis:6379/0
-      - POSTGRES_USER=erik
-      - POSTGRES_PASSWORD=erik
-      - POSTGRES_BROKER_URL=postgres:5432
-      - POSTGRES_DATABASE=postgres
-    depends_on:
-      - redis
-      - worker
-    networks:
-      - lups
+#  dashboard:
+#    container_name: dashboard
+#    build:
+#      context: celeryr
+#    command: celery --app worker.tasks flower --port=5555
+#    ports:
+#      - "5555:5555"
+#    environment:
+#      - REDIS_BROKER_URL=redis://redis:6379/0
+#      - POSTGRES_USER=erik
+#      - POSTGRES_PASSWORD=erik
+#      - POSTGRES_BROKER_URL=postgres:5432
+#      - POSTGRES_DATABASE=postgres
+#    depends_on:
+#      - redis
+#      - worker
+#    networks:
+#      - lups
   redis:
     container_name: redis
     image: redis:6-alpine

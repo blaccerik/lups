@@ -1,3 +1,4 @@
+import logging
 import time
 
 from fastapi import FastAPI
@@ -7,6 +8,8 @@ from routers import items, news, place, chat
 from services.place_service import read_pixels
 from utils.database import SessionLocal
 from utils.redis_database import get_client
+
+logging.basicConfig(level=logging.INFO)
 
 # Create an instance of FastAPI
 app = FastAPI()
@@ -30,10 +33,14 @@ async def startup_event():
     # from models.models import init_db
     # init_db()
 
-    # load pixels
     redis_client = get_client()
     postgres_client = SessionLocal()
+    # clear redis jobs
+    print(await redis_client.smembers("chats"))
+    await redis_client.delete("chats")
+    print(await redis_client.smembers("chats"))
 
+    # load pixels
     t1 = time.time()
     old = await redis_client.hgetall("pixels")
     # todo dont keep this on for prod mode
