@@ -44,27 +44,6 @@ async def websocket_endpoint(
 ):
     await websocket.accept()
 
-    # updates_channel = "erik"
-    # channel = redis_client.pubsub()
-    # await channel.subscribe(updates_channel)
-    # async for message in channel.listen():
-    #     buffer = []
-    #     c = 100
-    #     if message["type"] != "message":
-    #         continue
-    #     d = message["data"]
-    #     while c:
-    #         m = await channel.get_message()
-    #         if not m:
-    #             break
-    #         t = m["data"]
-    #         buffer.append(t)
-    #         c -= 1
-    #     print(d)
-    #     print(len(buffer))
-    #     await websocket.send_text(json.dumps(d))
-    #     await asyncio.sleep(5)
-
     # verify user
     try:
         user = await get_current_user_with_token(authorization)

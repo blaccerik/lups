@@ -3,6 +3,9 @@ import {ChatReceive, ChatSend, ChatService} from "../../services/chat.service";
 import {Router} from "@angular/router";
 import {OAuthService} from "angular-oauth2-oidc";
 import {UserInfoService} from "../../services/user-info.service";
+import {MatSidenav} from "@angular/material/sidenav";
+import {BreakpointObserver} from "@angular/cdk/layout";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 export interface Message {
   message_id: number
@@ -17,9 +20,8 @@ export interface Message {
 })
 export class ChatComponent implements OnInit {
 
+
   @ViewChild('chatContainer') private chatContainer: ElementRef;
-
-
   textField = "";
   messages: Message[] = [];
   id = -1;
@@ -27,19 +29,71 @@ export class ChatComponent implements OnInit {
   language = "estonia";
   model = "small"
 
+  form: FormGroup;
+
+  languages = [
+    { display: 'Eesti', value: 'estonia' },
+    { display: 'Inglise', value: 'english' },
+  ];
+  models = [
+    { display: 'Väike', value: 'small' },
+    { display: 'Suur', value: 'large' },
+    // Add more languages as needed
+  ];
+
+  stringToModel(value: string): string {
+    if (value === "small") {
+      return "computer"
+    }
+    return "desktop_windows"
+  }
+
   constructor(private chatService: ChatService,
               private router: Router,
               private oauthService: OAuthService,
-              public userInfoService: UserInfoService
+              public userInfoService: UserInfoService,
+              private observer: BreakpointObserver,
+              private fb: FormBuilder
   ) {
+    this.form = this.fb.group({
+      language: ['estonia', Validators.required], // Set default value for language
+      model: ['small', Validators.required], // Set default value for model
+    });
+  }
+
+  onSubmit() {
+    if (this.form.valid) {
+      // Do something with the form data
+      console.log(this.form.value);
+    } else {
+      // Handle invalid form
+      console.log('Form is invalid');
+    }
+  }
+
+  isSidenavOpen = false;
+  selected = 'option2';
+
+  toggleSidenav() {
+    this.isSidenavOpen = !this.isSidenavOpen;
   }
 
   ngOnInit() {
 
     if (!this.oauthService.hasValidIdToken()) {
+      localStorage.setItem('originalUrl', window.location.pathname);
       this.oauthService.initLoginFlow('google');
       return
     }
+
+    // // style for mobile
+    // this.observer.observe(['(max-width: 800px)']).subscribe((screenSize) => {
+    //   if(screenSize.matches){
+    //     this.isMobile = true;
+    //   } else {
+    //     this.isMobile = false;
+    //   }
+    // });
 
     // get all chats
     this.chatService.getChats().subscribe({

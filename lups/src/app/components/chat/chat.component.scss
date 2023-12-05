@@ -1,122 +1,33 @@
 @import '../../../variables';
 
-.parent-container {
-  display: flex;
-  margin-top: 50px;
-  justify-content: center;
-  align-items: center;
-  height: 300px; /* Adjust the height as needed */
-}
-
-
 .container {
-
-  position: relative;
-  background-color: $main-color;
-  border-radius: 5px;
-  width: 500px;
-  padding: 10px;
-  border: 1px black solid;
-  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
-}
-
-
-.messages::-webkit-scrollbar {
-  width: 6px;
-}
-
-.messages::-webkit-scrollbar-thumb {
-  background-color: #888;
-  border-radius: 3px;
-}
-
-.messages::-webkit-scrollbar-track {
-  background-color: $main-color;
-}
-
-.input-area {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.input-area input {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.input-area button {
-  margin-left: 10px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  background-color: $second-color;
-  color: $main-color;
-  font-size: 14px;
-  cursor: pointer;
-  transition: 0.1s;
-}
-
-.input-area button:hover {
-  background-color: $second-color-dark;
-}
-
-.messages {
-  height: 250px;
-  overflow-y: auto;
-}
-
-.message {
-  margin-bottom: 10px;
   width: 100%;
-  overflow: auto;
-  color: $main-color;
+  height: 100%;
 }
 
-.app-message {
-  float: left;
-  background-color: $second-color;
-  padding: 10px;
-  border-radius: 5px;
-  word-break: break-all; /* Break long words onto multiple lines */
-  overflow-wrap: break-word; /* Wrap long strings without spaces onto multiple lines */
-}
-
-.user-message {
-  float: right;
+.color {
   background-color: $third-color;
-  padding: 10px;
-  border-radius: 5px;
-  word-break: break-all; /* Break long words onto multiple lines */
-  overflow-wrap: break-word; /* Wrap long strings without spaces onto multiple lines */
 }
 
-.name {
-  font-size: 12px;
-  color: $main-color;
-  margin-bottom: 5px;
+.bigger {
+  transform: scale(1.25);
 }
 
-.loader {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid $main-color;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-top: 5px;
+.icon-cap {
+  margin: 27px 0
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.centered-title {
+  text-align: center;
+  font-size: 20px;
+  margin: 15px;
 }
+
+.down {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Optional: Center icons horizontally */
+  //gap: 10px; /* Optional: Adjust the gap between icons */
+}
+
 

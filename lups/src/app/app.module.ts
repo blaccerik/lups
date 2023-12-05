@@ -39,6 +39,8 @@ import {MatChipsModule} from "@angular/material/chips";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatCardModule} from "@angular/material/card";
+import {MatListModule} from "@angular/material/list";
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 @NgModule({
   declarations: [
@@ -88,7 +90,9 @@ import {MatCardModule} from "@angular/material/card";
     MatSidenavModule,
     MatTooltipModule,
     MatCardModule,
-    NgOptimizedImage
+    NgOptimizedImage,
+    MatListModule,
+    MatCheckboxModule
   ],
   exports: [],
   providers: [
