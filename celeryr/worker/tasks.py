@@ -4,18 +4,15 @@ import sys
 import time
 
 import redis
-from celery.exceptions import SoftTimeLimitExceeded
 from celery import Celery
-from llama_cpp import suppress_stdout_stderr
 
 from worker.chat import get_chat
-from worker.model import use_model
 from worker.model_cpp import ModelLoader
 from worker.news import get_news
 
 # Python 3.10.9
-DATABASE_URI = os.environ.get("REDIS_BROKER_URL", 'redis://localhost:6379/0')
-
+DATABASE_URI = f"redis://{os.environ.get('REDIS_BROKER_URL', 'localhost')}:6379/0"
+print(DATABASE_URI)
 celery_app = Celery(
     'tasks',
     broker=DATABASE_URI,
@@ -24,7 +21,7 @@ celery_app = Celery(
 
 
 def get_client():
-    return redis.Redis(host='localhost', port=6379, db=0)
+    return redis.Redis(host=os.environ.get('REDIS_BROKER_URL', 'localhost'), port=6379, db=0)
 
 
 @celery_app.on_after_configure.connect
@@ -44,10 +41,16 @@ A conversation between a User and Vambola. Vambola is an AI chatbot for lyps.ee.
 What color is the sky?<|im_end|>
 <|im_start|>Vambola
 """
-    for text_part, end in ml.stream(text):
-        continue
+    try:
+        for text_part, end in ml.stream(text):
+            continue
+    except Exception as e:
+        print("error")
+        print(e)
+        print("error")
     e = time.time()
     print(f"model used: {e - s}")
+
 
 @celery_app.task(name="cpp_model", bind=True)
 def test(self, chat_id):
@@ -55,7 +58,7 @@ def test(self, chat_id):
 
     redis_client = get_client()
     updates_channel = f"task_updates:{self.request.id}"
-
+    print(updates_channel)
     ml = ModelLoader()
     total_text = ""
     for text_part, end in ml.stream(ml.format_chat(messages)):
@@ -67,9 +70,8 @@ def test(self, chat_id):
             "stop": False
         }))
 
-
     # stop
-    redis_client.publish(updates_channel,  json.dumps({
+    redis_client.publish(updates_channel, json.dumps({
         "text": "",
         "stop": True
     }))

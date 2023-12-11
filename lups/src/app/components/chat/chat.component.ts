@@ -28,7 +28,6 @@ export class ChatComponent implements OnInit {
   hasLoaded: boolean = false;
   language = "estonia";
   model = "small"
-
   form: FormGroup;
 
   languages = [
@@ -38,15 +37,7 @@ export class ChatComponent implements OnInit {
   models = [
     { display: 'Väike', value: 'small' },
     { display: 'Suur', value: 'large' },
-    // Add more languages as needed
   ];
-
-  stringToModel(value: string): string {
-    if (value === "small") {
-      return "computer"
-    }
-    return "desktop_windows"
-  }
 
   constructor(private chatService: ChatService,
               private router: Router,
@@ -56,7 +47,7 @@ export class ChatComponent implements OnInit {
               private fb: FormBuilder
   ) {
     this.form = this.fb.group({
-      language: ['estonia', Validators.required], // Set default value for language
+      language: ['english', Validators.required], // Set default value for language
       model: ['small', Validators.required], // Set default value for model
     });
   }
@@ -71,8 +62,7 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  isSidenavOpen = false;
-  selected = 'option2';
+  isSidenavOpen = true;
 
   toggleSidenav() {
     this.isSidenavOpen = !this.isSidenavOpen;

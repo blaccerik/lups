@@ -19,11 +19,8 @@ RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-## copy model
-#COPY t5-model t5-model
-
-# copy cpp model
-COPY cpp-model cpp-model
+# download model
+RUN huggingface-cli download TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF tinyllama-1.1b-1t-openorca.Q8_0.gguf --local-dir cpp-model --local-dir-use-symlinks False
 
 # copy beat
 COPY beat.py beat.py
