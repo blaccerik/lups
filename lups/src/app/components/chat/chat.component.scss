@@ -21,9 +21,37 @@
   }
 
   &-box {
-    background-color: #f82a2a;
     width: 75%;
+    position: relative;
     height: 100%;
+  }
+  &-line {
+    margin-top: 10px;
+    margin-bottom: 10px; /* Add some spacing between messages */
+  }
+  &-owner {
+    margin-bottom: 10px;
+    text-transform: capitalize;
+  }
+  &-message {
+    //background-color: silver;
+    //box-shadow: rgba(0, 0, 0, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 15px;
+    white-space: pre-wrap; /* Preserve white spaces and wrap lines */
+  }
+  &-input {
+    position: absolute;
+    bottom: 5px;
+    width: 100%;
+    display: flex;
+  }
+  &-input-box {
+    width: calc(100% - 30px);
+  }
+  &-input-button {
+    margin: 6px;
   }
 }
 

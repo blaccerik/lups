@@ -43,7 +43,6 @@ async def websocket_endpoint(
         postgres_client: Session = Depends(get_db)
 ):
     await websocket.accept()
-
     # verify user
     try:
         user = await get_current_user_with_token(authorization)
@@ -61,6 +60,9 @@ async def websocket_endpoint(
     if not has_chat:
         await websocket.close()
         return
+
+    # send connected message
+    await websocket.send_text(ChatOutput(type=OutputType.completed).model_dump_json())
 
     # send data about queue / models
     await websocket.send_text(ChatOutputData(queue_number=0, type=OutputType.data).model_dump_json())

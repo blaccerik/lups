@@ -43,10 +43,19 @@ export class ChatService {
     const token = this.oauthService.getIdToken();
     console.log("ws url", environment.wsUrl)
     this.subject = webSocket(`${environment.wsUrl}/api/chat/${chat_id}?authorization=${token}`);
+
     // get websocket
-    this.subject.pipe(retry({delay: 3000})).subscribe((chatReceive: ChatReceive) => {
-      this.messagesSubject.next(chatReceive)
-    })
+    this.subject.pipe(retry({delay: 3000})).subscribe(
+      (chatReceive: ChatReceive) => {
+        this.messagesSubject.next(chatReceive)
+      },
+      (error: any) => {
+        console.error('WebSocket error:', error);
+      },
+      () => {
+        console.log('WebSocket closed.');
+      }
+    )
     return this.messagesSubject.asObservable();
   }
 

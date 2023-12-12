@@ -93,8 +93,30 @@
     <button mat-icon-button class="toggle-button" (click)="toggleSidenav()">
       <mat-icon>{{isSidenavOpen ? "arrow_forward_ios" : "arrow_back_ios"}}</mat-icon>
     </button>
-    <div class="chat-box">
-      ererer
+    <div *ngIf="!hasLoaded()">
+      ei ole
+    </div>
+    <div *ngIf="hasLoaded()" class="chat-box">
+      <div *ngFor="let message of messages" class="chat-line">
+        <div class="chat-message">
+          <div class="chat-owner">
+            {{message.message_owner}}
+          </div>
+          {{message.message_text}}
+        </div>
+      </div>
+      <div class="chat-input">
+        <mat-form-field appearance="outline" class="chat-input-box">
+          <mat-label>Kirjuta siia midagi</mat-label>
+          <input matInput type="text" [(ngModel)]="textField">
+          <button matSuffix mat-icon-button aria-label="Clear" *ngIf="textField" (click)="textField=''">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        <button mat-mini-fab color="primary" class="chat-input-button">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
     </div>
   </mat-drawer-content>
   <mat-drawer [opened]="isSidenavOpen" mode="side" position="end" class="drawer-container">

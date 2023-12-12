@@ -19,15 +19,11 @@ export interface Message {
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit {
-
-
-  @ViewChild('chatContainer') private chatContainer: ElementRef;
   textField = "";
   messages: Message[] = [];
   id = -1;
-  hasLoaded: boolean = false;
-  language = "estonia";
-  model = "small"
+  messagesLoaded = false;
+  websocketLoaded = false
   form: FormGroup;
 
   languages = [
@@ -47,8 +43,8 @@ export class ChatComponent implements OnInit {
               private fb: FormBuilder
   ) {
     this.form = this.fb.group({
-      language: ['english', Validators.required], // Set default value for language
-      model: ['small', Validators.required], // Set default value for model
+      language: ['english', Validators.required],
+      model: ['small', Validators.required],
     });
   }
 
@@ -62,10 +58,14 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  isSidenavOpen = true;
+  isSidenavOpen = false;
 
   toggleSidenav() {
     this.isSidenavOpen = !this.isSidenavOpen;
+  }
+
+  hasLoaded(): boolean {
+    return this.websocketLoaded && this.messagesLoaded
   }
 
   ngOnInit() {
@@ -76,20 +76,10 @@ export class ChatComponent implements OnInit {
       return
     }
 
-    // // style for mobile
-    // this.observer.observe(['(max-width: 800px)']).subscribe((screenSize) => {
-    //   if(screenSize.matches){
-    //     this.isMobile = true;
-    //   } else {
-    //     this.isMobile = false;
-    //   }
-    // });
-
     // get all chats
     this.chatService.getChats().subscribe({
       next: (chats: number[]) => {
         this.id = chats[0]
-        console.log(this.id)
 
         // connect to websocket
         this.connectToWebsocket()
@@ -104,39 +94,12 @@ export class ChatComponent implements OnInit {
     })
   }
 
-
-  // send() {
-  //   this.canWrite = false
-  //   const userMessage: Message = {
-  //     id: -1,
-  //     text: this.textField,
-  //     isUser: true,
-  //     isLoading: false
-  //   };
-  //   this.messages.push(userMessage);
-  //
-  //   const appMessage: Message = {
-  //     id: -1,
-  //     text: "loading...",
-  //     isUser: false,
-  //     isLoading: true
-  //   };
-  //   this.messages.push(appMessage);
-  //
-  //   this.chatService.send(this.textField)
-  //   this.textField = ""
-  //   // Scroll to the latest question
-  //   setTimeout(() => {
-  //     this.scrollToBottom();
-  //   }, 0);
-  // }
-
   getAllMessagesInChat(): void {
     this.chatService.getMessages(this.id).subscribe({
       next: (messages: Message[]) => {
         console.log(messages)
         this.messages = messages;
-        this.hasLoaded = true;
+        this.messagesLoaded = true;
         // // Scroll to the latest question
         // setTimeout(() => {
         //   this.scrollToBottom();
@@ -170,13 +133,14 @@ export class ChatComponent implements OnInit {
             console.log(chatReceive)
             console.log("unknown type")
         }
-      }
+      },
+
     })
   }
 
   receiveCompletedType(chatReceive: ChatReceive) {
     console.log("completed", chatReceive.message_text)
-    this.hasLoaded = true
+    this.websocketLoaded = true
   }
 
   receiveErrorType(chatReceive: ChatReceive) {
@@ -212,118 +176,49 @@ export class ChatComponent implements OnInit {
   }
 
   send() {
-    const message: ChatSend = {
-      type: "message",
-      ai_model_type: this.model,
-      language_type: this.language,
-      message_id: -1,
-      message_text: this.textField,
-    }
-    this.messages.push({
-      message_id: -1,
-      message_owner: "user",
-      message_text: this.textField
-    })
-    this.messages.push({
-      message_id: -1,
-      message_owner: "model",
-      message_text: "Loading..."
-    })
-    this.chatService.send(message)
+    // const message: ChatSend = {
+    //   type: "message",
+    //   ai_model_type: this.model,
+    //   language_type: this.language,
+    //   message_id: -1,
+    //   message_text: this.textField,
+    // }
+    // this.messages.push({
+    //   message_id: -1,
+    //   message_owner: "user",
+    //   message_text: this.textField
+    // })
+    // this.messages.push({
+    //   message_id: -1,
+    //   message_owner: "model",
+    //   message_text: "Loading..."
+    // })
+    // this.chatService.send(message)
     this.textField = ""
   }
-
-  cancel() {
-    const message: ChatSend = {
-      type: "cancel",
-      ai_model_type: this.model,
-      language_type: this.language,
-      message_id: -1,
-      message_text: "",
-    }
-    this.chatService.send(message)
-  }
-
-  clear() {
-    const message: ChatSend = {
-      type: "delete",
-      ai_model_type: this.model,
-      language_type: this.language,
-      message_id: -1,
-      message_text: "",
-    }
-    this.chatService.send(message)
-    this.messages = []
-    this.hasLoaded = false
-  }
-
+  //
+  // cancel() {
+  //   const message: ChatSend = {
+  //     type: "cancel",
+  //     ai_model_type: this.model,
+  //     language_type: this.language,
+  //     message_id: -1,
+  //     message_text: "",
+  //   }
+  //   this.chatService.send(message)
+  // }
   //
   // clear() {
-  //   this.hasLoaded = false
-  //   this.chatService.delete(this.id).subscribe({
-  //     next: (r: string) => {
-  //       this.messages = []
-  //       this.hasLoaded = true
-  //     },
-  //     error: err => {
-  //       console.log(err)
-  //       this.router.navigate([""])
-  //     }
-  //   })
-  // }
-  //
-  //
-  // // submit() {
-  // //   const userMessage: Message = {
-  // //     text: this.textFieldValue,
-  // //     isUser: true,
-  // //     isLoading: false
-  // //   };
-  // //   this.messages.push(userMessage);
-  // //
-  // //   const loadingMessage: Message = {
-  // //     text: "",
-  // //     isUser: false,
-  // //     isLoading: true
-  // //   };
-  // //   this.messages.push(loadingMessage);
-  // //
-  // //   this.sendPostRequest(this.textFieldValue);
-  // //   this.textFieldValue = ""; // Clear the input field
-  // //
-  // //   // Scroll to the latest question
-  // //   setTimeout(() => {
-  // //     this.scrollToBottom();
-  // //   }, 0);
-  // // }
-  // //
-  // // sendPostRequest(msg: string) {
-  // //   this.chatService.sendChatMessage(msg).subscribe({
-  // //     next: (response: ChatResponse) => {
-  // //       const loadingMessageIndex = this.messages.findIndex(msg => msg.isLoading);
-  // //       if (loadingMessageIndex > -1) {
-  // //         this.messages.splice(loadingMessageIndex, 1);
-  // //       }
-  // //
-  // //       const appMessage: Message = {
-  // //         text: response.output_text_ee,
-  // //         isUser: false,
-  // //         isLoading: false
-  // //       };
-  // //       this.messages.push(appMessage);
-  // //
-  // //     },
-  // //     error: (error: any) => {
-  // //       console.log(error);
-  // //     }
-  // //   });
-  // // }
-  //
-  // scrollToBottom(): void {
-  //   try {
-  //     this.chatContainer.nativeElement.lastElementChild?.scrollIntoView({behavior: 'smooth', block: 'end'});
-  //   } catch (err) {
-  //     console.log(err);
+  //   const message: ChatSend = {
+  //     type: "delete",
+  //     ai_model_type: this.model,
+  //     language_type: this.language,
+  //     message_id: -1,
+  //     message_text: "",
   //   }
+  //   this.chatService.send(message)
+  //   this.messages = []
+  //   this.hasLoaded = false
   // }
+
 }
