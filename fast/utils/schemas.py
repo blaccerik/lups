@@ -16,6 +16,17 @@ class User(BaseModel):
     name: str
 
 
+class TaskOutputType(Enum):
+    part = "part"
+    end = "end"
+    error = "error"
+
+
+class TaskOutput(BaseModel):
+    type: TaskOutputType
+    text: str
+
+
 class AIModelType(Enum):
     small = "small"  # TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF
 
@@ -38,7 +49,6 @@ class OutputType(Enum):
     completed = "completed"
 
 
-
 class InputType(Enum):
     cancel = "cancel"
     delete = "delete"
@@ -51,6 +61,28 @@ class ChatInput(BaseModel):
     language_type: LanguageType
     message_text: str
     message_id: int
+
+
+class ChatPost(BaseModel):
+    type: InputType
+    ai_model_type: AIModelType
+    language_type: LanguageType
+    message_text: str
+    message_id: int
+
+
+class ChatPostRespond(BaseModel):
+    stream_id: str
+    message_id: int
+
+
+class StreamPostType(Enum):
+    cancel = "cancel"
+    delete = "delete"
+
+
+class StreamPost(BaseModel):
+    type: StreamPostType
 
 
 class ChatOutput(BaseModel):

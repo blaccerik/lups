@@ -1,3 +1,6 @@
+import os.path
+import time
+
 from llama_cpp import Llama
 
 
@@ -23,17 +26,13 @@ class ModelLoader(object):
     #     "top_p": 0.18
     # }
 
-    def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(ModelLoader, cls).__new__(cls)
-
-            # load model
-            # model_file = "tinyllama-1.1b-chat-v0.3.Q8_0.gguf"  # TheBloke/TinyLlama-1.1B-Chat-v0.3-GGUF
-            # model_file = "tinyllama-2-1b-miniguanaco.Q8_0.gguf"  # TheBloke/Tinyllama-2-1b-miniguanaco-GGUF
-            model_file = "tinyllama-1.1b-1t-openorca.Q8_0.gguf"  # TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF
-            model_name = f"./cpp-model/{model_file}"
-            cls.llm = Llama(model_path=model_name, verbose=False)
-        return cls.instance
+    def __init__(self):
+        # load model
+        # model_file = "tinyllama-1.1b-chat-v0.3.Q8_0.gguf"  # TheBloke/TinyLlama-1.1B-Chat-v0.3-GGUF
+        # model_file = "tinyllama-2-1b-miniguanaco.Q8_0.gguf"  # TheBloke/Tinyllama-2-1b-miniguanaco-GGUF
+        model_file = "tinyllama-1.1b-1t-openorca.Q8_0.gguf"  # TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF
+        model_name = f"./cpp-model/{model_file}"
+        self.llm = Llama(model_path=model_name, verbose=False)
 
     def format_chat(self, messages):
         text = """<|im_start|>system
@@ -49,6 +48,7 @@ A conversation between a User and Vambola. Vambola is an AI chatbot for lyps.ee.
 
     def stream(self, text):
         print(f"input text:\n{text}")
+        t1 = time.time()
         stream = self.llm(prompt=text,
                           stream=True,
                           stop=["<|im_end|>"],
@@ -57,7 +57,8 @@ A conversation between a User and Vambola. Vambola is an AI chatbot for lyps.ee.
         total = ""
         for output in stream:
             text_part = output['choices'][0]['text']
-            yield text_part, False
+            yield text_part
             total += text_part
+        t2 = time.time()
         print(f"output text:\n{total}")
-        yield total, True
+        print(f"time taken {t2 - t1}")

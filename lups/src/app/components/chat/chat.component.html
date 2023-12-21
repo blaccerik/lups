@@ -100,23 +100,29 @@
       <div *ngFor="let message of messages" class="chat-line">
         <div class="chat-message">
           <div class="chat-owner">
-            {{message.message_owner}}
+            {{message.message_owner}} {{message.message_id}}
           </div>
           {{message.message_text}}
         </div>
       </div>
-      <div class="chat-input">
-        <mat-form-field appearance="outline" class="chat-input-box">
-          <mat-label>Kirjuta siia midagi</mat-label>
-          <input matInput type="text" [(ngModel)]="textField">
-          <button matSuffix mat-icon-button aria-label="Clear" *ngIf="textField" (click)="textField=''">
-            <mat-icon>close</mat-icon>
-          </button>
-        </mat-form-field>
-        <button mat-mini-fab color="primary" class="chat-input-button">
-          <mat-icon>send</mat-icon>
+    </div>
+    <div class="chat-input">
+      <mat-form-field appearance="outline" class="chat-input-box">
+        <mat-label>Kirjuta siia midagi</mat-label>
+        <input matInput type="text" [(ngModel)]="textField" (keyup.enter)="send()">
+        <button matSuffix mat-icon-button aria-label="Clear" *ngIf="textField" (click)="textField=''">
+          <mat-icon>close</mat-icon>
         </button>
-      </div>
+      </mat-form-field>
+      <button mat-mini-fab color="primary" class="chat-input-button" (click)="send()">
+        <mat-icon>send</mat-icon>
+      </button>
+      <button (click)="cancel()">
+        cancel
+      </button>
+      <button (click)="createNew()">
+        new
+      </button>
     </div>
   </mat-drawer-content>
   <mat-drawer [opened]="isSidenavOpen" mode="side" position="end" class="drawer-container">

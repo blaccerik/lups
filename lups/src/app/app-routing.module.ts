@@ -12,6 +12,7 @@ import {AllNewsComponent} from "./components/news/all-news/all-news.component";
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: "chat", component: ChatComponent},
+  {path: "chat/:id", component: ChatComponent},
   {path: "promises", component: PromisesComponent},
   {path: "news", component: AllNewsComponent},
   {path: "news/create", component: CreateNewsComponent},

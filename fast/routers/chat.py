@@ -1,24 +1,25 @@
-import asyncio
 import json
 import json
 import logging
-from asyncio import create_task, Task
+import uuid
 
-from fastapi import APIRouter, Depends
-from pydantic import ValidationError
+from celery.contrib.abortable import AbortableAsyncResult
+from fastapi import APIRouter, Depends, HTTPException
 from redis import Redis
 from sqlalchemy.orm import Session
-from starlette.websockets import WebSocket
+from sse_starlette import EventSourceResponse
 
-from services.chat_service import read_user, read_chats_by_user, read_messages, delete_messages, \
-    read_chat, process_input_and_send
-from utils.auth import get_current_user, get_current_user_with_token
+from services.chat_service import read_user, read_chats_by_user, read_messages, user_has_chat, create_chat, task_stream, \
+    create_message
+from utils.auth import get_current_user
 from utils.database import get_db
 from utils.redis_database import get_redis
-from utils.schemas import User, ChatInput, ChatOutputData, OutputType, ChatOutputError, InputType, ChatOutput
+from utils.schemas import User, ChatPost, ChatPostRespond
 
 router = APIRouter(prefix="/api/chat")
 logger = logging.getLogger("Chat")
+
+from utils.celery_config import celery_app
 
 
 @router.get("/")
@@ -28,109 +29,103 @@ async def get_chats(current_user: User = Depends(get_current_user), db: Session 
     return chats
 
 
+@router.get("/new")
+async def get_chat(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    user_id = read_user(current_user, db)
+    chat_id = create_chat(user_id, db)
+    return chat_id
+
+
+# @router.get("/test")
+# async def test():
+#     result = celery_app.send_task("test")
+#     await asyncio.sleep(1)
+#     # cancel task
+#     # result.abort()
+#     # AsyncResult(result.id).revoke()
+#     a = AbortableAsyncResult(result.id)
+#     print(a)
+#     a.abort()
+#     print(a)
+#     # await asyncio.sleep(1)
+#     # print(AsyncResult(result.id).result)
+#     return result.id
+
+
 @router.get("/{chat_id}")
-async def get_chat(chat_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_chat_by_id(chat_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     user_id = read_user(current_user, db)
     return read_messages(chat_id, user_id, db)
 
 
-@router.websocket("/{chat_id}")
-async def websocket_endpoint(
+@router.post("/{chat_id}")
+async def post_chat_by_id(
         chat_id: int,
-        authorization: str,
-        websocket: WebSocket,
+        chat_post: ChatPost,
+        current_user: User = Depends(get_current_user),
         redis_client: Redis = Depends(get_redis),
         postgres_client: Session = Depends(get_db)
 ):
-    await websocket.accept()
-    # verify user
-    try:
-        user = await get_current_user_with_token(authorization)
-    except:
-        await websocket.close()
-        return
-    if user is None:
-        await websocket.close()
-        return
-
-    user_id = read_user(user, postgres_client)
-
-    # verify chat
-    has_chat = await read_chat(chat_id, user_id, postgres_client)
-    if not has_chat:
-        await websocket.close()
-        return
-
-    # send connected message
-    await websocket.send_text(ChatOutput(type=OutputType.completed).model_dump_json())
-
-    # send data about queue / models
-    await websocket.send_text(ChatOutputData(queue_number=0, type=OutputType.data).model_dump_json())
-
-    # main loop
-    current_task: Task | None = None
-    try:
-        while True:
-            chat_input = ChatInput(**json.loads(await websocket.receive_text()))
-            logger.info(user)
-            logger.info(chat_input)
-
-            # cancel
-            if chat_input.type == InputType.cancel:
-                cancel_task(-1, -1, None, current_task, False)
-                current_task = None
-                await websocket.send_text(ChatOutput(type=OutputType.completed).model_dump_json())
-            # delete
-            elif chat_input.type == InputType.delete:
-                cancel_task(chat_id, user_id, postgres_client, current_task, True)
-                current_task = None
-                await websocket.send_text(ChatOutput(type=OutputType.completed).model_dump_json())
-            # stream
-            elif chat_input.type == InputType.message:
-                current_task = await process_message(chat_id, user_id, chat_input, current_task, redis_client,
-                                                     postgres_client, websocket)
-    except ValidationError as v:
-        print(v)
-        await websocket.send_text(ChatOutputError(type=OutputType.error, message_text="Bad input").model_dump_json())
-        await websocket.close()
-    except Exception as e:
-        print("main loop error")
-        print(e)
-        print("main loop error")
-    finally:
-        # end stream if user disconnects
-        cancel_task(-1, -1, None, current_task, False)
-
-
-def cancel_task(chat_id: int, user_id: int, postgres_client: Session, current_task: Task | None, delete: bool):
-    # cancel message
-    if not delete:
-        if current_task:
-            current_task.cancel()
-        return
-    # delete message
-    if current_task:
-        successful = current_task.cancel("delete")
-        if not successful:
-            delete_messages(chat_id, user_id, postgres_client)
-    else:
-        delete_messages(chat_id, user_id, postgres_client)
-
-
-async def process_message(
-        chat_id: int,
-        user_id: int,
-        chat_input: ChatInput,
-        current_task: Task | None,
-        redis_client: Redis,
-        postgres_client: Session,
-        websocket: WebSocket
-):
-    # check for previous jobs
+    # check if chat is not in queue
     if await redis_client.sismember("chats", str(chat_id)):
-        await websocket.send_text(
-            ChatOutputError(type=OutputType.error, message_text="Already in queue").model_dump_json())
-        return current_task
-    # run task
+        raise HTTPException(status_code=403, detail="Chat is in queue")
+
+    user_id = read_user(current_user, postgres_client)
+
+    # check if user has chat
+    await user_has_chat(chat_id, user_id, postgres_client)
+
+    # add message to database
+    dbm_id = create_message(chat_id, chat_post, postgres_client)
+
+    # create stream link
+    stream_id = uuid.uuid4().hex
+
+    # lock chat
     await redis_client.sadd("chats", str(chat_id))
-    return create_task(process_input_and_send(chat_id, user_id, chat_input, websocket, postgres_client, redis_client))
+
+    # send task to worker
+    task = celery_app.send_task("stream", args=[
+        chat_id,
+        stream_id,
+        chat_post.language_type.value
+    ])
+
+    # save stream
+    await redis_client.hset("streams", stream_id, json.dumps({
+        "task": task.id,
+        "chat": chat_id,
+        "lang": chat_post.language_type.value
+    }))
+    return ChatPostRespond(stream_id=stream_id, message_id=dbm_id)
+
+
+@router.delete("/stream/{stream_id}")
+async def delete_chat_stream(
+        stream_id: str,
+        redis_client: Redis = Depends(get_redis)
+):
+    # check if stream exists
+    raw_data = await redis_client.hget("streams", stream_id)
+    if raw_data is None:
+        raise HTTPException(status_code=403, detail="Stream does not exist")
+    data = json.loads(raw_data)
+    task_id = data["task"]
+    a = AbortableAsyncResult(task_id)
+    r = a.abort()
+    print("abort", r)
+    return
+
+
+@router.get("/stream/{stream_id}")
+async def get_chat_stream(
+        stream_id: str,
+        redis_client: Redis = Depends(get_redis)
+):
+    # check if stream exists
+    raw_data = await redis_client.hget("streams", stream_id)
+    if raw_data is None:
+        raise HTTPException(status_code=403, detail="Stream does not exist")
+
+    # start loop
+    return EventSourceResponse(task_stream(stream_id, redis_client))

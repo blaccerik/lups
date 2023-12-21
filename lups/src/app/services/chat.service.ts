@@ -4,17 +4,13 @@ import {Observable, retry, Subject} from "rxjs";
 import {Message} from "../components/chat/chat.component";
 import {OAuthService} from "angular-oauth2-oidc";
 import {environment} from "../../environments/environment";
-import {webSocket} from "rxjs/webSocket";
+import {webSocket, WebSocketSubject} from "rxjs/webSocket";
 
 
 export interface ChatReceive {
   type: string
-  // data
-  queue_number: number
-  // message
-  message_id: number
-  message_text: string
-  message_owner: string
+  id: number
+  text: string
 }
 
 export interface ChatSend {
@@ -25,13 +21,18 @@ export interface ChatSend {
   message_id: number
 }
 
+export interface ChatSendRespond {
+  stream_id: string
+  message_id: number
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
   private url = 'api/chat';
-  private subject: any;
-  private messagesSubject = new Subject<ChatReceive>();
+  // private subject: WebSocketSubject<any>;
+  // private messagesSubject: Subject<ChatReceive>
 
   constructor(private http: HttpClient, private oauthService: OAuthService) {
     if (!this.oauthService.hasValidIdToken()) {
@@ -39,35 +40,47 @@ export class ChatService {
     }
   }
 
-  connect(chat_id: number): Observable<ChatReceive> {
-    const token = this.oauthService.getIdToken();
-    console.log("ws url", environment.wsUrl)
-    this.subject = webSocket(`${environment.wsUrl}/api/chat/${chat_id}?authorization=${token}`);
-
-    // get websocket
-    this.subject.pipe(retry({delay: 3000})).subscribe(
-      (chatReceive: ChatReceive) => {
-        this.messagesSubject.next(chatReceive)
-      },
-      (error: any) => {
-        console.error('WebSocket error:', error);
-      },
-      () => {
-        console.log('WebSocket closed.');
-      }
-    )
-    return this.messagesSubject.asObservable();
-  }
-
   getMessages(id: number): Observable<Message[]> {
     return this.http.get<Message[]>(this.url + "/" + id)
   }
 
+  postMessage(id: number, chatSend: ChatSend): Observable<ChatSendRespond> {
+    return this.http.post<ChatSendRespond>(this.url + "/" + id, chatSend)
+  }
+
+  getStreamMessages(streamId: string): Observable<ChatReceive> {
+    const eventSource = new EventSource(this.url + "/stream/" + streamId)
+    return new Observable<ChatReceive>((observer) => {
+      eventSource.onmessage = (event: MessageEvent<any>) => {
+        const chatReceive = JSON.parse(event.data)
+        observer.next(chatReceive)
+        if (chatReceive.type === "end") {
+          eventSource.close()
+          observer.complete()
+        }
+      };
+      eventSource.onerror = (error: Event) => {
+        console.log(error)
+        eventSource.close()
+        observer.complete()
+      };
+    })
+  }
+
+  deleteStream(streamId: string): Observable<any> {
+    return this.http.delete<any>(this.url + "/stream/" + streamId)
+  }
+
   getChats(): Observable<number[]> {
+    console.log("chats")
     return this.http.get<number[]>(this.url + "/")
   }
 
-  send(chatSend: ChatSend): void {
-    this.subject.next(chatSend)
+  newChat(): Observable<number> {
+    return this.http.get<number>(this.url + "/new")
   }
+
+  // send(chatSend: ChatSend): void {
+  //   this.subject.next(chatSend)
+  // }
 }

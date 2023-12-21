@@ -36,10 +36,26 @@ async def startup_event():
     redis_client = get_client()
     postgres_client = SessionLocal()
     # clear redis jobs
+    print(await redis_client.hgetall("streams"))
     print(await redis_client.smembers("chats"))
+    await redis_client.delete("streams")
     await redis_client.delete("chats")
+    print(await redis_client.hgetall("streams"))
     print(await redis_client.smembers("chats"))
-
+    # print(await redis_client.scan(_type="STREAM"))
+    # async for i in redis_client.scan_iter(_type="STREAM"):
+    #     await redis_client.delete(i)
+    # print(await redis_client.scan(_type="STREAM"))
+    # print(await redis_client.scan())
+    # print(await redis_client.smembers("streams"))
+    # await redis_client.delete("streams")
+    # print(await redis_client.smembers("streams"))
+    # if await redis_client.hexists("streams"):
+    # print(await redis_client.xinfo_groups("streams"))
+    # print(await redis_client.xinfo_stream("streams"))
+    # print(await redis_client.hgetall("streams"))
+    # await redis_client.delete("streams")
+    # print(await redis_client.hgetall("streams"))
     # load pixels
     t1 = time.time()
     old = await redis_client.hgetall("pixels")
