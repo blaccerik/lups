@@ -1,10 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Observable, retry, Subject} from "rxjs";
+import {Observable} from "rxjs";
 import {Message} from "../components/chat/chat.component";
 import {OAuthService} from "angular-oauth2-oidc";
-import {environment} from "../../environments/environment";
-import {webSocket, WebSocketSubject} from "rxjs/webSocket";
 
 
 export interface ChatReceive {
@@ -31,8 +29,6 @@ export interface ChatSendRespond {
 })
 export class ChatService {
   private url = 'api/chat';
-  // private subject: WebSocketSubject<any>;
-  // private messagesSubject: Subject<ChatReceive>
 
   constructor(private http: HttpClient, private oauthService: OAuthService) {
     if (!this.oauthService.hasValidIdToken()) {
@@ -51,19 +47,20 @@ export class ChatService {
   getStreamMessages(streamId: string): Observable<ChatReceive> {
     const eventSource = new EventSource(this.url + "/stream/" + streamId)
     return new Observable<ChatReceive>((observer) => {
-      eventSource.onmessage = (event: MessageEvent<any>) => {
-        const chatReceive = JSON.parse(event.data)
+      // need to use event listener or else zone js isn't triggered
+      eventSource.addEventListener("message", m => {
+        const chatReceive = JSON.parse(m.data)
         observer.next(chatReceive)
         if (chatReceive.type === "end") {
           eventSource.close()
           observer.complete()
         }
-      };
-      eventSource.onerror = (error: Event) => {
-        console.log(error)
+      })
+      eventSource.addEventListener("error", e => {
+        console.log(e)
         eventSource.close()
         observer.complete()
-      };
+      })
     })
   }
 
@@ -72,15 +69,10 @@ export class ChatService {
   }
 
   getChats(): Observable<number[]> {
-    console.log("chats")
     return this.http.get<number[]>(this.url + "/")
   }
 
   newChat(): Observable<number> {
     return this.http.get<number>(this.url + "/new")
   }
-
-  // send(chatSend: ChatSend): void {
-  //   this.subject.next(chatSend)
-  // }
 }

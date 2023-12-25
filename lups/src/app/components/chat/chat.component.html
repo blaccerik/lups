@@ -94,7 +94,7 @@
       <mat-icon>{{isSidenavOpen ? "arrow_forward_ios" : "arrow_back_ios"}}</mat-icon>
     </button>
     <div *ngIf="!hasLoaded()">
-      ei ole
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
     </div>
     <div *ngIf="hasLoaded()" class="chat-box">
       <div *ngFor="let message of messages" class="chat-line">
@@ -114,13 +114,13 @@
           <mat-icon>close</mat-icon>
         </button>
       </mat-form-field>
-      <button mat-mini-fab color="primary" class="chat-input-button" (click)="send()">
+      <button *ngIf="!isStreaming" mat-mini-fab color="primary" class="chat-input-button" (click)="send()">
         <mat-icon>send</mat-icon>
       </button>
-      <button (click)="cancel()">
-        cancel
+      <button *ngIf="isStreaming" mat-mini-fab color="primary" class="chat-input-button" (click)="cancel()">
+        <mat-icon>clear</mat-icon>
       </button>
-      <button (click)="createNew()">
+      <button mat-mini-fab color="primary" class="chat-input-button" (click)="createNew()">
         new
       </button>
     </div>

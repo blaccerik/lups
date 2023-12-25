@@ -1,13 +1,12 @@
-fastapi==0.103.2
-uvicorn==0.23.2
-SQLAlchemy==2.0.21
-celery==5.3.4
-psycopg2==2.9.6
-redis==5.0.1
-deep-translator==1.11.1
-google-auth==2.20.0
-google-auth-oauthlib==1.0.0
-Pillow==9.3.0
-wsproto==1.2.0
-python-multipart==0.0.6
+fastapi
+uvicorn
+SQLAlchemy
+celery
+psycopg2
+redis
+deep-translator
+google-auth
+google-auth-oauthlib
+Pillow
+sse-starlette
 

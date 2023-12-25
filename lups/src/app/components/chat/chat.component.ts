@@ -1,10 +1,11 @@
-import {Component, NgZone, OnDestroy, OnInit, signal} from '@angular/core';
-import {ChatReceive, ChatSend, ChatSendRespond, ChatService} from "../../services/chat.service";
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChatReceive, ChatSend, ChatService} from "../../services/chat.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {OAuthService} from "angular-oauth2-oidc";
 import {UserInfoService} from "../../services/user-info.service";
 import {BreakpointObserver} from "@angular/cdk/layout";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {Subscription} from "rxjs";
 
 export interface Message {
   message_id: number
@@ -23,8 +24,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   chatId: number;
   streamId: string;
   messagesLoaded: boolean;
-  // websocketLoaded: boolean;
   form: FormGroup;
+  private streamSubscription: Subscription;
 
   languages = [
     {display: 'Eesti', value: 'estonia'},
@@ -41,8 +42,7 @@ export class ChatComponent implements OnInit, OnDestroy {
               public userInfoService: UserInfoService,
               private observer: BreakpointObserver,
               private route: ActivatedRoute,
-              private fb: FormBuilder,
-              private ngZone: NgZone
+              private fb: FormBuilder
   ) {
     this.form = this.fb.group({
       language: ['english', Validators.required],
@@ -61,6 +61,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   isSidenavOpen = false;
+  isStreaming = false;
 
   toggleSidenav() {
     this.isSidenavOpen = !this.isSidenavOpen;
@@ -71,24 +72,17 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    console.log("2323232323")
-    // this.chatService.disconnect()
+    if (this.streamSubscription) {
+      this.streamSubscription.unsubscribe()
+    }
   }
 
   ngOnInit() {
-    console.log("inity")
-
     if (!this.oauthService.hasValidIdToken()) {
       localStorage.setItem('originalUrl', window.location.pathname);
       this.oauthService.initLoginFlow('google');
       return
     }
-
-    // this.chatService.getStreamMessages("5d58d6a0-d324-4ab7-b844-09820b8c5932").subscribe({
-    //   next: value1 => {
-    //     console.log(value1)
-    //   }
-    // })
 
     this.route.params.subscribe(params => {
       console.log("params", params)
@@ -100,7 +94,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             console.log("chats", chats)
             const lastChat = chats[chats.length - 1]
             this.router.navigate(['/chat', lastChat]);
-            this.loadComponent(lastChat)
+            // this.loadComponent(lastChat)
           }
         })
       } else {
@@ -113,11 +107,15 @@ export class ChatComponent implements OnInit, OnDestroy {
     console.log("compobnent load", id)
     this.chatId = id
     this.messagesLoaded = false
-    // this.websocketLoaded = false
     this.messages = []
     this.textField = ""
     this.streamId = ""
-    // this.chatService.disconnect()
+    this.isStreaming = false;
+
+    // unsub if needed
+    if (this.streamSubscription) {
+      this.streamSubscription.unsubscribe()
+    }
 
     // get all messages in a chat
     this.getAllMessagesInChat()
@@ -150,25 +148,37 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private updateModelMessage(chatReceive: ChatReceive): void {
-    let msg: Message | undefined = this.messages.reverse().find(o => o.message_owner === "model" && o.message_id === -1)
+    this.messages[this.messages.length - 1].message_text = chatReceive.text
+
+    // need to use for loop or else the ui is messed up
+    let msg: Message | null = null
+    for (let i = this.messages.length - 1; i >= 0; i--) {
+      const message = this.messages[i]
+      if (message.message_id === -1 && message.message_owner === "model") {
+        msg = message
+        break
+      }
+    }
     if (!msg) {
       msg = {
         message_id: chatReceive.id,
         message_text: chatReceive.text,
         message_owner: "model"
       }
+      this.messages.push(msg)
     }
     if (chatReceive.type === "part") {
       msg.message_text = chatReceive.text
     } else if (chatReceive.type === "end") {
       msg.message_text = chatReceive.text
       msg.message_id = chatReceive.id
+      this.isStreaming = false;
     }
-    console.log(msg)
   }
 
 
   send() {
+    this.isStreaming = true;
     const message: ChatSend = {
       type: "message",
       ai_model_type: this.form.value["model"],
@@ -192,13 +202,9 @@ export class ChatComponent implements OnInit, OnDestroy {
         console.log("stream id", chatSendRespond)
         this.streamId = chatSendRespond.stream_id
         this.updateUserMessageId(chatSendRespond.message_id)
-
-        this.chatService.getStreamMessages(this.streamId).subscribe({
+        this.streamSubscription = this.chatService.getStreamMessages(this.streamId).subscribe({
           next: chatReceive => {
-            // this.ngZone.run(() => {
-            // todo this does not get detect by zone js use pipe or something like that
-              this.updateModelMessage(chatReceive)
-            // });
+            this.updateModelMessage(chatReceive)
           }
         })
       }
@@ -208,13 +214,13 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   cancel() {
     this.chatService.deleteStream(this.streamId).subscribe(
-      x => console.log(x)
+      () => {
+        this.streamId = ""
+      }
     )
-    // this.chatService.send(message)
   }
 
   createNew() {
-    // this.websocketLoaded = false
     this.messagesLoaded = false
     this.chatService.newChat().subscribe({
       next: (chatId: number) => {
@@ -222,18 +228,4 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     })
   }
-
-  // clear() {
-  //   const message: ChatSend = {
-  //     type: "delete",
-  //     ai_model_type: this.model,
-  //     language_type: this.language,
-  //     message_id: -1,
-  //     message_text: "",
-  //   }
-  //   this.chatService.send(message)
-  //   this.messages = []
-  //   this.hasLoaded = false
-  // }
-
 }

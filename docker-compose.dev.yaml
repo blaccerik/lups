@@ -22,7 +22,7 @@ services:
       resources:
         limits:
           cpus: '2'  # Adjust the CPU limit as needed
-          memory: 3G  # Adjust the memory limit as needed
+          memory: 4G  # Adjust the memory limit as needed
     volumes:
       - image_data:/usr/src/app/images
   dashboard:

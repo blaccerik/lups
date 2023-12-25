@@ -33,6 +33,7 @@ class ModelLoader(object):
         model_file = "tinyllama-1.1b-1t-openorca.Q8_0.gguf"  # TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF
         model_name = f"./cpp-model/{model_file}"
         self.llm = Llama(model_path=model_name, verbose=False)
+        print("model loaded")
 
     def format_chat(self, messages):
         text = """<|im_start|>system
