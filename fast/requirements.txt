@@ -9,4 +9,5 @@ google-auth
 google-auth-oauthlib
 Pillow
 sse-starlette
+python-multipart
 

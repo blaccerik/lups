@@ -10,6 +10,7 @@ from utils.database import SessionLocal
 from utils.redis_database import get_client
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Create an instance of FastAPI
 app = FastAPI()
@@ -57,17 +58,20 @@ async def startup_event():
     # await redis_client.delete("streams")
     # print(await redis_client.hgetall("streams"))
     # load pixels
-    t1 = time.time()
-    old = await redis_client.hgetall("pixels")
-    # todo dont keep this on for prod mode
-    if len(old) != 90000:
-        pixels = read_pixels(postgres_client)
-        pixel_data = {}
-        for pixel in pixels:
-            field_name = f"{pixel.x}_{pixel.y}"
-            pixel_data[field_name] = pixel.color
-        await redis_client.hmset('pixels', pixel_data)
-    t2 = time.time()
-    print("time taken", t2 - t1)
+    try:
+        t1 = time.time()
+        old = await redis_client.hgetall("pixels")
+        # todo dont keep this on for prod mode
+        if len(old) != 90000:
+            pixels = read_pixels(postgres_client)
+            pixel_data = {}
+            for pixel in pixels:
+                field_name = f"{pixel.x}_{pixel.y}"
+                pixel_data[field_name] = pixel.color
+            await redis_client.hmset('pixels', pixel_data)
+        t2 = time.time()
+        print("time taken", t2 - t1)
+    except Exception as e:
+        logger.error(e)
     postgres_client.close()
     await redis_client.close()
