@@ -26,6 +26,7 @@ class DBUser(Base):
 class DBChat(Base):
     __tablename__ = 'chats'
     id = Column(Integer, primary_key=True)
+    title = Column(String(100), unique=False)
     user_id = Column(Integer, ForeignKey('users.id'))
     deleted = Column(Boolean, nullable=False, default=False)
 

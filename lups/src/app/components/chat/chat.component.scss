@@ -17,7 +17,6 @@
     background-color: ghostwhite;
     display: flex;
     position: relative;
-    //align-items: center;
     justify-content: center;
   }
 
@@ -82,12 +81,35 @@
   }
 }
 
+
+
 .drawer-container {
   border: 0;
   background-color: silver;
-  padding-left: 2%;
-  padding-top: 2%;
-  padding-right: 2%;
+
+  height: 100%;
+  overflow-y: auto;
+
+
+  /* width */
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: #d3d3d3;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
 }
 
 .drawer-title {
@@ -135,6 +157,36 @@
 
 .chats {
   &-container {
-    background-color: pink;
+    background-color: orange;
+    border-radius: 15px;
+    padding: 15px;
+    margin: 10px;
+  }
+
+  &-box {
+    display: flex;
+    width: 100%;
+    margin-bottom: 5px;
+    align-items: center;
+    justify-content: space-between;
+    background-color: darkorange;
+    border-radius: 5px;
+
+    &:hover {
+      cursor: pointer;
+      background-color: orangered;
+    }
+  }
+
+  &-title {
+    font-size: 20px;
+    margin-left: 10px;
+  }
+
+  &-input {
+    margin-left: 10px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    font-size: 20px;
   }
 }

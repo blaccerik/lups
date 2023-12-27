@@ -8,7 +8,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from models.models import DBUser, DBChat, DBMessage
-from utils.schemas import User, MessageOwner, Message, LanguageType, ChatPost
+from utils.schemas import User, MessageOwner, Message, LanguageType, ChatPost, ChatRespond
 
 MAX_USER_TEXT_SIZE = 100
 MAX_MODEL_TEXT_SIZE = 512
@@ -33,15 +33,17 @@ def read_user(user: User, session: Session):
     return dbuser.id
 
 
-def create_chat(user_id: int, session: Session) -> int:
+def create_chat(user_id: int, session: Session) -> ChatRespond:
     c = DBChat()
     c.user_id = user_id
     session.add(c)
+    session.flush()
+    c.title = f"Chat {c.id}"
     session.commit()
-    return c.id
+    return ChatRespond(chat_id=c.id, title=c.title)
 
 
-async def user_has_chat(chat_id: int, user_id: int, session: Session) -> bool:
+async def user_has_chat(chat_id: int, user_id: int, session: Session):
     chat = session.query(DBChat).filter(and_(
         DBChat.user_id == user_id,
         DBChat.id == chat_id,
@@ -49,17 +51,26 @@ async def user_has_chat(chat_id: int, user_id: int, session: Session) -> bool:
     )).first()
     if chat is None:
         raise HTTPException(status_code=403, detail="User does not have the chat")
+    return chat
+
+async def update_chat_title(title: str, chat_id: int, user_id: int, session: Session):
+    if len(title) > 100:
+        raise HTTPException(status_code=400, detail="Title too long")
+    chat = await user_has_chat(chat_id, user_id, session)
+    chat.title = title
+    session.add(chat)
+    session.commit()
 
 
-def read_chats_by_user(user_id: int, session: Session):
+def read_chats_by_user(user_id: int, session: Session) -> list:
     chats = session.query(DBChat).filter(and_(
         DBChat.user_id == user_id,
         DBChat.deleted == False,
     )).all()
     if len(chats) == 0:
-        chat_id = create_chat(user_id, session)
-        return [chat_id]
-    return [c.id for c in chats]
+        chat_respond = create_chat(user_id, session)
+        return [chat_respond]
+    return [ChatRespond(title=c.title, chat_id=c.id) for c in chats]
 
 
 def read_messages(chat_id: int, user_id: int, session: Session):

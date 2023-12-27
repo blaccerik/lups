@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ChatReceive, ChatSend, ChatService} from "../../services/chat.service";
+import {ChatData, ChatReceive, ChatSend, ChatService} from "../../services/chat.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {OAuthService} from "angular-oauth2-oidc";
 import {UserInfoService} from "../../services/user-info.service";
@@ -22,18 +22,19 @@ export class ChatComponent implements OnInit, OnDestroy {
   textField: string;
   messages: Message[];
   chatId: number;
+  chats: ChatData[]
   streamId: string;
   messagesLoaded: boolean;
   form: FormGroup;
   private streamSubscription: Subscription;
 
   languages = [
-    {display: 'Eesti', value: 'estonia'},
+    // {display: 'Eesti', value: 'estonia'},
     {display: 'Inglise', value: 'english'},
   ];
   models = [
     {display: 'Väike', value: 'small'},
-    {display: 'Suur', value: 'large'},
+    // {display: 'Suur', value: 'large'},
   ];
 
   constructor(private chatService: ChatService,
@@ -84,23 +85,27 @@ export class ChatComponent implements OnInit, OnDestroy {
       return
     }
 
-    this.route.params.subscribe(params => {
-      console.log("params", params)
-      // no chat id
-      const chatId = params["id"]
-      if (!chatId) {
-        this.chatService.getChats().subscribe({
-          next: (chats: number[]) => {
-            console.log("chats", chats)
-            const lastChat = chats[chats.length - 1]
-            this.router.navigate(['/chat', lastChat]);
-            // this.loadComponent(lastChat)
+    // load all user chats
+    this.chatService.getChats().subscribe({
+      next: (chats: ChatData[]) => {
+        this.chats = chats
+
+        // listen to url changes
+        this.route.params.subscribe(params => {
+          console.log("params", params)
+          // no chat id
+          const chatId = params["id"]
+          if (!chatId) {
+            const lastChat = this.chats[this.chats.length - 1]
+            this.router.navigate(['/chat', lastChat.chat_id]);
+          } else {
+            this.loadComponent(chatId)
           }
         })
-      } else {
-        this.loadComponent(chatId)
       }
     })
+
+
   }
 
   loadComponent(id: number) {
@@ -223,9 +228,27 @@ export class ChatComponent implements OnInit, OnDestroy {
   createNew() {
     this.messagesLoaded = false
     this.chatService.newChat().subscribe({
-      next: (chatId: number) => {
-        this.router.navigate(["chat", chatId])
+      next: (chatData: ChatData) => {
+        this.chats.push(chatData)
+        this.router.navigate(["chat", chatData.chat_id])
       }
     })
+  }
+
+  toggleEdit(chat: ChatData) {
+    if (chat.editing) {
+      this.chatService.editChatTitle(chat.chat_id, chat.title).subscribe()
+    }
+    chat.editing = !chat.editing
+  }
+
+  onTitleChange(event: Event, chat: ChatData): void {
+    const inputValue = (event.target as HTMLInputElement).value;
+    // Update the title of the item
+    chat.title = inputValue;
+  }
+
+  selectChat(id: number) {
+    this.router.navigate(["chat", id])
   }
 }

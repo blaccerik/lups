@@ -1,93 +1,3 @@
-<!--<div *ngIf="!hasLoaded">-->
-<!--  loading-->
-<!--</div>-->
-<!--<div *ngIf="hasLoaded" style="background-color: aliceblue">-->
-<!--  <input type="text" [(ngModel)]="textField" maxlength="100" placeholder="Küsi küsimus" (keyup.enter)="send()">-->
-<!--  <input type="text" [(ngModel)]="language" placeholder="language">-->
-<!--  <button (click)="send()">send</button>-->
-<!--  <button (click)="cancel()">cancel</button>-->
-<!--  <button (click)="clear()">clear</button>-->
-<!--  <div *ngFor="let message of messages">-->
-<!--    {{message.message_owner}}: {{message.message_text}}-->
-<!--  </div>-->
-<!--</div>-->
-<!--<mat-drawer-container class="container">-->
-<!--  <mat-drawer mode="side" opened class="color" style="border-right: 3px solid black">-->
-<!--    <div class="down">-->
-<!--      <button mat-icon-button (click)="toggleSidenav()">-->
-<!--        <mat-icon class="bigger">{{ isSidenavOpen ? "close" : "menu" }}</mat-icon>-->
-<!--      </button>-->
-<!--      <mat-icon class="bigger icon-cap" [svgIcon]="this.form.controls['language'].value"></mat-icon>-->
-<!--      <mat-icon class="bigger icon-cap">{{stringToModel(this.form.controls['model'].value)}}</mat-icon>-->
-<!--    </div>-->
-<!--  </mat-drawer>-->
-<!--  <mat-drawer-content>-->
-<!--      <mat-drawer-container class="container">-->
-<!--        <mat-drawer mode="side" [opened]="isSidenavOpen" class="color" style="border-right: 3px solid black">-->
-<!--          <div class="centered-title">-->
-<!--            Seaded-->
-<!--          </div>-->
-<!--          <form [formGroup]="form" (ngSubmit)="onSubmit()">-->
-<!--            <div>-->
-<!--              <mat-form-field  appearance="outline" style="margin: 0 20px" color="warn">-->
-<!--                <mat-label>Mudeli keel</mat-label>-->
-<!--                <mat-select formControlName="language">-->
-<!--                  <mat-option *ngFor="let lang of languages" [value]="lang.value">{{ lang.display }}</mat-option>-->
-<!--                </mat-select>-->
-<!--              </mat-form-field>-->
-<!--            </div>-->
-
-<!--            <div>-->
-<!--              <mat-form-field appearance="outline" style="margin: 0 20px">-->
-<!--                <mat-label>Mudel</mat-label>-->
-<!--                <mat-select formControlName="model">-->
-<!--                  <mat-option *ngFor="let mdl of models" [value]="mdl.value">{{ mdl.display }}</mat-option>-->
-<!--                </mat-select>-->
-<!--              </mat-form-field>-->
-<!--            </div>-->
-<!--          </form>-->
-<!--        </mat-drawer>-->
-<!--        <mat-drawer-content>-->
-<!--          chat here-->
-<!--        </mat-drawer-content>-->
-<!--      </mat-drawer-container>-->
-<!--  </mat-drawer-content>-->
-<!--</mat-drawer-container>-->
-
-
-<!--<div class="side-navbar">-->
-
-<!--</div>-->
-
-
-<!--<div class="parent-container">-->
-<!--  <div class="container">-->
-<!--    <div *ngIf="!hasLoaded" class="loading">-->
-<!--      Loading...-->
-<!--    </div>-->
-<!--    <div *ngIf="hasLoaded">-->
-<!--&lt;!&ndash;      <div class="messages" #chatContainer>&ndash;&gt;-->
-<!--&lt;!&ndash;        <div *ngFor="let message of messages" class="message">&ndash;&gt;-->
-<!--&lt;!&ndash;          <div *ngIf="message.isUser" class="user-message">&ndash;&gt;-->
-<!--&lt;!&ndash;            <div class="name">{{userInfoService.userName}}</div>&ndash;&gt;-->
-<!--&lt;!&ndash;            {{ message.text }}&ndash;&gt;-->
-<!--&lt;!&ndash;          </div>&ndash;&gt;-->
-<!--&lt;!&ndash;          <div *ngIf="!message.isUser" class="app-message">&ndash;&gt;-->
-<!--&lt;!&ndash;            <div class="name">Vambola</div>&ndash;&gt;-->
-<!--&lt;!&ndash;            <div *ngIf="message.isLoading" class="loader"></div>&ndash;&gt;-->
-<!--&lt;!&ndash;            <div *ngIf="!message.isLoading">{{ message.text }}</div>&ndash;&gt;-->
-<!--&lt;!&ndash;          </div>&ndash;&gt;-->
-<!--&lt;!&ndash;        </div>&ndash;&gt;-->
-<!--&lt;!&ndash;      </div>&ndash;&gt;-->
-<!--&lt;!&ndash;      <div class="input-area">&ndash;&gt;-->
-<!--&lt;!&ndash;        <input type="text" [(ngModel)]="textField" maxlength="100" placeholder="Küsi küsimus" (keyup.enter)="send()">&ndash;&gt;-->
-<!--&lt;!&ndash;        <button [disabled]="!canWrite" (click)="send()">Saada</button>&ndash;&gt;-->
-<!--&lt;!&ndash;        <button [disabled]="!canWrite" (click)="clear()">Puhasta</button>&ndash;&gt;-->
-<!--&lt;!&ndash;      </div>&ndash;&gt;-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
-
 <mat-drawer-container class="main-container" autosize>
   <mat-drawer-content class="chat-container">
     <button mat-icon-button class="toggle-button" (click)="toggleSidenav()">
@@ -125,53 +35,72 @@
       </button>
     </div>
   </mat-drawer-content>
-  <mat-drawer [opened]="isSidenavOpen" mode="side" position="end" class="drawer-container">
-    <div class="drawer-title">
-      SEADED
-    </div>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="settings-container">
-      <div class="settings-box" style="background-color: gold">
-        <mat-icon class="settings-box-icon">memory</mat-icon>
-        <div class="settings-box-title">Mudel</div>
-        <mat-icon class="settings-box-info"
-                  matTooltip="Vali mudeli suurus.
+  <mat-drawer [opened]="isSidenavOpen" mode="side" position="end">
+    <div class="drawer-container">
+      <div class="drawer-title">
+        SEADED
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="settings-container">
+        <div class="settings-box" style="background-color: gold">
+          <mat-icon class="settings-box-icon">memory</mat-icon>
+          <div class="settings-box-title">Mudel</div>
+          <mat-icon class="settings-box-info"
+                    matTooltip="Vali mudeli suurus.
                   Suuremad mudelid genereerivad parema vastuse, kuid aeglasemini"
-                  matTooltipShowDelay="100">help_outline
-        </mat-icon>
-        <mat-form-field class="settings-box-input" appearance="outline">
-          <mat-label>Vali mudel</mat-label>
-          <mat-select formControlName="model">
-            <mat-option *ngFor="let mdl of models" [value]="mdl.value">{{ mdl.display }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
+                    matTooltipShowDelay="100">help_outline
+          </mat-icon>
+          <mat-form-field class="settings-box-input" appearance="outline">
+            <mat-label>Vali mudel</mat-label>
+            <mat-select formControlName="model">
+              <mat-option *ngFor="let mdl of models" [value]="mdl.value">{{ mdl.display }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
-      <div class="settings-box" style="background-color: deepskyblue">
-        <mat-icon class="settings-box-icon">language</mat-icon>
-        <div class="settings-box-title">Keel</div>
-        <mat-icon class="settings-box-info"
-                  matTooltip="Vali mudeli sisend ja väljastus keel. Eesti keelega genereeritakse vastust kauem"
-                  matTooltipShowDelay="100">help_outline
-        </mat-icon>
-        <mat-form-field class="settings-box-input" appearance="outline">
-          <mat-label>Vali keel</mat-label>
-          <mat-select formControlName="language">
-            <mat-option *ngFor="let lang of languages" [value]="lang.value">{{ lang.display }}</mat-option>
-          </mat-select>
-        </mat-form-field>
+        <div class="settings-box" style="background-color: deepskyblue">
+          <mat-icon class="settings-box-icon">language</mat-icon>
+          <div class="settings-box-title">Keel</div>
+          <mat-icon class="settings-box-info"
+                    matTooltip="Vali mudeli sisend ja väljastus keel. Eesti keelega genereeritakse vastust kauem"
+                    matTooltipShowDelay="100">help_outline
+          </mat-icon>
+          <mat-form-field class="settings-box-input" appearance="outline">
+            <mat-label>Vali keel</mat-label>
+            <mat-select formControlName="language">
+              <mat-option *ngFor="let lang of languages" [value]="lang.value">{{ lang.display }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </form>
+      <div class="drawer-title">
+        VESTLUSED
       </div>
-    </form>
+      <div class="chats-container">
+        <div *ngFor="let chat of chats">
+          <div *ngIf="!chat.editing" class="chats-box" (click)="selectChat(chat.chat_id)">
+            <div class="chats-title">
+              {{chat.title}}
+            </div>
+            <button mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </div>
+          <div *ngIf="chat.editing" class="chats-box">
+            <input
+              class="chats-input"
+              type="text"
+              [value]="chat.title"
+              (input)="onTitleChange($event, chat)"
+              maxlength="100"
+            />
+            <button mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
+              <mat-icon>done</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <div class="drawer-title">
-      VESTLUSED
-    </div>
-    <div class="chats-container">
-      <ul>
-        <li>chat 1</li>
-        <li>chat 2</li>
-        <li>chat 3</li>
-      </ul>
-    </div>
   </mat-drawer>
 
 

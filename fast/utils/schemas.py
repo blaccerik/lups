@@ -16,17 +16,6 @@ class User(BaseModel):
     name: str
 
 
-class TaskOutputType(Enum):
-    part = "part"
-    end = "end"
-    error = "error"
-
-
-class TaskOutput(BaseModel):
-    type: TaskOutputType
-    text: str
-
-
 class AIModelType(Enum):
     small = "small"  # TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF
 
@@ -41,26 +30,17 @@ class MessageOwner(Enum):
     model = "model"
 
 
-class OutputType(Enum):
-    error = "error"
-    data = "data"
-    message = "message"
-    stream_message = "stream_message"
-    completed = "completed"
-
-
 class InputType(Enum):
     cancel = "cancel"
     delete = "delete"
     message = "message"
 
+class ChatUpdate(BaseModel):
+    title: str
 
-class ChatInput(BaseModel):
-    type: InputType
-    ai_model_type: AIModelType
-    language_type: LanguageType
-    message_text: str
-    message_id: int
+class ChatRespond(BaseModel):
+    title: str
+    chat_id: int
 
 
 class ChatPost(BaseModel):
@@ -76,47 +56,11 @@ class ChatPostRespond(BaseModel):
     message_id: int
 
 
-class StreamPostType(Enum):
-    cancel = "cancel"
-    delete = "delete"
-
-
-class StreamPost(BaseModel):
-    type: StreamPostType
-
-
-class ChatOutput(BaseModel):
-    type: OutputType
-
-
-class ChatOutputData(ChatOutput):
-    queue_number: int
-
-
-class ChatOutputError(ChatOutput):
-    message_text: str
-
-
-class ChatOutputMessage(ChatOutput):
-    message_id: int
-    message_text: str
-    message_owner: MessageOwner
-    language_type: LanguageType
-
-
 class Message(BaseModel):
     message_id: int
     message_text: str
     message_owner: MessageOwner
     language_type: LanguageType
-
-
-class MessageSend(Message):
-    part: int  # set to -1 if message is complete. else shows message part number
-
-
-class MessageReceive(BaseModel):
-    text: str
 
 
 class News(BaseModel):

@@ -10,11 +10,11 @@ from sqlalchemy.orm import Session
 from sse_starlette import EventSourceResponse
 
 from services.chat_service import read_user, read_chats_by_user, read_messages, user_has_chat, create_chat, task_stream, \
-    create_message
+    create_message, update_chat_title
 from utils.auth import get_current_user
 from utils.database import get_db
 from utils.redis_database import get_redis
-from utils.schemas import User, ChatPost, ChatPostRespond
+from utils.schemas import User, ChatPost, ChatPostRespond, ChatUpdate
 
 router = APIRouter(prefix="/api/chat")
 logger = logging.getLogger("Chat")
@@ -30,32 +30,32 @@ async def get_chats(current_user: User = Depends(get_current_user), db: Session 
 
 
 @router.get("/new")
-async def get_chat(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    user_id = read_user(current_user, db)
-    chat_id = create_chat(user_id, db)
-    return chat_id
-
-
-# @router.get("/test")
-# async def test():
-#     result = celery_app.send_task("test")
-#     await asyncio.sleep(1)
-#     # cancel task
-#     # result.abort()
-#     # AsyncResult(result.id).revoke()
-#     a = AbortableAsyncResult(result.id)
-#     print(a)
-#     a.abort()
-#     print(a)
-#     # await asyncio.sleep(1)
-#     # print(AsyncResult(result.id).result)
-#     return result.id
+async def get_chat(current_user: User = Depends(get_current_user), postgres_client: Session = Depends(get_db)):
+    user_id = read_user(current_user, postgres_client)
+    chat_response = create_chat(user_id, postgres_client)
+    return chat_response
 
 
 @router.get("/{chat_id}")
-async def get_chat_by_id(chat_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    user_id = read_user(current_user, db)
-    return read_messages(chat_id, user_id, db)
+async def get_chat_by_id(chat_id: int, current_user: User = Depends(get_current_user),
+                         postgres_client: Session = Depends(get_db)):
+    user_id = read_user(current_user, postgres_client)
+    return read_messages(chat_id, user_id, postgres_client)
+
+
+@router.put("/{chat_id}")
+async def update_chat(
+        chat_id: int,
+        chat_update: ChatUpdate,
+        current_user:
+        User = Depends(get_current_user),
+        postgres_client: Session = Depends(get_db)
+):
+    user_id = read_user(current_user, postgres_client)
+
+    await update_chat_title(chat_update.title, chat_id, user_id, postgres_client)
+
+    return
 
 
 @router.post("/{chat_id}")

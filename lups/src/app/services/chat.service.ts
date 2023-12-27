@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {map, Observable} from "rxjs";
 import {Message} from "../components/chat/chat.component";
 import {OAuthService} from "angular-oauth2-oidc";
 
@@ -24,20 +24,29 @@ export interface ChatSendRespond {
   message_id: number
 }
 
+export interface ChatData {
+  title: string
+  chat_id: number
+  editing: boolean
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
   private url = 'api/chat';
 
-  constructor(private http: HttpClient, private oauthService: OAuthService) {
-    if (!this.oauthService.hasValidIdToken()) {
-      return
-    }
-  }
+  constructor(private http: HttpClient, private oauthService: OAuthService) {}
 
   getMessages(id: number): Observable<Message[]> {
     return this.http.get<Message[]>(this.url + "/" + id)
+  }
+
+  editChatTitle(id: number, title: string): Observable<any> {
+    const data = {
+      title: title
+    }
+    return this.http.put<any>(this.url + "/" + id, data)
   }
 
   postMessage(id: number, chatSend: ChatSend): Observable<ChatSendRespond> {
@@ -68,11 +77,16 @@ export class ChatService {
     return this.http.delete<any>(this.url + "/stream/" + streamId)
   }
 
-  getChats(): Observable<number[]> {
-    return this.http.get<number[]>(this.url + "/")
+  getChats(): Observable<ChatData[]> {
+    return this.http.get<ChatData[]>(this.url + "/")
   }
 
-  newChat(): Observable<number> {
-    return this.http.get<number>(this.url + "/new")
+  newChat(): Observable<ChatData> {
+    return this.http.get<ChatData>(this.url + "/new").pipe(
+      map(c => {
+        c.editing = false
+        return c
+      })
+    )
   }
 }
