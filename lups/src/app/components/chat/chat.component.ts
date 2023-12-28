@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ChatData, ChatReceive, ChatSend, ChatService} from "../../services/chat.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {OAuthService} from "angular-oauth2-oidc";
@@ -18,7 +18,7 @@ export interface Message {
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   textField: string;
   messages: Message[];
   chatId: number;
@@ -132,16 +132,29 @@ export class ChatComponent implements OnInit, OnDestroy {
         console.log(messages)
         this.messages = messages;
         this.messagesLoaded = true;
-        // // Scroll to the latest question
-        // setTimeout(() => {
-        //   this.scrollToBottom();
-        // }, 0);
       },
       error: err => {
         console.log(err)
         // this.router.navigate([""])
       }
     })
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
+  @ViewChild('scrollContainer') private scrollContainer: ElementRef | undefined;
+
+  scrollToBottom(): void {
+    const container = this.scrollContainer?.nativeElement
+    if (!container) {
+      return
+    }
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: 'smooth' // Add smooth scroll behavior
+    });
   }
 
   private updateUserMessageId(id: number): void {

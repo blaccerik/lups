@@ -6,11 +6,11 @@
     <div *ngIf="!hasLoaded()" class="spinner">
       <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
     </div>
-    <div *ngIf="hasLoaded()" class="chat-box">
+    <div #scrollContainer *ngIf="hasLoaded()" class="chat-box">
       <div *ngFor="let message of messages" class="chat-line">
         <div class="chat-message">
           <div class="chat-owner">
-            {{message.message_owner}} {{message.message_id}}
+            {{message.message_owner === "user" ? "Kasutaja" : "Vambola"}}:
           </div>
           {{message.message_text}}
         </div>
