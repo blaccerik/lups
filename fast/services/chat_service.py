@@ -164,7 +164,7 @@ async def task_stream(
         text_part = raw_data["text"]
         text_index = int(raw_data["index"])
         task_type = raw_data["type"]
-        print(raw_data)
+        logger.info(f"Data: {task_type} {text_index} size: {len(text_part)}")
         yield {
             "event": "message",
             "id": text_index,
@@ -178,15 +178,14 @@ async def task_stream(
 
         # end loop
         if task_type == "end":
-            print(task_type)
             break
 
     else:
         # end loop if it goes on for too long
-        print("loop end")
+        logger.error("Took to long to get messages")
 
-    # clear redis
-    print("CLEAN UP------------")
-    print(await redis_client.hget("streams", stream_id))
-    print(await redis_client.smembers("chats"))
-    print("CLEAN UP------------")
+    logger.info("------------CLEAN UP------------")
+    s = await redis_client.hget("streams", stream_id)
+    c = await redis_client.smembers("chats")
+    logger.info(f"chats: {c} streams: {s}")
+    logger.info("------------CLEAN UP------------")
