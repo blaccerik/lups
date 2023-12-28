@@ -81,7 +81,11 @@
   }
 }
 
-
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .drawer-container {
   border: 0;
@@ -171,11 +175,16 @@
     justify-content: space-between;
     background-color: darkorange;
     border-radius: 5px;
+    border: 1px solid darkorange;
 
     &:hover {
       cursor: pointer;
       background-color: orangered;
     }
+  }
+
+  &-selected {
+    border-color: black;
   }
 
   &-title {
