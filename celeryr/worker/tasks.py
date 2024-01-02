@@ -1,6 +1,4 @@
-import json
 import os
-import random
 import sys
 import time
 
@@ -24,6 +22,7 @@ celery_app = Celery(
     backend=DATABASE_URI
 )
 
+MAX_TEXT_LEN = 512
 
 def get_client():
     return redis.Redis(host=os.environ.get('REDIS_BROKER_URL', 'localhost'), port=6379, db=0)
@@ -62,6 +61,16 @@ What color is the sky?<|im_end|>
     e = time.time()
     print(f"model used: {e - s}")
 
+    # clear redis jobs
+    redis_client = get_client()
+    print(redis_client.hgetall("streams"))
+    print(redis_client.smembers("chats"))
+    redis_client.delete("streams")
+    redis_client.delete("chats")
+    print(redis_client.hgetall("streams"))
+    print(redis_client.smembers("chats"))
+    redis_client.close()
+
 
 class PredictTask(AbortableTask):
     abstract = True
@@ -79,40 +88,6 @@ class PredictTask(AbortableTask):
             self.cpp_model = ModelLoader()
         return self.run(*args, **kwargs)
 
-
-# @celery_app.task(name="test", soft_time_limit=60, base=PredictTask, bind=True)
-# def test2(self, chat_id):
-#     messages = get_chat(chat_id)
-#     redis_client = get_client()
-#     updates_channel = f"task_updates:{chat_id}"
-#     try:
-#         for text_part in self.model.stream(self.model.format_chat(messages)):
-#             if self.is_aborted():
-#                 print("aborted")
-#                 break
-#             redis_client.publish(updates_channel, json.dumps({
-#                 "text": text_part,
-#                 "type": "message"
-#             }))
-#         redis_client.publish(updates_channel, json.dumps({
-#             "text": "",
-#             "type": "done"
-#         }))
-#     except SoftTimeLimitExceeded:
-#         print("time limit")
-#         redis_client.publish(updates_channel, json.dumps({
-#             "text": "",
-#             "type": "timeout"
-#         }))
-#     except Exception as e:
-#         print(e)
-#         redis_client.publish(updates_channel, json.dumps({
-#             "text": "",
-#             "type": "timeout"
-#         }))
-#
-#     redis_client.close()
-
 @celery_app.task(name="stream", soft_time_limit=60, base=PredictTask, bind=True)
 def stream(self, chat_id, stream_id, language):
     # database connections
@@ -127,6 +102,9 @@ def stream(self, chat_id, stream_id, language):
         for index, text_part in enumerate(self.cpp_model.stream(self.cpp_model.format_chat(messages))):
             if self.is_aborted():
                 print("aborted")
+                break
+            elif len(total_text) + len(text_part) >= MAX_TEXT_LEN:
+                print("too long")
                 break
             total_text += text_part
             redis_client.xadd(
@@ -149,26 +127,29 @@ def stream(self, chat_id, stream_id, language):
         text=total_text,
         text_model=total_text
     )
-    postgres_client.add(db_output)
-    print("add to database")
-    postgres_client.commit()
-    print("add to database")
-    message_id = db_output.id
-
-    # send complete message to user
-    redis_client.xadd(
-        updates_channel,
-        {
-            "index": message_id,
-            "text": total_text,
-            "type": "end"
-        }
-    )
-    # remove locks
-    redis_client.hdel("streams", stream_id)
-    redis_client.srem("chats", str(chat_id))
-    redis_client.close()
-    postgres_client.close()
+    try:
+        postgres_client.add(db_output)
+        postgres_client.commit()
+        message_id = db_output.id
+        # send complete message to user
+        redis_client.xadd(
+            updates_channel,
+            {
+                "index": message_id,
+                "text": total_text,
+                "type": "end"
+            }
+        )
+    except Exception as e:
+        print("DB ERROR")
+        print(e)
+        print("DB ERROR")
+    finally:
+        # remove locks
+        redis_client.hdel("streams", stream_id)
+        redis_client.srem("chats", str(chat_id))
+        redis_client.close()
+        postgres_client.close()
 
 
 @celery_app.task(name="get_news", time_limit=600)

@@ -1,42 +1,33 @@
-<div class="main">
+<div class="container">
   <img class="logo" src="assets/logo.png" alt="image" (click)="home()">
-  <div class="name" (click)="home()">
-    Eesti Rahvalüpsjate Erakond
-  </div>
-
-  <div class="small-menu" [class.is-open]="isMenuOpen">
+  <div class="name" (click)="home()">Eesti Rahvalüpsjate Erakond</div>
+  <div class="section-container">
     <div *ngFor="let section of sections">
-      <div *ngIf="section.isSeen || section.id" class="section" (click)="go(section)">
-        {{section.text}} <i *ngIf="section.hasChildren" class="material-icons">{{ section.isSeen ? "menu" : "close" }}</i>
-      </div>
-    </div>
-  </div>
-
-  <div class="menu">
-    <div *ngFor="let section of sections">
-      <div *ngIf="section.id" class="section" (click)="go(section)">
+      <div *ngIf="section.id" class="section-item" (click)="go(section)">
         {{section.text}}
-        <div *ngIf="!section.link" class="submenu">
-          <div *ngFor="let section2 of sections">
-            <div class="section" [ngStyle]="{'min-width': getWidth(section2.width)}" *ngIf="section2.parentId === section.id" (click)="go(section2)">
-              {{ section2.text }}
+        <div *ngIf="!section.link" class="section-submenu">
+          <div *ngFor="let submenuSection of sections">
+            <div *ngIf="submenuSection.parentId === section.id"
+                 class="section-submenu-item section-item"
+                 (click)="go(submenuSection)">
+              {{submenuSection.text}}
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="user-info">
-    <div class="section burger" (click)="toggleMenu()">
-      <i class="material-icons">{{ isMenuOpen ? "close" : "menu" }}</i>
+  <div class="small-menu-burger section-item" (click)="toggleMenu()">
+    <mat-icon>{{ isMenuOpen ? "close" : "menu" }}</mat-icon>
+  </div>
+  <div class="small-menu" [class.is-open]="isMenuOpen">
+    <div *ngFor="let section of sections">
+      <div *ngIf="section.isSeen || section.id" class="section-item" (click)="go(section)">
+        {{section.text}}
+        <mat-icon *ngIf="section.id && section.isSeen !== undefined" class="small-menu-burger-icon">
+          {{ section.isSeen ? "close" : "menu"}}
+        </mat-icon>
+      </div>
     </div>
-    <div class="section" *ngIf="authService.hasValidIdToken()" (click)="logout()">
-      Logout
-    </div>
-    <div class="section" *ngIf="!authService.hasValidIdToken()" (click)="login()">
-      Login
-    </div>
-    <img class="image" *ngIf="authService.hasValidIdToken()" src="{{userInfoService.picture}}" alt="image">
   </div>
 </div>
-
