@@ -17,9 +17,6 @@
       </div>
     </div>
   </div>
-  <div class="small-menu-burger section-item" (click)="toggleMenu()">
-    <mat-icon>{{ isMenuOpen ? "close" : "menu" }}</mat-icon>
-  </div>
   <div class="small-menu" [class.is-open]="isMenuOpen">
     <div *ngFor="let section of sections">
       <div *ngIf="section.isSeen || section.id" class="section-item" (click)="go(section)">
@@ -29,5 +26,17 @@
         </mat-icon>
       </div>
     </div>
+  </div>
+  <div class="account">
+    <div class="small-menu-burger section-item" (click)="toggleMenu()">
+      <mat-icon>{{ isMenuOpen ? "close" : "menu" }}</mat-icon>
+    </div>
+    <button *ngIf="!authService.hasValidIdToken()" class="account-login" mat-button (click)="login()">
+      Login
+    </button>
+    <button *ngIf="authService.hasValidIdToken()" class="account-login" mat-button (click)="logout()">
+      Logout
+    </button>
+    <img *ngIf="authService.hasValidIdToken()" class="account-image" src="{{userInfoService.picture}}" alt="image">
   </div>
 </div>

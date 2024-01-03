@@ -82,7 +82,6 @@
 
   &-burger {
     display: none;
-    margin-left: auto;
     @media (max-width: $menuBreakpoint) {
       display: block;
     }
@@ -100,6 +99,25 @@
       background-color: midnightblue;
       width: 100%;
     }
+  }
+}
+
+.account {
+  margin-left: auto;
+  display: flex;
+
+  &-login {
+    background-color: orange;
+    color: $main-color !important;
+    margin: 12px;
+  }
+
+  &-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    margin-top: 15px;
+    margin-right: 12px;
   }
 }
 
