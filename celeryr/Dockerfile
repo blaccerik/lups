@@ -58,9 +58,9 @@ WORKDIR /usr/src/app
 #RUN #pip install llama-cpp-python
 
 # install dependencies
-RUN apt-get update
+RUN #apt-get update
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN #pip install -r requirements.txt
 #
 ## download model
 #RUN huggingface-cli download TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF tinyllama-1.1b-1t-openorca.Q8_0.gguf --local-dir cpp-model --local-dir-use-symlinks False
