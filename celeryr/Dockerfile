@@ -22,14 +22,13 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 #    pipinstall --upgrade setuptools wheel &&  \
 #    apt-get install build-essential
 #RUN gcc-11 --version # check if gcc works
-RUN apt-get -y install build-essential
-RUN apt-get -y install g++
-RUN apt-get update
-RUN apt-get -y install clang
+RUN apt update
+RUN apt -y upgrade
+RUN pip install llama-cpp-python
 
 # install dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # download model
 RUN huggingface-cli download TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF tinyllama-1.1b-1t-openorca.Q8_0.gguf --local-dir cpp-model --local-dir-use-symlinks False
