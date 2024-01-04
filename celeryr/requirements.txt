@@ -2,7 +2,6 @@ celery==5.2.3
 flower==2.0.1
 redis==5.0.1
 transformers
-llama-cpp-python
 newsdataapi
 huggingface_hub
 beautifulsoup4==4.12.2
