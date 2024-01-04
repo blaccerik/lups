@@ -21,39 +21,26 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 #RUN pip install --upgrade pip &&  \
 #    pipinstall --upgrade setuptools wheel &&  \
 #    apt-get install build-essential
-RUN gcc --version # check if gcc works
 
-#RUN apt-get update
-#RUN apt install curl -y
-#RUN apt install cmake -y
-#RUN pip install testresources
-#
-## get add repo
-#RUN apt-get install -y software-properties-common
-#RUN apt-get update
-#
-#
-#RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
-#RUN apt install -y gcc-11 g++-11
-#RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 --slave /usr/bin/g++ g++ /usr/bin/g++-11
-#
-#RUN pip install --upgrade pip &&
-#RUN pip install --upgrade setuptools wheel &&
-#RUN apt-get install build-essential &&
-
-
-RUN apt update
-RUN apt -y upgrade
+RUN apt-get update
+RUN apt install curl -y
+RUN apt install cmake -y
+RUN pip install testresources
 
 # get add repo
 RUN apt-get install -y software-properties-common
 RUN apt-get update
 
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 
-RUN apt update
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 RUN apt install -y gcc-11 g++-11
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 --slave /usr/bin/g++ g++ /usr/bin/g++-11
+
+RUN pip install --upgrade pip
+RUN pip install --upgrade setuptools wheel
+RUN apt-get install build-essential
+
+RUN gcc-11 --version
 
 RUN pip install llama-cpp-python
 
