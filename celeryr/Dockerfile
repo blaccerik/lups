@@ -24,6 +24,7 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 #RUN gcc-11 --version # check if gcc works
 RUN apt-get -y install build-essential
 RUN apt-get -y install g++
+RUN apt-get update
 RUN apt-get -y install clang
 
 # install dependencies
