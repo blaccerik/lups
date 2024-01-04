@@ -11,11 +11,20 @@ ENV PYTHONUNBUFFERED 1
 # postgre stuff
 RUN apt-get update && apt-get -y install libpq-dev gcc
 
-# cmake for llama cpp
-RUN apt-get -y install build-essential
+## cmake for llama cpp
+#RUN apt-get -y install build-essential
+
+
+#RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test &&  \
+#    apt install -y gcc-11 g++-11 &&  \
+#    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 --slave /usr/bin/g++ g++ /usr/bin/g++-11
+#RUN pip install --upgrade pip &&  \
+#    pipinstall --upgrade setuptools wheel &&  \
+#    apt-get install build-essential
+#RUN gcc-11 --version # check if gcc works
+RUN apt-get -y install build-essential g++ clang
 
 # install dependencies
-RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
