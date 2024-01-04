@@ -22,8 +22,12 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 #    pipinstall --upgrade setuptools wheel &&  \
 #    apt-get install build-essential
 #RUN gcc-11 --version # check if gcc works
-RUN apt update
-RUN apt -y upgrade
+RUN apt-get update
+RUN apt install curl -y
+RUN apt install cmake -y
+RUN pip install testresource
+
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 RUN pip install llama-cpp-python
 
 # install dependencies
