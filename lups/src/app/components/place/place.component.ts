@@ -1,5 +1,14 @@
 import {PixelResponse, PlaceService} from "../../services/place.service";
-import {ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  Renderer2,
+  ViewChild
+} from '@angular/core';
 import {OAuthService} from "angular-oauth2-oidc";
 import {PopupService} from "../../services/popup.service";
 import {MatDialog} from "@angular/material/dialog";
@@ -11,7 +20,7 @@ import {HelpDialogComponent} from "./help-dialog/help-dialog.component";
   templateUrl: './place.component.html',
   styleUrls: ['./place.component.scss']
 })
-export class PlaceComponent implements OnInit {
+export class PlaceComponent implements OnInit, OnDestroy {
   predefinedColors = [
     "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
   ];
@@ -117,6 +126,10 @@ export class PlaceComponent implements OnInit {
           }
         );
       }})
+  }
+
+  ngOnDestroy() {
+    this.placeService.disconnect()
   }
 
   selectColor(color: string): void {

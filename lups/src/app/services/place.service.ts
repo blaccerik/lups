@@ -29,7 +29,7 @@ export class PlaceService {
       token = this.oauthService.getIdToken();
     }
     console.log(environment.wsUrl)
-    this.subject = webSocket(`${environment.wsUrl}?authorization=${token}`);
+    this.subject = webSocket(`${environment.wsUrl}/api/place/ws?authorization=${token}`);
 
     // get websocket
     this.subject.pipe(retry({delay: 1000})).subscribe((message: any) => {
@@ -58,6 +58,12 @@ export class PlaceService {
 
   connect(): any {
     return this.messagesSubject.asObservable();
+  }
+
+  disconnect() {
+    if (this.subject) {
+      this.subject.disconnect()
+    }
   }
 
   send(x: number, y: number, color: string) {
