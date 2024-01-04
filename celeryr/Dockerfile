@@ -53,8 +53,8 @@ FROM blaccerik/llama-test:v1
 #    apt install -y gcc-11
 ##
 #RUN gcc-11 --version
-
-RUN pip install llama-cpp-python
+RUN pip freeze
+#RUN #pip install llama-cpp-python
 
 ## install dependencies
 #COPY requirements.txt .
