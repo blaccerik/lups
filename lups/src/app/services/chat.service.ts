@@ -1,13 +1,33 @@
-import { Injectable } from '@angular/core';
-import {HttpClient, HttpEvent} from "@angular/common/http";
+import {Injectable} from '@angular/core';
+import {HttpClient} from "@angular/common/http";
 import {map, Observable} from "rxjs";
 import {Message} from "../components/chat/chat.component";
+import {OAuthService} from "angular-oauth2-oidc";
 
 
-export interface ChatResponse {
-  id: number,
-  message: string,
+export interface ChatReceive {
   type: string
+  id: number
+  text: string
+}
+
+export interface ChatSend {
+  type: string
+  ai_model_type: string
+  language_type: string
+  message_text: string
+  message_id: number
+}
+
+export interface ChatSendRespond {
+  stream_id: string
+  message_id: number
+}
+
+export interface ChatData {
+  title: string
+  chat_id: number
+  editing: boolean
 }
 
 @Injectable({
@@ -16,46 +36,57 @@ export interface ChatResponse {
 export class ChatService {
   private url = 'api/chat';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private oauthService: OAuthService) {}
 
-  get(id: number): Observable<Message[]> {
-    return this.http.get<ChatResponse[]>(this.url + "/" + id).pipe(
-      map((chatResponses: ChatResponse[]) => {
-        return chatResponses.map((c: ChatResponse) => {
-          const m: Message = {
-            id: c.id,
-            message: c.message,
-            isLoading: false,
-            isUser: c.type === "user"
-          };
-          return m;
-        });
+  getMessages(id: number): Observable<Message[]> {
+    return this.http.get<Message[]>(this.url + "/" + id)
+  }
+
+  editChatTitle(id: number, title: string): Observable<any> {
+    const data = {
+      title: title
+    }
+    return this.http.put<any>(this.url + "/" + id, data)
+  }
+
+  postMessage(id: number, chatSend: ChatSend): Observable<ChatSendRespond> {
+    return this.http.post<ChatSendRespond>(this.url + "/" + id, chatSend)
+  }
+
+  getStreamMessages(streamId: string): Observable<ChatReceive> {
+    const eventSource = new EventSource(this.url + "/stream/" + streamId)
+    return new Observable<ChatReceive>((observer) => {
+      // need to use event listener or else zone js isn't triggered
+      eventSource.addEventListener("message", m => {
+        const chatReceive = JSON.parse(m.data)
+        observer.next(chatReceive)
+        if (chatReceive.type === "end") {
+          eventSource.close()
+          observer.complete()
+        }
       })
-    );
-  }
-
-  chats(): Observable<number[]> {
-    return this.http.get<number[]>(this.url + "/")
-  }
-
-  delete(id: number): Observable<string> {
-    return this.http.delete<string>(this.url + "/" + id)
-  }
-
-  create(text: string, id: number): Observable<string> {
-    return this.http.post<string>(this.url + "/create", null)
-  }
-
-  send(text: string, id: number): Observable<ChatResponse> {
-    const body = { message: text };
-    return this.http.post<ChatResponse>(this.url + "/" + id, body)
-  }
-
-  stream(): Observable<HttpEvent<any>>{
-    return this.http.get('api/chat/stream', {
-      responseType: 'text',
-      observe: 'events',
-      reportProgress: true,
+      eventSource.addEventListener("error", e => {
+        console.log(e)
+        eventSource.close()
+        observer.complete()
+      })
     })
+  }
+
+  deleteStream(streamId: string): Observable<any> {
+    return this.http.delete<any>(this.url + "/stream/" + streamId)
+  }
+
+  getChats(): Observable<ChatData[]> {
+    return this.http.get<ChatData[]>(this.url + "/")
+  }
+
+  newChat(): Observable<ChatData> {
+    return this.http.get<ChatData>(this.url + "/new").pipe(
+      map(c => {
+        c.editing = false
+        return c
+      })
+    )
   }
 }

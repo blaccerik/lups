@@ -1,122 +1,201 @@
 @import '../../../variables';
 
-.parent-container {
+.main-container {
+  width: 100%;
+  height: 100%;
+}
+
+.toggle-button {
+  position: absolute;
+  right: 2%;
+  top: calc(50% - 50px);
+  z-index: 99;
+}
+
+.chat {
+  &-container {
+    background-color: ghostwhite;
+    display: flex;
+    position: relative;
+    justify-content: center;
+  }
+
+  &-box {
+    width: 75%;
+    position: relative;
+    height: calc(100% - 100px);
+    overflow-y: auto;
+    border: 1px solid gray;
+    border-radius: 4px;
+    //padding-right: 10px;
+    padding: 0 10px;
+    margin-top: 10px;
+
+    /* width */
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+      background: #d3d3d3;
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+    }
+
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  }
+  &-line {
+    margin-top: 10px;
+    margin-bottom: 10px; /* Add some spacing between messages */
+  }
+  &-owner {
+    margin-bottom: 10px;
+    text-transform: capitalize;
+  }
+  &-message {
+    //background-color: silver;
+    //box-shadow: rgba(0, 0, 0, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 15px;
+    white-space: pre-wrap; /* Preserve white spaces and wrap lines */
+  }
+  &-input {
+    position: absolute;
+    bottom: 5px;
+    width: calc(75% + 22px);
+    display: flex;
+  }
+  &-input-box {
+    width: calc(100% - 0px);
+  }
+  &-input-button {
+    margin: 6px;
+  }
+}
+
+.spinner {
   display: flex;
-  margin-top: 50px;
   justify-content: center;
   align-items: center;
-  height: 300px; /* Adjust the height as needed */
 }
 
+.drawer-container {
+  border: 0;
+  background-color: silver;
 
-.container {
-
-  position: relative;
-  background-color: $main-color;
-  border-radius: 5px;
-  width: 500px;
-  padding: 10px;
-  border: 1px black solid;
-  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
-}
-
-
-.messages::-webkit-scrollbar {
-  width: 6px;
-}
-
-.messages::-webkit-scrollbar-thumb {
-  background-color: #888;
-  border-radius: 3px;
-}
-
-.messages::-webkit-scrollbar-track {
-  background-color: $main-color;
-}
-
-.input-area {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.input-area input {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.input-area button {
-  margin-left: 10px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  background-color: $second-color;
-  color: $main-color;
-  font-size: 14px;
-  cursor: pointer;
-  transition: 0.1s;
-}
-
-.input-area button:hover {
-  background-color: $second-color-dark;
-}
-
-.messages {
-  height: 250px;
+  height: 100%;
   overflow-y: auto;
-}
 
-.message {
-  margin-bottom: 10px;
-  width: 100%;
-  overflow: auto;
-  color: $main-color;
-}
 
-.app-message {
-  float: left;
-  background-color: $second-color;
-  padding: 10px;
-  border-radius: 5px;
-  word-break: break-all; /* Break long words onto multiple lines */
-  overflow-wrap: break-word; /* Wrap long strings without spaces onto multiple lines */
-}
-
-.user-message {
-  float: right;
-  background-color: $third-color;
-  padding: 10px;
-  border-radius: 5px;
-  word-break: break-all; /* Break long words onto multiple lines */
-  overflow-wrap: break-word; /* Wrap long strings without spaces onto multiple lines */
-}
-
-.name {
-  font-size: 12px;
-  color: $main-color;
-  margin-bottom: 5px;
-}
-
-.loader {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid $main-color;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-top: 5px;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+  /* width */
+  &::-webkit-scrollbar {
+    width: 10px;
   }
-  100% {
-    transform: rotate(360deg);
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: #d3d3d3;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
   }
 }
 
+.drawer-title {
+  text-align: center;
+  //margin-bottom: 10px;
+  margin: 10px 0;
+  font-size: 25px;
+}
+
+.settings {
+  &-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    @media (max-width: $menuBreakpoint) {
+      grid-template-columns: 1fr;
+    }
+  }
+  &-box {
+    position: relative;
+    border-radius: 15px;
+    padding: 15px 15px 0 15px;
+    margin: 10px;
+    box-shadow: rgba(0, 0, 0, 0.25) 5px 5px 5px;
+    &-icon {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+    }
+    &-info {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+    }
+    &-title {
+      text-align: center;
+      font-size: 20px;
+    }
+    &-input {
+      width: 200px;
+      margin-top: 15px;
+    }
+  }
+}
+
+.chats {
+  &-container {
+    background-color: orange;
+    border-radius: 15px;
+    padding: 15px;
+    margin: 10px;
+  }
+
+  &-box {
+    display: flex;
+    width: 100%;
+    margin-bottom: 5px;
+    align-items: center;
+    justify-content: space-between;
+    background-color: darkorange;
+    border-radius: 5px;
+    border: 1px solid darkorange;
+
+    &:hover {
+      cursor: pointer;
+      background-color: orangered;
+    }
+  }
+
+  &-selected {
+    border-color: black;
+  }
+
+  &-title {
+    font-size: 20px;
+    margin-left: 10px;
+  }
+
+  &-input {
+    margin-left: 10px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    font-size: 20px;
+  }
+}

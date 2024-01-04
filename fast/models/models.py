@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, PrimaryKeyConstraint, Date, Text, func
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, PrimaryKeyConstraint, Date, Text, func, VARCHAR
 from sqlalchemy.orm import relationship
 
 from utils.database import Base, engine, SessionLocal
@@ -26,6 +26,7 @@ class DBUser(Base):
 class DBChat(Base):
     __tablename__ = 'chats'
     id = Column(Integer, primary_key=True)
+    title = Column(String(100), unique=False)
     user_id = Column(Integer, ForeignKey('users.id'))
     deleted = Column(Boolean, nullable=False, default=False)
 
@@ -37,13 +38,14 @@ class DBMessage(Base):
     __tablename__ = 'messages'
     id = Column(Integer, primary_key=True)
     chat_id = Column(Integer, ForeignKey('chats.id'), nullable=False)
-    message_ee = Column(String(100), nullable=False)
-    message_en = Column(String(100), nullable=False)
-    type = Column(Enum("user", "bot", name="message_type_enum"), nullable=False)
+    text = Column(String(512), nullable=False)
+    text_model = Column(String(512), nullable=False)
+    language = Column(Enum("estonia", "english", name="message_language_enum"), nullable=False)
+    owner = Column(Enum("user", "model", name="message_owner_enum"), nullable=False)
     deleted = Column(Boolean, nullable=False, default=False)
 
     def __repr__(self):
-        return f"Message(id={self.id}, chat_id={self.chat_id}, message='{self.message_ee}', type={self.type})"
+        return f"Message(id={self.id}, chat_id={self.chat_id}, message='{self.text}')"
 
 
 class DBPixel(Base):

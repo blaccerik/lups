@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import {OAuthService} from "angular-oauth2-oidc";
 import {UserInfoService} from "./services/user-info.service";
 import {Router} from "@angular/router";
+import { MatIconRegistry } from '@angular/material/icon';
+import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-root',
@@ -12,8 +14,20 @@ export class AppComponent {
   title = 'lups';
   constructor(private oauthService: OAuthService,
               private userInfoService: UserInfoService,
-              private router: Router
+              private router: Router,
+              private matIconRegistry: MatIconRegistry,
+              private domSanitizer: DomSanitizer
   ) {
+
+    this.matIconRegistry.addSvgIcon(
+      "estonia",
+      this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/flags/estonia.svg")
+    );
+    this.matIconRegistry.addSvgIcon(
+      "english",
+      this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/flags/english.svg")
+    );
+
     this.oauthService.configure({
       issuer: 'https://accounts.google.com',
       strictDiscoveryDocumentValidation: false,
@@ -40,7 +54,17 @@ export class AppComponent {
         }).catch((error: any) => {
           console.log("catch")
           console.log("error", error)
+
+          // todo reimplement this
+          localStorage.removeItem("id_token")
+          this.oauthService.revokeTokenAndLogout().then(r => {
+            this.router.navigate([""])
+          }).catch(e => {
+            console.log("very bad error", e)
+          })
         })
+      } else {
+        console.log("not valid")
       }
     });
   }

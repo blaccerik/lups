@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {OAuthService} from "angular-oauth2-oidc";
 import {Router} from "@angular/router";
 import {UserInfoService} from "../../services/user-info.service";
@@ -6,12 +6,12 @@ import {UserInfoService} from "../../services/user-info.service";
 
 interface Section {
   text: string;
-  isSeen: boolean;
+  isSeen?: boolean;
   link?: string;
   id?: number;
   parentId?: number;
-  hasChildren?: boolean;
-  width?: number;
+  // hasChildren?: boolean;
+  // width?: number;
 }
 
 @Component({
@@ -21,20 +21,21 @@ interface Section {
 })
 export class NavbarComponent {
   sections: Section[] = [
-    {text: "Erakond", id: 1, isSeen: true, hasChildren: true},
-    {text: "Väärtused", parentId: 1, isSeen: false, link: "/promises" },
-    {text: "Liikmed", parentId: 1, isSeen: false, link: "/" },
-    {text: "Uudised", id: 3, isSeen: true, link: "/news" },
-    {text: "Meelelahutus", id: 4, isSeen: true, hasChildren: true},
-    {text: "Lõuend", parentId: 4 , isSeen: false, link: "/place"},
-    {text: "Vambolai", parentId: 4, isSeen: false, link: "/chat"},
-  ]
+    {text: "Uudised", id: 1, link: "/news"},
 
+    {text: "Erakond", id: 2, isSeen: false},
+    {text: "Väärtused", parentId: 2, isSeen: false, link: "/promises"},
+
+    {text: "Meelelahutus", id: 3, isSeen: false},
+    {text: "Lõuend", parentId: 3, isSeen: false, link: "/place"},
+    {text: "Vambolai", parentId: 3, isSeen: false, link: "/chat"},
+  ]
 
 
   constructor(public readonly authService: OAuthService,
               public readonly userInfoService: UserInfoService,
-              private readonly router: Router) {}
+              private readonly router: Router) {
+  }
 
   isMenuOpen = false;
 
@@ -56,29 +57,28 @@ export class NavbarComponent {
     })
   }
 
-  getWidth(n: any) {
-    if (n) {
-      return n + "px"
-    }
-    return "50px"
-  }
 
   home() {
     this.isMenuOpen = false;
     this.router.navigate([""])
   }
 
-  go(parent: Section) {
-    if (parent.link) {
+  go(currentSection: Section) {
+    if (currentSection.link) {
       this.isMenuOpen = false;
-      this.router.navigate([parent.link])
+      for (const section of this.sections) {
+        if (section.isSeen !== undefined) {
+          section.isSeen = false
+        }
+      }
+      this.router.navigate([currentSection.link])
       return
     }
-    if (window.innerWidth <= 800 && parent.id) {
-      parent.isSeen = !parent.isSeen
-      for (const child of this.sections) {
-        if (child.parentId == parent.id) {
-          child.isSeen = !child.isSeen
+    if (currentSection.id) {
+      currentSection.isSeen = !currentSection.isSeen
+      for (const section of this.sections) {
+        if (section.parentId == currentSection.id) {
+          section.isSeen = !section.isSeen
         }
       }
     }

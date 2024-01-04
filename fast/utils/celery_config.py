@@ -1,7 +1,7 @@
 from celery import Celery
 import os
 
-DATABASE_URI = os.environ.get("REDIS_BROKER_URL", 'redis://localhost:6379/0')
+DATABASE_URI = f"redis://{os.environ.get('REDIS_BROKER_URL', 'localhost')}:6379/0"
 print(DATABASE_URI)
 
 celery_app = Celery(

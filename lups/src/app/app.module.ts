@@ -39,6 +39,9 @@ import {MatChipsModule} from "@angular/material/chips";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatCardModule} from "@angular/material/card";
+import {MatListModule} from "@angular/material/list";
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
@@ -56,40 +59,43 @@ import {MatCardModule} from "@angular/material/card";
     HelpDialogComponent,
     AllNewsComponent
   ],
-  imports: [
-    BrowserAnimationsModule,
-    BrowserModule,
-    NgxImageZoomModule,
-    AppRoutingModule,
-    CommonModule,
-    MatIconModule,
-    FormsModule,
-    MatDialogModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-    OAuthModule.forRoot(),
-    InfiniteScrollModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatTabsModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    BrowserAnimationsModule,
-    MatDividerModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatInputModule,
-    MatToolbarModule,
-    MatMenuModule,
-    MatButtonToggleModule,
-    MatDialogModule,
-    MatChipsModule,
-    MatSidenavModule,
-    MatTooltipModule,
-    MatCardModule,
-    NgOptimizedImage
-  ],
+    imports: [
+        BrowserAnimationsModule,
+        BrowserModule,
+        NgxImageZoomModule,
+        AppRoutingModule,
+        CommonModule,
+        MatIconModule,
+        FormsModule,
+        MatDialogModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        OAuthModule.forRoot(),
+        InfiniteScrollModule,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatTabsModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        BrowserAnimationsModule,
+        MatDividerModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatInputModule,
+        MatToolbarModule,
+        MatMenuModule,
+        MatButtonToggleModule,
+        MatDialogModule,
+        MatChipsModule,
+        MatSidenavModule,
+        MatTooltipModule,
+        MatCardModule,
+        NgOptimizedImage,
+        MatListModule,
+        MatCheckboxModule,
+        MatProgressSpinnerModule
+    ],
   exports: [],
   providers: [
     OAuthService,

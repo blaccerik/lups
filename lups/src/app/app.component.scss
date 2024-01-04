@@ -2,18 +2,12 @@
 
 .router-container {
   position: absolute;
-  top: 50px;
+  top: calc($menuHeight + 5px);
   left: 0;
   width: 100%;
-  height: calc(100% - 50px); /* Adjust the height as needed */
-  //overflow-y: scroll; /* Enable scrollbar for the router outlet content */
+  height: calc(100% - calc($menuHeight + 5px)); /* Adjust the height as needed */
   overflow-y: auto;
-  padding-top: 50px;
   box-sizing: border-box;
-
-  @media (max-width: $menuBreakpoint) {
-    padding-top: 0;
-  }
 }
 
 .router-container::-webkit-scrollbar {

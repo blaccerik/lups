@@ -1,6 +1,5 @@
 from enum import Enum
 
-from fastapi import UploadFile
 from pydantic import BaseModel
 
 
@@ -17,19 +16,51 @@ class User(BaseModel):
     name: str
 
 
-class MessageType(str, Enum):
+class AIModelType(Enum):
+    small = "small"  # TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF
+
+
+class LanguageType(Enum):
+    estonia = "estonia"
+    english = "english"
+
+
+class MessageOwner(Enum):
     user = "user"
-    bot = "bot"
+    model = "model"
+
+
+class InputType(Enum):
+    cancel = "cancel"
+    delete = "delete"
+    message = "message"
+
+class ChatUpdate(BaseModel):
+    title: str
+
+class ChatRespond(BaseModel):
+    title: str
+    chat_id: int
+
+
+class ChatPost(BaseModel):
+    type: InputType
+    ai_model_type: AIModelType
+    language_type: LanguageType
+    message_text: str
+    message_id: int
+
+
+class ChatPostRespond(BaseModel):
+    stream_id: str
+    message_id: int
 
 
 class Message(BaseModel):
-    id: int
-    message: str
-    type: MessageType
-
-
-class MessagePost(BaseModel):
-    message: str
+    message_id: int
+    message_text: str
+    message_owner: MessageOwner
+    language_type: LanguageType
 
 
 class News(BaseModel):
@@ -43,6 +74,7 @@ class News(BaseModel):
     has_image: bool
     link: str | None
 
+
 class NewsId(BaseModel):
     id: int
 
@@ -51,6 +83,7 @@ class PixelSmall(BaseModel):
     x: int
     y: int
     c: int
+
 
 class PixelLarge(BaseModel):
     x: int

@@ -1,8 +1,7 @@
 @import 'src/variables';
 
 .container {
-  //border: 3px solid red;
-  margin: 5% 0%;
+  margin: 5% 0;
 }
 
 .title {
@@ -43,13 +42,13 @@
     width: 90%;
   }
 
- &-container {
-   width: 50%;
-   @media (max-width: $menuBreakpoint) {
-     width: 100%;
-   }
+  &-container {
+    width: 50%;
+    @media (max-width: $menuBreakpoint) {
+      width: 100%;
+    }
 
- }
+  }
 
   &-title {
     color: $third-color;

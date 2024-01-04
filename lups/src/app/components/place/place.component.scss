@@ -22,23 +22,13 @@ canvas {
 .settings {
   position: absolute;
   left: 0;
-  top: $menuHeight;
-
-
-  @media (max-width: $menuBreakpoint) {
-    top: 0;
-  }
-
+  top: 0;
   bottom: 0;
-  //width: 50%;
   display: flex;
   height: fit-content;
   background-color: $third-color;
-  //height: 5%;
-  //padding: 10px;
 
   .burger {
-    //margin: 10px;
     padding: 10px;
     width: fit-content;
     transition: 0.3s;
