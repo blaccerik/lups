@@ -43,7 +43,7 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 
 
 RUN apt update
-RUN apt upgrade
+RUN apt -y upgrade
 
 # get add repo
 RUN apt-get install -y software-properties-common
