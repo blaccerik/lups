@@ -21,7 +21,7 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 #RUN pip install --upgrade pip &&  \
 #    pipinstall --upgrade setuptools wheel &&  \
 #    apt-get install build-essential
-#RUN gcc-11 --version # check if gcc works
+RUN gcc --version # check if gcc works
 
 #RUN apt-get update
 #RUN apt install curl -y
