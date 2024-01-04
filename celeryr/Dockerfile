@@ -2,7 +2,7 @@
 FROM blaccerik/llama-test:v1
 
 # set work directory
-#WORKDIR /usr/src/app
+WORKDIR /usr/src/app
 #
 ## set environment variables
 #ENV PYTHONDONTWRITEBYTECODE 1
@@ -53,12 +53,13 @@ FROM blaccerik/llama-test:v1
 #    apt install -y gcc-11
 ##
 #RUN gcc-11 --version
-RUN pip freeze
+#RUN echo "hell"
+#RUN pip freeze
 #RUN #pip install llama-cpp-python
 
-## install dependencies
-#COPY requirements.txt .
-#RUN pip install -r requirements.txt
+# install dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 #
 ## download model
 #RUN huggingface-cli download TheBloke/TinyLlama-1.1B-1T-OpenOrca-GGUF tinyllama-1.1b-1t-openorca.Q8_0.gguf --local-dir cpp-model --local-dir-use-symlinks False
