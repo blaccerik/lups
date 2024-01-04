@@ -41,9 +41,19 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 #RUN pip install --upgrade setuptools wheel &&
 #RUN apt-get install build-essential &&
 
+
 RUN apt update
-RUN apt-get install build-essential -y
-RUN apt-get install ninja-build -y
+RUN apt upgrade
+
+# get add repo
+RUN apt-get install -y software-properties-common
+RUN apt-get update
+
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test
+
+RUN apt update
+RUN apt install -y gcc-11 g++-11
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 --slave /usr/bin/g++ g++ /usr/bin/g++-11
 
 RUN pip install llama-cpp-python
 
