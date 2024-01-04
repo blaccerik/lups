@@ -28,7 +28,7 @@ RUN apt install cmake -y
 RUN pip install testresources
 
 # get add repo
-RUN apt-get install software-properties-common
+RUN apt-get install -y software-properties-common
 RUN apt-get update
 
 
