@@ -25,9 +25,12 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 RUN apt-get update
 RUN apt install curl -y
 RUN apt install cmake -y
-RUN pip install testresource
+RUN pip install testresources
 
 RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
+RUN apt install -y gcc-11 g++-11
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 --slave /usr/bin/g++ g++ /usr/bin/g++-11
+
 RUN pip install llama-cpp-python
 
 # install dependencies
