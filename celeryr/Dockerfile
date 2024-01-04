@@ -4,9 +4,9 @@ FROM blaccerik/llama-test:v1
 # set work directory
 WORKDIR /usr/src/app
 #
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+## set environment variables
+#ENV PYTHONDONTWRITEBYTECODE 1
+#ENV PYTHONUNBUFFERED 1
 #
 ## postgre stuff
 #RUN apt-get update && apt-get -y install libpq-dev gcc
@@ -58,6 +58,7 @@ ENV PYTHONUNBUFFERED 1
 #RUN #pip install llama-cpp-python
 
 # install dependencies
+RUN apt-get update
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 #
