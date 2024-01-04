@@ -62,7 +62,7 @@ export class PlaceService {
 
   disconnect() {
     if (this.subject) {
-      this.subject.disconnect()
+      this.subject.unsubscribe()
     }
   }
 

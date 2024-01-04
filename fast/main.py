@@ -31,8 +31,8 @@ app.include_router(news.router)
 
 @app.on_event("startup")
 async def startup_event():
-    # from models.models import init_db
-    # init_db()
+    from models.models import init_db
+    init_db()
 
     redis_client = get_client()
     postgres_client = SessionLocal()
