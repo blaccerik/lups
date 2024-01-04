@@ -22,7 +22,9 @@ RUN apt-get update && apt-get -y install libpq-dev gcc
 #    pipinstall --upgrade setuptools wheel &&  \
 #    apt-get install build-essential
 #RUN gcc-11 --version # check if gcc works
-RUN apt-get -y install build-essential g++ clang
+RUN apt-get -y install build-essential
+RUN apt-get -y install g++
+RUN apt-get -y install clang
 
 # install dependencies
 COPY requirements.txt .
