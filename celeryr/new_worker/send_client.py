@@ -1,6 +1,7 @@
 from celery import Celery
 
-url = "redis://localhost:6379/0"
+url = "redis://10.0.0.2:6379/0"
+# url = "redis://134.209.198.189:6379/0"
 app = Celery(
     'tasks',
     broker=url,
