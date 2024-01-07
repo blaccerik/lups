@@ -1,0 +1,11 @@
+celery==5.2.3
+flower==2.0.1
+redis==5.0.1
+psycopg2==2.9.6
+pydantic
+transformers
+llama-cpp-python
+newsdataapi
+huggingface_hub
+beautifulsoup4==4.12.2
+SQLAlchemy==2.0.16

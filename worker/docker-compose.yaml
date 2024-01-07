@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  worker_redis:
+    container_name: worker_redis
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+  worker:
+    container_name: worker
+    build:
+      context: .
+    command: celery --app core.main worker --concurrency=1 --pool prefork

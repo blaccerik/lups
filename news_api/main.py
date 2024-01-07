@@ -120,5 +120,5 @@ def fetch_image(url):
 
 if __name__ == '__main__':
     # key = read_key()
-    # main(key)
+    # core(key)
     read_news()

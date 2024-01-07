@@ -1,0 +1,3 @@
+
+# copy worker dir
+scp -i C:\Users\erik\.ssh/id_rsa -r worker erik@134.209.198.189:/home/erik
