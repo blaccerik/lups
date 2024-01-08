@@ -1,13 +1,36 @@
 version: '3.8'
 
 services:
+  nginx:
+    container_name: nginx
+    build:
+      dockerfile: h.Dockerfile
+    network_mode: service:worker_wireguard
+  worker_wireguard:
+    container_name: wireguard
+    image: linuxserver/wireguard:latest
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./config/wg0.conf:/config/wg_confs/wg0.conf
+      - /lib/modules:/lib/modules
+    ports:
+      - 51820:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
   worker_redis:
     container_name: worker_redis
     image: redis:6-alpine
-    ports:
-      - "6379:6379"
+    network_mode: service:worker_wireguard
   worker:
     container_name: worker
+    network_mode: service:worker_wireguard
     build:
       context: .
-    command: celery --app core.main worker --concurrency=1 --pool prefork
+    command: celery --app core.main worker --concurrency=1 --pool prefork --loglevel=info

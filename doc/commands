@@ -1,3 +1,16 @@
 
 # copy worker dir
 scp -i C:\Users\erik\.ssh/id_rsa -r worker erik@134.209.198.189:/home/erik
+
+# generate wireguard keys windows
+wg genkey > privatekey.txt
+type privatekey.txt | wg pubkey > publickey.txt
+
+# transfer data
+scp -i C:\Users\erik\.ssh\digital -r worker erik@134.209.198.189:/home/erik
+
+scp -i C:\Users\erik\.ssh\oracle -r wiregurd oracle@158.101.197.187:/home/oracle
+
+# close / start wireguard
+sudo wg-quick down wg0
+sudo wg-quick up wg0

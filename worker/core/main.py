@@ -6,11 +6,11 @@ from redis import Redis
 from core.model import ModelLoader
 from core.schemas import Message
 
-REDIS_URI = 'redis://worker_redis:6379/0'
+REDIS_URI = 'redis://localhost:6379/0'
 celery_app = Celery('tasks', broker=REDIS_URI, backend=REDIS_URI)
 
 def get_redis_client():
-    return Redis(host="worker_redis", port=6379, db=0)
+    return Redis(host="localhost", port=6379, db=0)
 
 @celery_app.on_after_configure.connect
 def setup_model(sender, **kwargs):

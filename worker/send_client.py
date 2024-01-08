@@ -9,6 +9,6 @@ app = Celery(
 )
 
 if __name__ == '__main__':
-    result = app.send_task('test', (46545, 443434234))
+    result = app.send_task('test', (1,1))
     print(result)
     print(result.get())
