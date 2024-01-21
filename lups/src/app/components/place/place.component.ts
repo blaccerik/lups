@@ -13,7 +13,19 @@ import {OAuthService} from "angular-oauth2-oidc";
 import {PopupService} from "../../services/popup.service";
 import {MatDialog} from "@angular/material/dialog";
 import {HelpDialogComponent} from "./help-dialog/help-dialog.component";
+import {Subscription} from "rxjs";
 
+interface Color {
+  value: string
+  text: string
+}
+
+interface Tool {
+  icon: string
+  time: Date
+  text: string
+  value: string
+}
 
 @Component({
   selector: 'app-place',
@@ -21,10 +33,39 @@ import {HelpDialogComponent} from "./help-dialog/help-dialog.component";
   styleUrls: ['./place.component.scss']
 })
 export class PlaceComponent implements OnInit, OnDestroy {
+
+  selectedOption: string;
+
+  colors: Color[] = [
+    {value: 'red', text: "punane"},
+    {value: 'green', text: "roheline"},
+    {value: 'blue', text: "sinine"},
+    {value: 'yellow', text: "kollane"},
+    {value: 'purple', text: "lilla"},
+    {value: 'orange', text: "oranž"},
+    {value: 'black', text: "must"},
+    {value: 'white', text: "valge"},
+  ];
+  tools: Tool[] = [
+    {icon: "brush", text: "pliiats", time: new Date(), value: "brush"},
+    {icon: "image", text: "pilt", time: new Date(), value: "image"}
+  ]
+  selectedC: Color
+
+
+  selectOption(option: Color): void {
+    this.selectedC = option
+  }
+
   predefinedColors = [
     "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
   ];
-  selectedColor: string = 'white';
+  selectedTool: string | null
+  brushColor: string
+  brushSize: number
+  imgSize: number
+  img: string[]
+
   private context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement
   private container: HTMLDivElement
@@ -41,8 +82,8 @@ export class PlaceComponent implements OnInit, OnDestroy {
   offsetX = 0;
   offsetY = 0;
 
-  @ViewChild('canvasContainer', { static: false }) containerRef: ElementRef<HTMLDivElement>;
-  @ViewChild('canvasElement', { static: false }) canvasElement: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvasContainer', {static: false}) containerRef: ElementRef<HTMLDivElement>;
+  @ViewChild('canvasElement', {static: false}) canvasElement: ElementRef<HTMLCanvasElement>;
 
   @HostListener('document:mouseup', ['$event'])
   onMouseUpGlobal(event: MouseEvent): void {
@@ -94,10 +135,37 @@ export class PlaceComponent implements OnInit, OnDestroy {
     public readonly popupService: PopupService,
     private dialog: MatDialog,
     private cdRef: ChangeDetectorRef,
-    private renderer: Renderer2) { }
+    private renderer: Renderer2) {
+  }
+
+
+  private placeService$: Subscription
+  isSideDrawerOpen = false
+
+  toggleDrawer() {
+    this.isSideDrawerOpen = !this.isSideDrawerOpen
+  }
+
+  selectTool(tool: string) {
+    if (this.selectedTool === tool) {
+      this.selectedTool = null
+    } else {
+      this.selectedTool = tool;
+    }
+  }
 
   ngOnInit(): void {
-    this.placeService.getPixels().subscribe({
+    // set default values
+    this.selectedTool = null
+    this.brushColor = this.colors[0].value
+    this.brushSize = 1
+    this.imgSize = 3
+    this.img = []
+
+
+
+    this.selectedC = this.colors[0]
+    this.placeService$ = this.placeService.getPixels().subscribe({
       next: (value: PixelResponse[]) => {
         this.loading = false;
         // setup objects
@@ -125,15 +193,15 @@ export class PlaceComponent implements OnInit, OnDestroy {
             this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
           }
         );
-      }})
+      }
+    })
   }
 
   ngOnDestroy() {
+    if (this.placeService$) {
+      this.placeService$.unsubscribe()
+    }
     this.placeService.disconnect()
-  }
-
-  selectColor(color: string): void {
-    this.selectedColor = color;
   }
 
   private findOffset(newX: number, newY: number): void {
@@ -181,7 +249,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
     const y = Math.floor(event.offsetY / this.pixelSize);
 
     // place dummy pixel until backend responds
-    this.context.fillStyle = this.selectedColor
+    this.context.fillStyle = "red"
     this.context.fillRect(x * this.pixelSize, y * this.pixelSize, this.pixelSize, this.pixelSize);
     this.context.fillStyle = "grey"
     this.context.fillRect(x * this.pixelSize, y * this.pixelSize, 1, 1);
@@ -190,7 +258,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
     this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize + 3, 1, 1);
 
     // send request to backend
-    this.placeService.send(x, y, this.selectedColor)
+    this.placeService.send(x, y, "red")
   }
 
   toggleMenu() {

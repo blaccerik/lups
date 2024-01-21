@@ -1,63 +1,123 @@
 @import 'src/variables';
 
-.container {
-  height: 100%;
+
+.main-container {
   width: 100%;
-  justify-content: center;
-  display: flex;
+  height: 100%;
+  background-color: red;
 }
 
-.canvas-container {
-  position: relative;
-  width: min(100%, 1200px); /* Adjust as needed */
-  height: min(100%, 1200px); /* Adjust as needed */
-  overflow: hidden;
+.canvas {
+  &-button {
+    position: absolute;
+    left: 2%;
+    top: calc(50% - 50px);
+    z-index: 99;
+  }
+  &-container {
+    position: relative;
+    width: min(100%, 1200px); /* Adjust as needed */
+    height: min(100%, 1200px); /* Adjust as needed */
+    overflow: hidden;
+  }
+  &-container-wrapper {
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    display: flex;
+  }
 }
 
+.drawer {
+  height: 100%;
+  width: 150px;
+  background-color: lightgrey;
+  border: 0;
+
+  &-color-menu-button {
+    width: 100px;
+    background-color: silver;
+  }
+
+  &-color-menu {
+
+  }
+  &-color-menu-item {
+  }
+  &-color-menu-icon {
+    border: 2px solid black;
+    padding: 2px;
+  }
+
+  &-tool-list {
+  }
+  &-tool-list-item {
+    background-color: #82fa53;
+    border: 2px solid #82fa53;
+    //margin: 10px;
+    font-size: 25px;
+    text-transform: capitalize;
+    padding: 5px;
+    &:hover {
+      background-color: greenyellow;
+      cursor: pointer;
+    }
+  }
+  &-tool-selected {
+    border: 2px solid black;
+    //border-color: black;
+  }
+  &-tool-icon {
+    vertical-align: bottom;
+    font-size: 35px;
+  }
+
+
+}
 canvas {
   position: absolute;
   image-rendering: pixelated;
 }
 
-.settings {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  height: fit-content;
-  background-color: $third-color;
-
-  .burger {
-    padding: 10px;
-    width: fit-content;
-    transition: 0.3s;
-    color: $main-color;
-
-    &:hover {
-      color: $second-color;
-      background-color: $third-color;
-      cursor: pointer;
-    }
-  }
-
-  .color {
-    width: 25px;
-    height: 25px;
-    margin: 0 10px;
-    border: 2px $main-color solid;
-
-    &:hover {
-      cursor: pointer;
-    }
-
-    &.selected {
-      border: 2px black dashed;
-    }
-  }
-
-  .buttons {
-    display: flex;
-    align-items: center;
-  }
-}
+//.settings {
+//  position: absolute;
+//  left: 0;
+//  top: 0;
+//  bottom: 0;
+//  display: flex;
+//  height: fit-content;
+//  background-color: $third-color;
+//
+//  .burger {
+//    padding: 10px;
+//    width: fit-content;
+//    transition: 0.3s;
+//    color: $main-color;
+//
+//    &:hover {
+//      color: $second-color;
+//      background-color: $third-color;
+//      cursor: pointer;
+//    }
+//  }
+//
+//  .color {
+//    width: 25px;
+//    height: 25px;
+//    margin: 0 10px;
+//    border: 2px $main-color solid;
+//
+//    &:hover {
+//      cursor: pointer;
+//    }
+//
+//    &.selected {
+//      border: 2px black dashed;
+//    }
+//  }
+//
+//  .buttons {
+//    display: flex;
+//    align-items: center;
+//  }
+//}

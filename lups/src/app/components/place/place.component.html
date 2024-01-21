@@ -1,35 +1,81 @@
-<div class="square-7" *ngIf="loading"></div>
-<div class="container" *ngIf="!loading">
-  <div #canvasContainer class="canvas-container">
-    <canvas #canvasElement
-            width="1200"
-            height="1200"
-            (contextmenu)="placePixel($event)"
-            (mousedown)="onMouseDown($event)"
-            (mousemove)="onMouseMove($event)"
-            (mouseup)="onMouseUpGlobal($event)"
-            (wheel)="onWheel($event)"
-            [style.transform]="'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + scale + ')'">
-    </canvas>
-  </div>
-  <div class="settings">
-    <div class="burger" (click)="toggleMenu()">
-      <i class="material-icons">{{ isMenuOpen ? "close" : "menu" }}</i>
-    </div>
-    <div *ngIf="isMenuOpen" class="buttons">
-      <div class="burger" (click)="showHelp()">
-        <i class="material-icons">help_outline</i>
-      </div>
-      <div class="color"
-           *ngFor="let color of predefinedColors"
-           [style.background-color]="color"
-           [class.selected]="selectedColor === color"
-           (click)="selectColor(color)">
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="popup-container">
-  <app-not-logged-in-popup [text]="popup" *ngFor="let popup of popupService.getPopups()"></app-not-logged-in-popup>
-</div>
+
+<!--<div class="popup-container">-->
+<!--  <app-not-logged-in-popup [text]="popup" *ngFor="let popup of popupService.getPopups()"></app-not-logged-in-popup>-->
+<!--</div>-->
+
+<mat-drawer-container class="main-container" autosize>
+  <mat-drawer-content class="canvas-wrapper">
+    <button mat-icon-button class="canvas-button" (click)="drawer.toggle()">
+      <mat-icon>{{drawer.opened ? "arrow_back_ios" : "arrow_forward_ios"}}</mat-icon>
+    </button>
+    <div class="square-7" *ngIf="loading"></div>
+    <div class="canvas-container-wrapper" *ngIf="!loading">
+      <div #canvasContainer class="canvas-container">
+        <canvas #canvasElement
+                width="1200"
+                height="1200"
+                (contextmenu)="placePixel($event)"
+                (mousedown)="onMouseDown($event)"
+                (mousemove)="onMouseMove($event)"
+                (mouseup)="onMouseUpGlobal($event)"
+                (wheel)="onWheel($event)"
+                [style.transform]="'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + scale + ')'">
+        </canvas>
+      </div>
+<!--      <div class="settings">-->
+<!--        <div class="burger" (click)="toggleMenu()">-->
+<!--          <i class="material-icons">{{ isMenuOpen ? "close" : "menu" }}</i>-->
+<!--        </div>-->
+<!--        <div *ngIf="isMenuOpen" class="buttons">-->
+<!--          <div class="burger" (click)="showHelp()">-->
+<!--            <i class="material-icons">help_outline</i>-->
+<!--          </div>-->
+<!--          <div class="color"-->
+<!--               *ngFor="let color of predefinedColors"-->
+<!--               [style.background-color]="color"-->
+<!--               [class.selected]="selectedColor === color"-->
+<!--               (click)="selectColor(color)">-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+    </div>
+  </mat-drawer-content>
+  <mat-drawer #drawer [opened]="isSideDrawerOpen" mode="side" class="drawer">
+    <div class="drawer-tool-list-item"
+         *ngFor="let tool of tools"
+         (click)="selectTool(tool.value)"
+         [class.drawer-tool-selected]="tool.value === selectedTool">
+      <mat-icon class="drawer-tool-icon" inline="true">{{tool.icon}}</mat-icon> {{tool.text}}
+    </div>
+    <div *ngIf="selectedTool === 'brush'" class="drawer-tool-list-item">
+      color
+    </div>
+    <div *ngIf="selectedTool === 'brush'" class="drawer-tool-list-item">
+      size
+    </div>
+    <div *ngIf="selectedTool === 'image'" class="drawer-tool-list-item">
+      image size
+    </div>
+    <div *ngIf="selectedTool === 'image'" class="drawer-tool-list-item">
+      image selector
+    </div>
+<!--      </div>-->
+
+
+<!--    <div>-->
+<!--      <mat-icon>brush</mat-icon>-->
+<!--      <mat-icon>image</mat-icon>-->
+<!--    </div>-->
+<!--    <mat-menu #menu="matMenu">-->
+<!--      <div mat-menu-item *ngFor="let color of colors" (click)="selectOption(color)">-->
+<!--        <mat-icon class="drawer-color-menu-icon" [ngStyle]="{color: color.value}">texture</mat-icon> {{color.text}}-->
+<!--      </div>-->
+<!--    </mat-menu>-->
+
+<!--    <button class="drawer-color-menu-button" mat-button [matMenuTriggerFor]="menu">-->
+<!--      <mat-icon [ngStyle]="{color: selectedC.value}">palette</mat-icon> {{selectedC.text}}-->
+<!--    </button>-->
+<!--    eeee-->
+  </mat-drawer>
+</mat-drawer-container>
