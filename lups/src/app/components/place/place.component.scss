@@ -14,12 +14,14 @@
     top: calc(50% - 50px);
     z-index: 99;
   }
+
   &-container {
     position: relative;
     width: min(100%, 1200px); /* Adjust as needed */
     height: min(100%, 1200px); /* Adjust as needed */
     overflow: hidden;
   }
+
   &-container-wrapper {
     height: 100%;
     width: 100%;
@@ -28,96 +30,183 @@
   }
 }
 
+
 .drawer {
   height: 100%;
-  width: 150px;
+  width: 200px;
   background-color: lightgrey;
   border: 0;
 
-  &-color-menu-button {
-    width: 100px;
-    background-color: silver;
+  &-container {
+    background-color: yellow;
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
   }
 
-  &-color-menu {
-
-  }
-  &-color-menu-item {
-  }
-  &-color-menu-icon {
-    border: 2px solid black;
-    padding: 2px;
+  &-title {
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 20px;
   }
 
-  &-tool-list {
-  }
-  &-tool-list-item {
-    background-color: #82fa53;
-    border: 2px solid #82fa53;
-    //margin: 10px;
-    font-size: 25px;
-    text-transform: capitalize;
-    padding: 5px;
-    &:hover {
-      background-color: greenyellow;
+  &-component {
+    font-size: 20px;
+    margin-bottom: 10px;
+    width: 170px;
+    padding: 10px;
+    border-radius: 0 5px 5px 0;
+    border: 2px solid orange;
+    border-left: 0;
+    background-color: orange;
+    text-transform: uppercase;
+    align-items: center;
+    justify-items: center;
+    display: flex;
+
+
+    &-hover:hover {
+      background-color: darkorange;
+      border-color: black;
       cursor: pointer;
     }
+
+    &-selected {
+      border-style: dotted;
+      border-color: black;
+    }
   }
-  &-tool-selected {
-    border: 2px solid black;
-    //border-color: black;
-  }
-  &-tool-icon {
+
+  &-icon {
     vertical-align: bottom;
-    font-size: 35px;
+    font-size: 25px;
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+
+    &-border {
+      border: 2px solid black;
+      border-radius: 5px;
+    }
+
   }
 
+  &-text {
+    text-transform: uppercase;
+  }
 
+  &-counter {
+    border-radius: 5px;
+    border: 2px solid black;
+    overflow: hidden;
+    margin-left: 2px;
+
+    &-button {
+      background-color: inherit;
+      border: none;
+      font-size: 20px;
+      padding: 1px 10px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+
+      &:hover {
+        background-color: orangered;
+        color: white;
+        cursor: pointer;
+      }
+
+      &:active {
+        background-color: red;
+      }
+    }
+  }
 }
+
+::ng-deep .menu {
+  background: orange;
+}
+
 canvas {
   position: absolute;
   image-rendering: pixelated;
 }
 
-//.settings {
-//  position: absolute;
-//  left: 0;
-//  top: 0;
-//  bottom: 0;
-//  display: flex;
-//  height: fit-content;
-//  background-color: $third-color;
-//
-//  .burger {
-//    padding: 10px;
-//    width: fit-content;
-//    transition: 0.3s;
-//    color: $main-color;
-//
-//    &:hover {
-//      color: $second-color;
-//      background-color: $third-color;
-//      cursor: pointer;
-//    }
-//  }
-//
-//  .color {
-//    width: 25px;
-//    height: 25px;
-//    margin: 0 10px;
-//    border: 2px $main-color solid;
-//
-//    &:hover {
-//      cursor: pointer;
-//    }
-//
-//    &.selected {
-//      border: 2px black dashed;
-//    }
-//  }
-//
-//  .buttons {
-//    display: flex;
-//    align-items: center;
-//  }
-//}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: orangered;
+  -webkit-transition: .2s;
+  transition: .2s;
+  border-radius: 34px;
+  //border: 2px solid orangered
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .2s;
+  transition: .2s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #61e516;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
+
+
+.counter-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.counter {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.button-up,
+.button-down {
+  font-size: 16px;
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.button-up {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+
+.button-down {
+  background-color: #f44336; /* Red */
+  color: white;
+}

@@ -42,6 +42,7 @@ import {MatCardModule} from "@angular/material/card";
 import {MatListModule} from "@angular/material/list";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 
 @NgModule({
   declarations: [
@@ -94,7 +95,8 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
         NgOptimizedImage,
         MatListModule,
         MatCheckboxModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        MatSlideToggleModule
     ],
   exports: [],
   providers: [

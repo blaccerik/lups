@@ -34,8 +34,6 @@ interface Tool {
 })
 export class PlaceComponent implements OnInit, OnDestroy {
 
-  selectedOption: string;
-
   colors: Color[] = [
     {value: 'red', text: "punane"},
     {value: 'green', text: "roheline"},
@@ -46,25 +44,38 @@ export class PlaceComponent implements OnInit, OnDestroy {
     {value: 'black', text: "must"},
     {value: 'white', text: "valge"},
   ];
-  tools: Tool[] = [
-    {icon: "brush", text: "pliiats", time: new Date(), value: "brush"},
-    {icon: "image", text: "pilt", time: new Date(), value: "image"}
-  ]
-  selectedC: Color
 
-
-  selectOption(option: Color): void {
-    this.selectedC = option
-  }
-
-  predefinedColors = [
-    "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
-  ];
   selectedTool: string | null
-  brushColor: string
+  brushColor: Color
   brushSize: number
   imgSize: number
   img: string[]
+
+  selectTool(tool: string) {
+    if (this.selectedTool === tool) {
+      this.selectedTool = null
+    } else {
+      this.selectedTool = tool
+    }
+    console.log(this.selectedTool)
+  }
+
+  increaseBrushSize() {
+    if (this.brushSize < 4) {
+      this.brushSize++
+    }
+  }
+
+  decreaseBrushSize() {
+    if (this.brushSize > 1) {
+      this.brushSize--
+    }
+  }
+
+  selectColor(color: Color) {
+    this.brushColor = color
+  }
+
 
   private context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement
@@ -81,6 +92,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
   scale = 1;
   offsetX = 0;
   offsetY = 0;
+  isChecked: boolean = false;
 
   @ViewChild('canvasContainer', {static: false}) containerRef: ElementRef<HTMLDivElement>;
   @ViewChild('canvasElement', {static: false}) canvasElement: ElementRef<HTMLCanvasElement>;
@@ -128,7 +140,6 @@ export class PlaceComponent implements OnInit, OnDestroy {
     this.findOffset(x, y);
   }
 
-
   constructor(
     private placeService: PlaceService,
     private readonly authService: OAuthService,
@@ -142,29 +153,15 @@ export class PlaceComponent implements OnInit, OnDestroy {
   private placeService$: Subscription
   isSideDrawerOpen = false
 
-  toggleDrawer() {
-    this.isSideDrawerOpen = !this.isSideDrawerOpen
-  }
-
-  selectTool(tool: string) {
-    if (this.selectedTool === tool) {
-      this.selectedTool = null
-    } else {
-      this.selectedTool = tool;
-    }
-  }
 
   ngOnInit(): void {
     // set default values
     this.selectedTool = null
-    this.brushColor = this.colors[0].value
+    this.brushColor = this.colors[0]
     this.brushSize = 1
     this.imgSize = 3
     this.img = []
 
-
-
-    this.selectedC = this.colors[0]
     this.placeService$ = this.placeService.getPixels().subscribe({
       next: (value: PixelResponse[]) => {
         this.loading = false;
@@ -249,7 +246,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
     const y = Math.floor(event.offsetY / this.pixelSize);
 
     // place dummy pixel until backend responds
-    this.context.fillStyle = "red"
+    this.context.fillStyle = this.brushColor.value
     this.context.fillRect(x * this.pixelSize, y * this.pixelSize, this.pixelSize, this.pixelSize);
     this.context.fillStyle = "grey"
     this.context.fillRect(x * this.pixelSize, y * this.pixelSize, 1, 1);
@@ -258,7 +255,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
     this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize + 3, 1, 1);
 
     // send request to backend
-    this.placeService.send(x, y, "red")
+    this.placeService.send(x, y, this.brushColor.value)
   }
 
   toggleMenu() {
