@@ -43,6 +43,7 @@ import {MatListModule} from "@angular/material/list";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import { DrawerComponent } from './components/place/drawer/drawer.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import {MatSlideToggleModule} from "@angular/material/slide-toggle";
     PlaceComponent,
     NotLoggedInPopupComponent,
     HelpDialogComponent,
-    AllNewsComponent
+    AllNewsComponent,
+    DrawerComponent
   ],
     imports: [
         BrowserAnimationsModule,

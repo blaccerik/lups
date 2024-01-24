@@ -40,51 +40,7 @@
     </div>
   </mat-drawer-content>
   <mat-drawer #drawer [opened]="isSideDrawerOpen" mode="side" class="drawer">
-    <div class="drawer-container">
-      <div class="drawer-title">
-        Tööriistad
-      </div>
-      <div class="drawer-component drawer-component-hover" [class.drawer-component-selected]="selectedTool === 'brush'"
-           (click)="selectTool('brush')">
-        <mat-icon class="drawer-icon" inline="true">brush</mat-icon>
-        pliiats
-      </div>
-      <div class="drawer-component drawer-component-hover" [class.drawer-component-selected]="selectedTool === 'image'"
-           (click)="selectTool('image')">
-        <mat-icon class="drawer-icon" inline="true">image</mat-icon>
-        pilt
-      </div>
-      <div class="drawer-title">
-        Seaded
-      </div>
-      <div class="drawer-component">
-        <mat-icon class="drawer-icon" inline="true">aspect_ratio</mat-icon>
-        <div class="drawer-counter">
-          <button class="drawer-counter-button" (click)="decreaseBrushSize()">-</button>
-          {{brushSize}}
-          <button class="drawer-counter-button" (click)="increaseBrushSize()">+</button>
-        </div>
-      </div>
-      <div class="drawer-component drawer-component-hover" [matMenuTriggerFor]="menu">
-        <mat-icon class="drawer-icon drawer-icon-border" [style.color]="brushColor.value" inline="true">color_lens
-        </mat-icon>
-        {{brushColor.text}}
-      </div>
-      <mat-menu #menu="matMenu" class="menu">
-        <div mat-menu-item *ngFor="let color of colors" (click)="selectColor(color)">
-          <mat-icon class="drawer-color-menu-icon" [ngStyle]="{color: color.value}">texture</mat-icon>
-          {{color.text}}
-        </div>
-      </mat-menu>
+    <app-drawer (dataEvent)="receiveData($event)"></app-drawer>
 
-
-      <div class="drawer-title">
-        Lisa
-      </div>
-      <div class="drawer-component drawer-component-hover">
-        <mat-icon class="drawer-icon" inline="true">help</mat-icon>
-        abi
-      </div>
-    </div>
   </mat-drawer>
 </mat-drawer-container>

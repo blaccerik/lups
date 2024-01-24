@@ -14,18 +14,9 @@ import {PopupService} from "../../services/popup.service";
 import {MatDialog} from "@angular/material/dialog";
 import {HelpDialogComponent} from "./help-dialog/help-dialog.component";
 import {Subscription} from "rxjs";
+import {Tool} from "./drawer/drawer.component";
 
-interface Color {
-  value: string
-  text: string
-}
 
-interface Tool {
-  icon: string
-  time: Date
-  text: string
-  value: string
-}
 
 @Component({
   selector: 'app-place',
@@ -33,49 +24,6 @@ interface Tool {
   styleUrls: ['./place.component.scss']
 })
 export class PlaceComponent implements OnInit, OnDestroy {
-
-  colors: Color[] = [
-    {value: 'red', text: "punane"},
-    {value: 'green', text: "roheline"},
-    {value: 'blue', text: "sinine"},
-    {value: 'yellow', text: "kollane"},
-    {value: 'purple', text: "lilla"},
-    {value: 'orange', text: "oranž"},
-    {value: 'black', text: "must"},
-    {value: 'white', text: "valge"},
-  ];
-
-  selectedTool: string | null
-  brushColor: Color
-  brushSize: number
-  imgSize: number
-  img: string[]
-
-  selectTool(tool: string) {
-    if (this.selectedTool === tool) {
-      this.selectedTool = null
-    } else {
-      this.selectedTool = tool
-    }
-    console.log(this.selectedTool)
-  }
-
-  increaseBrushSize() {
-    if (this.brushSize < 4) {
-      this.brushSize++
-    }
-  }
-
-  decreaseBrushSize() {
-    if (this.brushSize > 1) {
-      this.brushSize--
-    }
-  }
-
-  selectColor(color: Color) {
-    this.brushColor = color
-  }
-
 
   private context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement
@@ -152,15 +100,24 @@ export class PlaceComponent implements OnInit, OnDestroy {
 
   private placeService$: Subscription
   isSideDrawerOpen = false
+  tool: Tool
 
+  receiveData(data: Tool) {
+    this.tool = data;
+  }
 
   ngOnInit(): void {
+
     // set default values
-    this.selectedTool = null
-    this.brushColor = this.colors[0]
-    this.brushSize = 1
-    this.imgSize = 3
-    this.img = []
+    this.tool = {
+      selectedTool: null,
+      brushColor: {value: 'red', text: "punane"},
+      brushSize: 1,
+      imgSize: 10,
+      originalImage: null,
+      editedImage: null,
+      imageColors: []
+    }
 
     this.placeService$ = this.placeService.getPixels().subscribe({
       next: (value: PixelResponse[]) => {
@@ -246,7 +203,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
     const y = Math.floor(event.offsetY / this.pixelSize);
 
     // place dummy pixel until backend responds
-    this.context.fillStyle = this.brushColor.value
+    this.context.fillStyle = this.tool.brushColor.value
     this.context.fillRect(x * this.pixelSize, y * this.pixelSize, this.pixelSize, this.pixelSize);
     this.context.fillStyle = "grey"
     this.context.fillRect(x * this.pixelSize, y * this.pixelSize, 1, 1);
@@ -255,17 +212,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
     this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize + 3, 1, 1);
 
     // send request to backend
-    this.placeService.send(x, y, this.brushColor.value)
-  }
-
-  toggleMenu() {
-    this.isMenuOpen = !this.isMenuOpen;
-  }
-
-  showHelp() {
-    this.dialog.open(HelpDialogComponent, {
-      autoFocus: false, // Prevents dialog from auto-closing on click inside
-    });
+    this.placeService.send(x, y, this.tool.brushColor.value)
   }
 }
 
