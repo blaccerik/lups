@@ -12,11 +12,18 @@ import {
 import {OAuthService} from "angular-oauth2-oidc";
 import {PopupService} from "../../services/popup.service";
 import {MatDialog} from "@angular/material/dialog";
-import {HelpDialogComponent} from "./help-dialog/help-dialog.component";
 import {Subscription} from "rxjs";
 import {Tool} from "./drawer/drawer.component";
 
+interface Block {
+  color: string,
+  user?: string,
+}
 
+interface OverlayBlock {
+  x: number,
+  y: number
+}
 
 @Component({
   selector: 'app-place',
@@ -31,7 +38,6 @@ export class PlaceComponent implements OnInit, OnDestroy {
   private pixelSize = 4; // Size of each pixel
   private lastPixelPlacementTimestamp = 0;
   loading = true;
-  isMenuOpen = false;
   private isDragging = false;
   private startX = 0;
   private startY = 0;
@@ -40,10 +46,13 @@ export class PlaceComponent implements OnInit, OnDestroy {
   scale = 1;
   offsetX = 0;
   offsetY = 0;
-  isChecked: boolean = false;
+  isMouseOnCanvas: boolean = false;
+  private blocks: Block[][]
+  private overlayBlocks: OverlayBlock[]
 
   @ViewChild('canvasContainer', {static: false}) containerRef: ElementRef<HTMLDivElement>;
   @ViewChild('canvasElement', {static: false}) canvasElement: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvasTooltip') canvasTooltip: ElementRef<HTMLDivElement>;
 
   @HostListener('document:mouseup', ['$event'])
   onMouseUpGlobal(event: MouseEvent): void {
@@ -66,8 +75,67 @@ export class PlaceComponent implements OnInit, OnDestroy {
 
   }
 
+  onMouseEnterCanvas(): void {
+    this.isMouseOnCanvas = true;
+  }
+
+  onMouseLeaveCanvas(): void {
+    this.isMouseOnCanvas = false;
+  }
+
+  private addToOverlayBlocks(x: number, y: number) {
+    if (0 <= x && x < 300 && 0 <= y && y < 300) {
+      this.overlayBlocks.push({
+        x: x,
+        y: y
+      })
+    }
+  }
+
   onMouseMove(event: MouseEvent): void {
-    if (!this.isDragging) return;
+
+    // find mouse coords
+    const rect = this.containerRef.nativeElement.getBoundingClientRect()
+    const scaledMouseX = event.clientX - rect.x; // - canvasRect.left;
+    const scaledMouseY = event.clientY - rect.y;  //- canvasRect.top;
+
+    // Position the tooltip next to the mouse
+    if (this.canvasTooltip) {
+      this.canvasTooltip.nativeElement.style.left = scaledMouseX + 25 + 'px';
+      this.canvasTooltip.nativeElement.style.top = scaledMouseY + 'px';
+    }
+
+    if (!this.isDragging) {
+
+      const x = Math.floor(event.offsetX / this.pixelSize);
+      const y = Math.floor(event.offsetY / this.pixelSize);
+
+      if (!this.context) return;
+
+      // clean prev overlay
+      for (const overlayBlock of this.overlayBlocks) {
+        this.context.fillStyle = this.blocks[overlayBlock.x][overlayBlock.y].color
+        this.context.fillRect(
+          overlayBlock.x * this.pixelSize,
+          overlayBlock.y * this.pixelSize,
+          this.pixelSize,
+          this.pixelSize
+        );
+      }
+      this.overlayBlocks = []
+      this.addToOverlayBlocks(x,y)
+      this.addToOverlayBlocks(x + 1, y)
+      this.addToOverlayBlocks(x - 1, y)
+
+      this.context.fillStyle = "grey"
+      this.context.fillRect((x - 1) * this.pixelSize, y * this.pixelSize, this.pixelSize * 3, this.pixelSize)
+      // this.context.fillRect(x * this.pixelSize, y * this.pixelSize, 1, 1);
+      // this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize, 1, 1);
+      // this.context.fillRect(x * this.pixelSize, y * this.pixelSize + 3, 1, 1);
+      // this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize + 3, 1, 1);
+      return
+    }
+
     const newX = event.clientX - this.startX;
     const newY = event.clientY - this.startY;
     this.findOffset(newX, newY)
@@ -119,6 +187,19 @@ export class PlaceComponent implements OnInit, OnDestroy {
       imageColors: []
     }
 
+    // init map
+    const size = 300
+    this.blocks = new Array(size)
+    for (let i = 0; i < size; i++) {
+      this.blocks[i] = new Array(size)
+      for (let j = 0; j < size; j++) {
+        this.blocks[i][j] = {
+          color: "white"
+        }
+      }
+    }
+    this.overlayBlocks = []
+
     this.placeService$ = this.placeService.getPixels().subscribe({
       next: (value: PixelResponse[]) => {
         this.loading = false;
@@ -136,6 +217,13 @@ export class PlaceComponent implements OnInit, OnDestroy {
 
         // draw canvas
         for (const pixelResponse of value) {
+          // update map
+          this.blocks[pixelResponse.x][pixelResponse.y] = {
+            color: pixelResponse.color,
+            user: "erik"
+          }
+
+          // draw on canvas
           this.context.fillStyle = pixelResponse.color
           this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
         }

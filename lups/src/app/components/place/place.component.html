@@ -18,25 +18,15 @@
                 (mousemove)="onMouseMove($event)"
                 (mouseup)="onMouseUpGlobal($event)"
                 (wheel)="onWheel($event)"
+                (mouseenter)="onMouseEnterCanvas()"
+                (mouseleave)="onMouseLeaveCanvas()"
                 [style.transform]="'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + scale + ')'">
         </canvas>
+        <div #canvasTooltip class="canvas-tooltip" *ngIf="isMouseOnCanvas">
+<!--          {{ user }}-->
+          erik
+        </div>
       </div>
-      <!--      <div class="settings">-->
-      <!--        <div class="burger" (click)="toggleMenu()">-->
-      <!--          <i class="material-icons">{{ isMenuOpen ? "close" : "menu" }}</i>-->
-      <!--        </div>-->
-      <!--        <div *ngIf="isMenuOpen" class="buttons">-->
-      <!--          <div class="burger" (click)="showHelp()">-->
-      <!--            <i class="material-icons">help_outline</i>-->
-      <!--          </div>-->
-      <!--          <div class="color"-->
-      <!--               *ngFor="let color of predefinedColors"-->
-      <!--               [style.background-color]="color"-->
-      <!--               [class.selected]="selectedColor === color"-->
-      <!--               (click)="selectColor(color)">-->
-      <!--          </div>-->
-      <!--        </div>-->
-      <!--      </div>-->
     </div>
   </mat-drawer-content>
   <mat-drawer #drawer [opened]="isSideDrawerOpen" mode="side" class="drawer">
