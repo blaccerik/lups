@@ -17,7 +17,6 @@ export class PopupService {
       return; // Limit reached, do not add more popups
     }
     this.popups.push(text);
-
     if (!this.timeoutId) {
       this.timeoutId = setTimeout(() => {
         this.removePopup();

@@ -1,19 +1,27 @@
 import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 
-
 export interface Color {
   value: string
   text: string
+  rgb: number[]
 }
 
 export interface Tool {
   selectedTool: string | null
-  brushColor: Color
+
   brushSize: number
+  brushColor: Color
+  brushMatrix: (string | null)[][]
+
+
   imgSize: number
   originalImage: string | null
   editedImage: string | null
-  imageColors: string[]
+  imageMatrix: (string | null)[][]
+  // imageColors: (Color | null)[],
+
+  shadows: boolean,
+  names: boolean
 }
 
 @Component({
@@ -22,33 +30,24 @@ export interface Tool {
   styleUrls: ['./drawer.component.scss']
 })
 export class DrawerComponent implements OnInit {
-
+  ALPHA_CUTOFF = 50
   colors: Color[] = [
-    {value: 'red', text: "punane"},
-    {value: 'green', text: "roheline"},
-    {value: 'blue', text: "sinine"},
-    {value: 'yellow', text: "kollane"},
-    {value: 'purple', text: "lilla"},
-    {value: 'orange', text: "oranž"},
-    {value: 'black', text: "must"},
-    {value: 'white', text: "valge"},
+    {value: 'red', text: "punane", rgb: [255, 0, 0]},
+    {value: 'green', text: "roheline", rgb: [0, 255, 0]},
+    {value: 'blue', text: "sinine", rgb: [0, 0, 255]},
+    {value: 'yellow', text: "kollane", rgb: [255, 255, 0]},
+    {value: 'purple', text: "lilla", rgb: [255, 0, 255]},
+    {value: 'orange', text: "oranž", rgb: [255, 165, 0]},
+    {value: 'black', text: "must", rgb: [0, 0, 0]},
+    {value: 'white', text: "valge", rgb: [255, 255, 255]},
   ];
-
-  shadows: boolean
-  names: boolean
   tool: Tool
 
   @Output() dataEvent = new EventEmitter<Tool>();
 
-  listOfColors: number[][] = [
-    [255, 0, 0],
-    [150, 33, 77],
-    [75, 99, 23],
-    [45, 88, 250],
-    [250, 0, 255]
-  ];
 
   ngOnInit(): void {
+
     // set default values
     this.tool = {
       selectedTool: null,
@@ -57,7 +56,10 @@ export class DrawerComponent implements OnInit {
       imgSize: 10,
       originalImage: null,
       editedImage: null,
-      imageColors: []
+      imageMatrix: [],
+      brushMatrix: [[this.colors[0].value]],
+      shadows: false,
+      names: false
     }
   }
 
@@ -65,28 +67,18 @@ export class DrawerComponent implements OnInit {
   @ViewChild('canvas', {static: true}) canvasRef: ElementRef;
   private context: CanvasRenderingContext2D | null;
 
-  private drawColors() {
-    const a = this.canvasRef
-    console.log(a)
-    // this.context = (this.canvasRef.nativeElement as HTMLCanvasElement).getContext('2d');
-    //
-    // console.log(this.context)
-    // const canvas = this.colorCanvas.nativeElement;
-    // const ctx = canvas.getContext('2d');
-    // if (!ctx) {
-    //   return
-    // }
-    //
-    // console.log(ctx)
-    // const pixelSize = 20; // Adjust this size based on your preference
-    //
-    // canvas.width = this.listOfColors.length * pixelSize;
-    // canvas.height = pixelSize;
-    //
-    // this.listOfColors.forEach((color, index) => {
-    //   ctx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-    //   ctx.fillRect(index * pixelSize, 0, pixelSize, pixelSize);
-    // });
+  private updateImage() {
+    if (!this.tool.originalImage) {
+      return
+    }
+    const image = new Image();
+    image.src = this.tool.originalImage
+    image.onload = () => {
+      const colors = this.imageToColors(image)
+      this.tool.imageMatrix = colors
+      this.tool.editedImage = this.createImage(colors)
+      this.dataEvent.emit(this.tool)
+    };
   }
 
   selectTool(tool: string) {
@@ -98,71 +90,58 @@ export class DrawerComponent implements OnInit {
     this.dataEvent.emit(this.tool)
   }
 
+  private updateBrush() {
+    const size = this.tool.brushSize
+    const colors: (string | null)[][] = new Array(size)
+    for (let i = 0; i < size; i++) {
+      colors[i] = new Array(size)
+      for (let j = 0; j < size; j++) {
+        colors[i][j] = this.tool.brushColor.value
+      }
+    }
+    this.tool.brushMatrix = colors
+    this.dataEvent.emit(this.tool)
+  }
+
   increaseBrushSize() {
     if (this.tool.brushSize < 4) {
       this.tool.brushSize++
     }
-    this.dataEvent.emit(this.tool)
+    this.updateBrush()
   }
 
   decreaseBrushSize() {
     if (this.tool.brushSize > 1) {
       this.tool.brushSize--
     }
-    this.dataEvent.emit(this.tool)
+    this.updateBrush()
   }
 
   selectColor(color: Color) {
     this.tool.brushColor = color
-    this.dataEvent.emit(this.tool)
+    this.updateBrush()
   }
 
   increaseImageSize() {
     if (this.tool.imgSize < 19) {
       this.tool.imgSize++
     }
-
-    if (!this.tool.originalImage) {
-      return
-    }
-    const image = new Image();
-    image.src = this.tool.originalImage
-    image.onload = () => {
-
-      // update edited image
-      const rgbArray = this.compressImage(image)
-      const newRGBArray = this.mapValuesToColors(rgbArray)
-      this.tool.editedImage = this.createImage(newRGBArray)
-      this.dataEvent.emit(this.tool)
-    };
+    this.updateImage()
   }
 
   decreaseImageSize() {
     if (this.tool.imgSize > 11) {
       this.tool.imgSize--
     }
-
-
-    if (!this.tool.originalImage) {
-      return
-    }
-    const image = new Image();
-    image.src = this.tool.originalImage
-    image.onload = () => {
-
-      // update edited image
-      const rgbArray = this.compressImage(image)
-      const newRGBArray = this.mapValuesToColors(rgbArray)
-      this.tool.editedImage = this.createImage(newRGBArray)
-      this.dataEvent.emit(this.tool)
-    };
+    this.updateImage()
   }
 
   changeShadows() {
+    this.dataEvent.emit(this.tool)
   }
 
   changeNames() {
-
+    this.dataEvent.emit(this.tool)
   }
 
   @ViewChild('fileInput', {static: false}) fileInput: ElementRef;
@@ -171,11 +150,12 @@ export class DrawerComponent implements OnInit {
     event.stopPropagation();
     this.tool.originalImage = null
     this.tool.editedImage = null
-    this.tool.imageColors = []
+    this.tool.imageMatrix = []
     this.selectedImage = null
 
     // Reset the value of the file input without triggering a click event
     this.fileInput.nativeElement.value = '';
+    this.dataEvent.emit(this.tool)
   }
 
   selectedImage: string | ArrayBuffer | null = null;
@@ -192,23 +172,12 @@ export class DrawerComponent implements OnInit {
     reader.onload = () => {
       this.selectedImage = reader.result as string;
       this.tool.originalImage = this.selectedImage
-
-      const image = new Image();
-
-      image.onload = () => {
-
-        // update edited image
-        const rgbArray = this.compressImage(image)
-        const newRGBArray = this.mapValuesToColors(rgbArray)
-        this.tool.editedImage = this.createImage(newRGBArray)
-      };
-
-      image.src = this.selectedImage;
+      this.updateImage()
     };
     reader.readAsDataURL(file);
   }
 
-  compressImage(img: HTMLImageElement) {
+  imageToColors(img: HTMLImageElement): (string | null)[][] {
     // Create an off-screen canvas
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -232,24 +201,36 @@ export class DrawerComponent implements OnInit {
     const pixelData = imageData.data;
 
     // Create an array to store RGB values
-    const rgbArray: number[][] = [];
+    const colors1d: (string | null)[] = []
 
     // Iterate through the pixel data array and extract RGB values
     for (let i = 0; i < pixelData.length; i += 4) {
       const red = pixelData[i];
       const green = pixelData[i + 1];
       const blue = pixelData[i + 2];
-
-      // Add RGB values to the array
-      rgbArray.push([red, green, blue]);
+      const alpha = pixelData[i + 3]
+      if (alpha < this.ALPHA_CUTOFF) {
+        colors1d.push(null)
+      } else {
+        colors1d.push(this.closestColor([red, green, blue]).value)
+      }
     }
-    return rgbArray
+
+    // convert to 2d array
+    const colors: (string | null)[][] = new Array(size)
+    for (let i = 0; i < size; i++) {
+      colors[i] = new Array(size)
+      for (let j = 0; j < size; j++) {
+        colors[i][j] = colors1d[i + j * size]
+      }
+    }
+    return colors
   }
 
-
-  closestColor(listOfColors: number[][], targetColor: number[]): number[] {
-    const colors = listOfColors.map(color => this.calculateDistance(color, targetColor));
-    return listOfColors[colors.indexOf(Math.min(...colors))];
+  closestColor(targetColor: number[]): Color {
+    const colors = this.colors.map(color => this.calculateDistance(color.rgb, targetColor));
+    const index = colors.indexOf(Math.min(...colors))
+    return this.colors[index];
   }
 
   private calculateDistance(color1: number[], color2: number[]): number {
@@ -258,30 +239,8 @@ export class DrawerComponent implements OnInit {
     return Math.sqrt(sumSquaredDifferences);
   }
 
-  mapValuesToColors(values: number[][]): number[][] {
-    const listOfColors = [
-      [255, 0, 0],       // Red
-      [0, 255, 0],       // Green
-      [0, 0, 255],       // Blue
-      [255, 255, 0],     // Yellow
-      // [0, 255, 255],     // Cyan
-      [255, 0, 255],     // Magenta
-      [0, 0, 0],         // Black
-      [255, 255, 255],   // White
-      // [128, 128, 128],   // Gray
-      // [165, 42, 42],     // Brown
-      [255, 165, 0],     // Orange
-      // [128, 0, 128],     // Purple
-      // [255, 182, 193],   // Pink
-      // [0, 128, 128],     // Teal
-      // [230, 230, 250],   // Lavender
-      // [128, 128, 0]      // Olive
-    ]
-    // return values
-    return values.map(value => this.closestColor(listOfColors, value))
-  }
 
-  createImage(values: number[][]) {
+  createImage(colors: (string | null)[][]) {
     // Create an off-screen canvas
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -298,8 +257,11 @@ export class DrawerComponent implements OnInit {
     // Draw rectangles with different colors
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) {
-        const color = values[i + j * size]
-        ctx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+        const color = colors[i][j]
+        if (!color) {
+          continue
+        }
+        ctx.fillStyle = color;
         ctx.fillRect(i, j, 1, 1);
       }
     }

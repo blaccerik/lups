@@ -4,6 +4,7 @@ import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
 import {environment} from "../../environments/environment";
 import {webSocket} from "rxjs/webSocket";
+import {Tool} from "../components/place/drawer/drawer.component";
 
 export interface PixelResponse {
   x: number,
@@ -66,11 +67,20 @@ export class PlaceService {
     }
   }
 
-  send(x: number, y: number, color: string) {
+  send(x: number, y: number, tool: Tool) {
+    let matrix: (string | null)[][]
+    if (tool.selectedTool === "brush") {
+      matrix = tool.brushMatrix
+    } else if (tool.selectedTool === "image") {
+      matrix = tool.imageMatrix
+    } else {
+      throw Error("Tool not selected")
+    }
     this.subject.next({
+      tool: tool.selectedTool,
       x: x,
       y: y,
-      color: color
+      matrix: matrix
     })
   }
 }

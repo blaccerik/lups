@@ -49,6 +49,9 @@ export class PlaceComponent implements OnInit, OnDestroy {
   isMouseOnCanvas: boolean = false;
   private blocks: Block[][]
   private overlayBlocks: OverlayBlock[]
+  private placeService$: Subscription
+  isSideDrawerOpen = false
+  tool: Tool
 
   @ViewChild('canvasContainer', {static: false}) containerRef: ElementRef<HTMLDivElement>;
   @ViewChild('canvasElement', {static: false}) canvasElement: ElementRef<HTMLCanvasElement>;
@@ -72,7 +75,6 @@ export class PlaceComponent implements OnInit, OnDestroy {
     this.startX = event.clientX - this.offsetX;
     this.startY = event.clientY - this.offsetY;
     this.renderer.addClass(this.canvas, 'dragging');
-
   }
 
   onMouseEnterCanvas(): void {
@@ -80,6 +82,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
   }
 
   onMouseLeaveCanvas(): void {
+    this.clearOverlay()
     this.isMouseOnCanvas = false;
   }
 
@@ -89,6 +92,80 @@ export class PlaceComponent implements OnInit, OnDestroy {
         x: x,
         y: y
       })
+    }
+  }
+
+  private addToBlocks(x: number, y: number, block: Block) {
+    if (0 <= x && x < 300 && 0 <= y && y < 300) {
+      this.blocks[x][y] = block
+    }
+  }
+
+  private clearOverlay() {
+
+    if (!this.context) return;
+
+    for (const overlayBlock of this.overlayBlocks) {
+      this.context.fillStyle = this.blocks[overlayBlock.x][overlayBlock.y].color
+      this.context.fillRect(
+        overlayBlock.x * this.pixelSize,
+        overlayBlock.y * this.pixelSize,
+        this.pixelSize,
+        this.pixelSize
+      );
+    }
+    this.overlayBlocks = []
+  }
+
+  private drawOverlayToCanvas(
+    x: number,
+    y: number,
+    size: number,
+    matrix: (string | null)[][],
+    temp: boolean
+  ) {
+    if (!this.context) return;
+
+    // check if mismatch, it happens rarely
+    if (size !== matrix.length) return;
+
+    const delta = Math.floor(size / 2)
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
+        const color = matrix[i][j]
+        if (!color) {
+          continue;
+        }
+
+        this.context.fillStyle = color
+        const dx = x + i - delta
+        const dy = y + j - delta
+        if (temp) {
+          this.addToBlocks(dx, dy, {
+            color: color
+          })
+        } else {
+          this.addToOverlayBlocks(dx, dy)
+        }
+        this.context.fillRect(
+          dx * this.pixelSize,
+          dy * this.pixelSize,
+          this.pixelSize,
+          this.pixelSize
+        )
+      }
+    }
+  }
+
+  private drawOverlay(x: number, y: number) {
+
+    // check if can draw overlay
+    if (!this.tool.shadows) return;
+
+    if (this.tool.selectedTool === "brush") {
+      this.drawOverlayToCanvas(x, y, this.tool.brushSize, this.tool.brushMatrix, false)
+    } else if (this.tool.selectedTool === "image" && this.tool.originalImage) {
+      this.drawOverlayToCanvas(x, y, this.tool.imgSize, this.tool.imageMatrix, false)
     }
   }
 
@@ -105,34 +182,16 @@ export class PlaceComponent implements OnInit, OnDestroy {
       this.canvasTooltip.nativeElement.style.top = scaledMouseY + 'px';
     }
 
+    // draw overlay
     if (!this.isDragging) {
 
       const x = Math.floor(event.offsetX / this.pixelSize);
       const y = Math.floor(event.offsetY / this.pixelSize);
 
-      if (!this.context) return;
-
       // clean prev overlay
-      for (const overlayBlock of this.overlayBlocks) {
-        this.context.fillStyle = this.blocks[overlayBlock.x][overlayBlock.y].color
-        this.context.fillRect(
-          overlayBlock.x * this.pixelSize,
-          overlayBlock.y * this.pixelSize,
-          this.pixelSize,
-          this.pixelSize
-        );
-      }
-      this.overlayBlocks = []
-      this.addToOverlayBlocks(x,y)
-      this.addToOverlayBlocks(x + 1, y)
-      this.addToOverlayBlocks(x - 1, y)
+      this.clearOverlay()
 
-      this.context.fillStyle = "grey"
-      this.context.fillRect((x - 1) * this.pixelSize, y * this.pixelSize, this.pixelSize * 3, this.pixelSize)
-      // this.context.fillRect(x * this.pixelSize, y * this.pixelSize, 1, 1);
-      // this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize, 1, 1);
-      // this.context.fillRect(x * this.pixelSize, y * this.pixelSize + 3, 1, 1);
-      // this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize + 3, 1, 1);
+      this.drawOverlay(x, y)
       return
     }
 
@@ -166,10 +225,6 @@ export class PlaceComponent implements OnInit, OnDestroy {
   }
 
 
-  private placeService$: Subscription
-  isSideDrawerOpen = false
-  tool: Tool
-
   receiveData(data: Tool) {
     this.tool = data;
   }
@@ -179,12 +234,15 @@ export class PlaceComponent implements OnInit, OnDestroy {
     // set default values
     this.tool = {
       selectedTool: null,
-      brushColor: {value: 'red', text: "punane"},
+      brushColor: {value: 'red', text: "punane", rgb: [255, 0, 0]},
       brushSize: 1,
       imgSize: 10,
       originalImage: null,
       editedImage: null,
-      imageColors: []
+      imageMatrix: [],
+      brushMatrix: [["red"]],
+      shadows: false,
+      names: false
     }
 
     // init map
@@ -282,6 +340,16 @@ export class PlaceComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.tool.selectedTool) {
+      this.popupService.addPopup("Tool not selected");
+      return;
+    }
+
+    if (this.tool.selectedTool === "image" && !this.tool.originalImage) {
+      this.popupService.addPopup("Image not selected");
+      return;
+    }
+
     if (!this.canPlacePixel()) {
       this.popupService.addPopup("Placing too fast");
       return;
@@ -290,17 +358,15 @@ export class PlaceComponent implements OnInit, OnDestroy {
     const x = Math.floor(event.offsetX / this.pixelSize);
     const y = Math.floor(event.offsetY / this.pixelSize);
 
-    // place dummy pixel until backend responds
-    this.context.fillStyle = this.tool.brushColor.value
-    this.context.fillRect(x * this.pixelSize, y * this.pixelSize, this.pixelSize, this.pixelSize);
-    this.context.fillStyle = "grey"
-    this.context.fillRect(x * this.pixelSize, y * this.pixelSize, 1, 1);
-    this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize, 1, 1);
-    this.context.fillRect(x * this.pixelSize, y * this.pixelSize + 3, 1, 1);
-    this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize + 3, 1, 1);
+    // place dummy pixels until backend responds
+    if (this.tool.selectedTool === "image" && this.tool.originalImage) {
+      this.drawOverlayToCanvas(x, y, this.tool.imgSize, this.tool.imageMatrix, true)
+    } else if (this.tool.selectedTool === "brush") {
+      this.drawOverlayToCanvas(x, y, this.tool.brushSize, this.tool.brushMatrix, true)
+    }
 
     // send request to backend
-    this.placeService.send(x, y, this.tool.brushColor.value)
+    this.placeService.send(x, y, this.tool)
   }
 }
 

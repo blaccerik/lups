@@ -1,12 +1,12 @@
-<!--<div class="popup-container">-->
-<!--  <app-not-logged-in-popup [text]="popup" *ngFor="let popup of popupService.getPopups()"></app-not-logged-in-popup>-->
-<!--</div>-->
 
 <mat-drawer-container class="main-container" autosize>
   <mat-drawer-content class="canvas-wrapper">
     <button mat-icon-button class="canvas-button" (click)="drawer.toggle()">
       <mat-icon>{{drawer.opened ? "arrow_back_ios" : "arrow_forward_ios"}}</mat-icon>
     </button>
+    <div class="canvas-popup">
+      <app-not-logged-in-popup [text]="popup" *ngFor="let popup of popupService.getPopups()"></app-not-logged-in-popup>
+    </div>
     <div class="square-7" *ngIf="loading"></div>
     <div class="canvas-container-wrapper" *ngIf="!loading">
       <div #canvasContainer class="canvas-container">
@@ -22,8 +22,7 @@
                 (mouseleave)="onMouseLeaveCanvas()"
                 [style.transform]="'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + scale + ')'">
         </canvas>
-        <div #canvasTooltip class="canvas-tooltip" *ngIf="isMouseOnCanvas">
-<!--          {{ user }}-->
+        <div #canvasTooltip class="canvas-tooltip" *ngIf="isMouseOnCanvas && tool.names">
           erik
         </div>
       </div>

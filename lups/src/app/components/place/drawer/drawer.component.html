@@ -58,7 +58,7 @@
     <mat-icon class="icon" inline="true">layers</mat-icon>
     varjud
     <label class="switch">
-      <input type="checkbox" [(ngModel)]="shadows" (change)="changeShadows()">
+      <input type="checkbox" [(ngModel)]="tool.shadows" (change)="changeShadows()">
       <span class="switch-slider"></span>
     </label>
   </div>
@@ -67,7 +67,7 @@
     <mat-icon class="icon" inline="true">people</mat-icon>
     nimed
     <label class="switch">
-      <input type="checkbox" [(ngModel)]="names" (change)="changeNames()">
+      <input type="checkbox" [(ngModel)]="tool.names" (change)="changeNames()">
       <span class="switch-slider"></span>
     </label>
   </div>
