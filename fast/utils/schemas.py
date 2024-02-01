@@ -1,6 +1,7 @@
 from enum import Enum
+from typing import Union, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Item(BaseModel):
@@ -35,8 +36,10 @@ class InputType(Enum):
     delete = "delete"
     message = "message"
 
+
 class ChatUpdate(BaseModel):
     title: str
+
 
 class ChatRespond(BaseModel):
     title: str
@@ -77,6 +80,32 @@ class News(BaseModel):
 
 class NewsId(BaseModel):
     id: int
+
+
+# place schemas
+class PlaceColor(str, Enum):
+    red = "red"
+    green = "green"
+    blue = "blue"
+    yellow = "yellow"
+    purple = "purple"
+    orange = "orange"
+    black = "black"
+    white = "white"
+class PlaceInput(BaseModel):
+    tool: str
+    x: int = Field(ge=0, lt=300)
+    y: int = Field(ge=0, lt=300)
+    size: int = Field(gt=0, le=20)
+    matrix: List[List[Union[PlaceColor, None]]]
+
+    @staticmethod
+    def validate_matrix_size(matrix, size):
+        if len(matrix) != size:
+            raise ValueError("Matrix size does not match the specified 'size'")
+        for row in matrix:
+            if len(row) != size:
+                raise ValueError("Each row in the matrix must have the specified 'size'")
 
 
 class PixelSmall(BaseModel):

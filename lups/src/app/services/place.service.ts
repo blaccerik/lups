@@ -69,10 +69,13 @@ export class PlaceService {
 
   send(x: number, y: number, tool: Tool) {
     let matrix: (string | null)[][]
+    let size: number
     if (tool.selectedTool === "brush") {
       matrix = tool.brushMatrix
+      size = tool.brushSize
     } else if (tool.selectedTool === "image") {
       matrix = tool.imageMatrix
+      size = tool.imgSize
     } else {
       throw Error("Tool not selected")
     }
@@ -80,6 +83,7 @@ export class PlaceService {
       tool: tool.selectedTool,
       x: x,
       y: y,
+      size: size,
       matrix: matrix
     })
   }

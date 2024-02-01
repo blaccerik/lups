@@ -3,6 +3,7 @@ version: '3.8'
 services:
   fastapi:
     container_name: fastapi
+    restart: unless-stopped
     build:
       context: fast
     ports:
@@ -76,6 +77,7 @@ services:
 
   redis:
     container_name: redis
+    restart: unless-stopped
     image: redis:6-alpine
     expose:
       - 6379
