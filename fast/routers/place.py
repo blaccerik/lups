@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, WebSocket
 from pydantic import ValidationError
 from redis.client import Redis
 
-from services.place_service import update_pixel, read_pixels_redis
+from services.place_service import update_pixel, read_pixels
 from utils.auth import get_current_user_with_token
 from utils.redis_database import get_redis
-from utils.schemas import PixelSmall, PlaceInput
+from utils.schemas import PlaceInput, PlaceOutput
 
 router = APIRouter(prefix="/api/place")
 connected_clients = []
@@ -17,9 +17,11 @@ connected_clients = []
 logger = logging.getLogger("Place")
 
 
-@router.get("/", response_model=List[PixelSmall])
+# response model must be set for faster send
+@router.get("/", response_model=List[PlaceOutput])
 async def get_pixels(redis_client: Redis = Depends(get_redis)):
-    return await read_pixels_redis(redis_client)
+    return []
+    # return await read_pixels(redis_client)
 
 
 @router.websocket("/ws")
@@ -41,22 +43,16 @@ async def websocket_endpoint(authorization: str, websocket: WebSocket, redis_cli
                 continue
 
             # edit database
-            await update_pixel(place_input, redis_client)
-            # for client in connected_clients:
-            #     await client.send_text(json.dumps({
-            #         "x": data["x"],
-            #         "y": data["y"],
-            #         "color": data["color"]
-            #     }))
+            place_outputs = await update_pixel(place_input, user, redis_client)
+            # send message
+            for client in connected_clients:
+                print(json.dumps(place_outputs))
+                await client.send_text(json.dumps(place_outputs))
     except (ValidationError or ValueError) as ve:
-        print("validation")
-        print(ve)
-        print("validation")
+        logger.error(ve)
         await websocket.close()
     except Exception as e:
-        print("error")
-        print(e)
-        print("error")
+        logger.error(e)
     finally:
         # Remove the disconnected WebSocket from the list
         connected_clients.remove(websocket)

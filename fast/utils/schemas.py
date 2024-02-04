@@ -92,6 +92,8 @@ class PlaceColor(str, Enum):
     orange = "orange"
     black = "black"
     white = "white"
+
+
 class PlaceInput(BaseModel):
     tool: str
     x: int = Field(ge=0, lt=300)
@@ -108,13 +110,13 @@ class PlaceInput(BaseModel):
                 raise ValueError("Each row in the matrix must have the specified 'size'")
 
 
-class PixelSmall(BaseModel):
-    x: int
-    y: int
-    c: int
+class PlacePixel(BaseModel):
+    color: PlaceColor
+    user: str | None
 
 
-class PixelLarge(BaseModel):
+class PlaceOutput(BaseModel):
+    c: str  # must be str instead PlaceColor for faster send
+    u: str | None
     x: int
     y: int
-    color: str
