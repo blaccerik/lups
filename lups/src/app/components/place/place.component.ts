@@ -17,7 +17,7 @@ import {Tool} from "./drawer/drawer.component";
 
 interface Block {
   color: string,
-  user?: string,
+  user: string | null,
 }
 
 interface OverlayBlock {
@@ -52,6 +52,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
   private placeService$: Subscription
   isSideDrawerOpen = false
   tool: Tool
+  hoverName: string | null
 
   @ViewChild('canvasContainer', {static: false}) containerRef: ElementRef<HTMLDivElement>;
   @ViewChild('canvasElement', {static: false}) canvasElement: ElementRef<HTMLCanvasElement>;
@@ -142,7 +143,8 @@ export class PlaceComponent implements OnInit, OnDestroy {
         const dy = y + j - delta
         if (temp) {
           this.addToBlocks(dx, dy, {
-            color: color
+            color: color,
+            user: null
           })
         } else {
           this.addToOverlayBlocks(dx, dy)
@@ -171,13 +173,15 @@ export class PlaceComponent implements OnInit, OnDestroy {
 
   onMouseMove(event: MouseEvent): void {
 
-    // find mouse coords
-    const rect = this.containerRef.nativeElement.getBoundingClientRect()
-    const scaledMouseX = event.clientX - rect.x; // - canvasRect.left;
-    const scaledMouseY = event.clientY - rect.y;  //- canvasRect.top;
-
     // Position the tooltip next to the mouse
     if (this.canvasTooltip) {
+
+      // find mouse coords
+      const rect = this.containerRef.nativeElement.getBoundingClientRect()
+      const scaledMouseX = event.clientX - rect.x; // - canvasRect.left;
+      const scaledMouseY = event.clientY - rect.y;  //- canvasRect.top;
+
+      // draw box
       this.canvasTooltip.nativeElement.style.left = scaledMouseX + 25 + 'px';
       this.canvasTooltip.nativeElement.style.top = scaledMouseY + 'px';
     }
@@ -187,6 +191,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
 
       const x = Math.floor(event.offsetX / this.pixelSize);
       const y = Math.floor(event.offsetY / this.pixelSize);
+      this.hoverName = this.blocks[x][y].user
 
       // clean prev overlay
       this.clearOverlay()
@@ -244,6 +249,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
       shadows: false,
       names: false
     }
+    this.hoverName = null
 
     // init map
     const size = 300
@@ -252,7 +258,8 @@ export class PlaceComponent implements OnInit, OnDestroy {
       this.blocks[i] = new Array(size)
       for (let j = 0; j < size; j++) {
         this.blocks[i][j] = {
-          color: "white"
+          color: "white",
+          user: null
         }
       }
     }
@@ -278,7 +285,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
           // update map
           this.blocks[pixelResponse.x][pixelResponse.y] = {
             color: pixelResponse.color,
-            user: "erik"
+            user: pixelResponse.user
           }
 
           // draw on canvas
@@ -288,9 +295,22 @@ export class PlaceComponent implements OnInit, OnDestroy {
 
         // connect to websocket
         this.placeService.connect().subscribe(
-          (pixelResponse: PixelResponse) => {
-            this.context.fillStyle = pixelResponse.color
-            this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
+          (pixelResponses: PixelResponse[]) => {
+            for (const pixelResponse of pixelResponses) {
+              // update blocks
+              this.addToBlocks(pixelResponse.x, pixelResponse.y, {
+                color: pixelResponse.color,
+                user: pixelResponse.user
+              })
+              // draw block
+              this.context.fillStyle = pixelResponse.color
+              this.context.fillRect(
+                pixelResponse.x * this.pixelSize,
+                pixelResponse.y * this.pixelSize,
+                this.pixelSize,
+                this.pixelSize
+              )
+            }
           }
         );
       }

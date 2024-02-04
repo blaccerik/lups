@@ -10,7 +10,16 @@ export interface PixelResponse {
   x: number,
   y: number,
   color: string
+  user: string
 }
+
+interface PixelResponseCompressed {
+  x: number,
+  y: number,
+  c: string,
+  u: string
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +27,7 @@ export interface PixelResponse {
 export class PlaceService {
 
   private subject: any;
-  private messagesSubject = new Subject<PixelResponse>();
+  private messagesSubject = new Subject<PixelResponse[]>();
   predefinedColors = [
     "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
   ];
@@ -33,24 +42,29 @@ export class PlaceService {
     this.subject = webSocket(`${environment.wsUrl}/api/place/ws?authorization=${token}`);
 
     // get websocket
-    this.subject.pipe(retry({delay: 1000})).subscribe((message: any) => {
-      this.messagesSubject.next({
-        color: message.color,
-        x: message.x,
-        y: message.y
-      })
+    this.subject.pipe(retry({delay: 1000})).subscribe((pixelInputs: PixelResponseCompressed[]) => {
+      // Map the compressed data to PixelResponse format
+      this.messagesSubject.next(pixelInputs.map((compressed: PixelResponseCompressed) => {
+        return {
+          x: compressed.x,
+          y: compressed.y,
+          color: compressed.c,
+          user: compressed.u
+        };
+      }));
     })
   }
 
   getPixels(): Observable<PixelResponse[]> {
-    return this.http.get<any>("api/place/").pipe(
+    return this.http.get<PixelResponseCompressed[]>("api/place/").pipe(
       map(data => {
         // Transform the data here
-        return data.map((message: any) => {
+        return data.map((pixelInput: PixelResponseCompressed) => {
           return {
-            color: this.predefinedColors[message.c],
-            x: message.x,
-            y: message.y
+            user: pixelInput.u,
+            color: pixelInput.c,
+            x: pixelInput.x,
+            y: pixelInput.y
           };
         });
       })

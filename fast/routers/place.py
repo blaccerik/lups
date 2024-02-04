@@ -20,14 +20,12 @@ logger = logging.getLogger("Place")
 # response model must be set for faster send
 @router.get("/", response_model=List[PlaceOutput])
 async def get_pixels(redis_client: Redis = Depends(get_redis)):
-    return []
-    # return await read_pixels(redis_client)
+    return await read_pixels(redis_client)
 
 
 @router.websocket("/ws")
 async def websocket_endpoint(authorization: str, websocket: WebSocket, redis_client: Redis = Depends(get_redis)):
     await websocket.accept()
-    print(websocket)
     user = await get_current_user_with_token(authorization)
     # Add the websocket to the list of connected clients
     connected_clients.append(websocket)
@@ -46,7 +44,6 @@ async def websocket_endpoint(authorization: str, websocket: WebSocket, redis_cli
             place_outputs = await update_pixel(place_input, user, redis_client)
             # send message
             for client in connected_clients:
-                print(json.dumps(place_outputs))
                 await client.send_text(json.dumps(place_outputs))
     except (ValidationError or ValueError) as ve:
         logger.error(ve)

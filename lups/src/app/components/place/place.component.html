@@ -23,7 +23,12 @@
                 [style.transform]="'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + scale + ')'">
         </canvas>
         <div #canvasTooltip class="canvas-tooltip" *ngIf="isMouseOnCanvas && tool.names">
-          erik
+          <div *ngIf="hoverName">
+            {{hoverName}}
+          </div>
+          <div *ngIf="!hoverName">
+            Kasutaja puudub
+          </div>
         </div>
       </div>
     </div>
