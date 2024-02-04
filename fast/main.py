@@ -4,7 +4,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import items, news, place, chat
+from routers import news, place, chat
 from utils.database import SessionLocal
 from utils.redis_database import get_client
 from utils.schemas import PlacePixel, PlaceColor
@@ -25,7 +25,6 @@ app.add_middleware(
 
 # app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-app.include_router(items.router)
 app.include_router(chat.router)
 app.include_router(place.router)
 app.include_router(news.router)

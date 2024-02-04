@@ -29,8 +29,6 @@ async def read_pixels(redis_client: Redis) -> List[PlaceOutput]:
     return values
 
 
-
-
 async def update_pixel(place_input: PlaceInput, user: User, redis_client: Redis):
     delta = place_input.size // 2
     values = {}
@@ -54,4 +52,3 @@ async def update_pixel(place_input: PlaceInput, user: User, redis_client: Redis)
     await redis_client.hset('pixels', mapping=values)
 
     return result
-
