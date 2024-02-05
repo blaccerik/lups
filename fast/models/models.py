@@ -1,14 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, PrimaryKeyConstraint, Date, Text, func, VARCHAR
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, Date, Text, func
 from sqlalchemy.orm import relationship
 
 from utils.database import Base, engine, SessionLocal
-
-
-class Item(Base):
-    __tablename__ = "items"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
 
 
 class DBUser(Base):
@@ -46,19 +39,6 @@ class DBMessage(Base):
 
     def __repr__(self):
         return f"Message(id={self.id}, chat_id={self.chat_id}, message='{self.text}')"
-
-
-class DBPixel(Base):
-    __tablename__ = "pixel"
-
-    x = Column(Integer, nullable=False)
-    y = Column(Integer, nullable=False)
-    color = Column(Enum("red", "green", "blue", "yellow", "purple", "orange", "black", "white", name="color_name"),
-                   nullable=False)
-
-    __table_args__ = (
-        PrimaryKeyConstraint("x", "y"),
-    )
 
 
 class DBNews(Base):
@@ -105,17 +85,6 @@ def init_db():
     print("created")
 
     postgres_client = SessionLocal()
-
-    # static data
-    from services.place_service import SIZE
-    for x in range(SIZE):
-        for y in range(SIZE):
-            p = DBPixel()
-            p.x = x
-            p.y = y
-            p.color = "white"
-            postgres_client.add(p)
-    postgres_client.commit()
 
     translate = {
         "top": "top",

@@ -3,6 +3,7 @@ version: '3.8'
 services:
   nginx:
     container_name: nginx
+    restart: unless-stopped
     build:
       context: lups/.
       dockerfile: Dockerfile
@@ -16,6 +17,7 @@ services:
       - ./nginx:/var/log/nginx
   fastapi:
     container_name: fastapi
+    restart: unless-stopped
     build:
       context: fast
     ports:
@@ -71,6 +73,7 @@ services:
   redis:
     container_name: redis
     image: redis:6-alpine
+    restart: unless-stopped
     expose:
       - 6379
     networks:

@@ -12,8 +12,18 @@ import {
 import {OAuthService} from "angular-oauth2-oidc";
 import {PopupService} from "../../services/popup.service";
 import {MatDialog} from "@angular/material/dialog";
-import {HelpDialogComponent} from "./help-dialog/help-dialog.component";
+import {Subscription} from "rxjs";
+import {Tool} from "./drawer/drawer.component";
 
+interface Block {
+  color: string,
+  user: string | null,
+}
+
+interface OverlayBlock {
+  x: number,
+  y: number
+}
 
 @Component({
   selector: 'app-place',
@@ -21,17 +31,13 @@ import {HelpDialogComponent} from "./help-dialog/help-dialog.component";
   styleUrls: ['./place.component.scss']
 })
 export class PlaceComponent implements OnInit, OnDestroy {
-  predefinedColors = [
-    "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
-  ];
-  selectedColor: string = 'white';
+
   private context: CanvasRenderingContext2D;
   private canvas: HTMLCanvasElement
   private container: HTMLDivElement
   private pixelSize = 4; // Size of each pixel
   private lastPixelPlacementTimestamp = 0;
   loading = true;
-  isMenuOpen = false;
   private isDragging = false;
   private startX = 0;
   private startY = 0;
@@ -40,9 +46,17 @@ export class PlaceComponent implements OnInit, OnDestroy {
   scale = 1;
   offsetX = 0;
   offsetY = 0;
+  isMouseOnCanvas: boolean = false;
+  private blocks: Block[][]
+  private overlayBlocks: OverlayBlock[]
+  private placeService$: Subscription
+  isSideDrawerOpen = false
+  tool: Tool
+  hoverName: string | null
 
-  @ViewChild('canvasContainer', { static: false }) containerRef: ElementRef<HTMLDivElement>;
-  @ViewChild('canvasElement', { static: false }) canvasElement: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvasContainer', {static: false}) containerRef: ElementRef<HTMLDivElement>;
+  @ViewChild('canvasElement', {static: false}) canvasElement: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvasTooltip') canvasTooltip: ElementRef<HTMLDivElement>;
 
   @HostListener('document:mouseup', ['$event'])
   onMouseUpGlobal(event: MouseEvent): void {
@@ -62,11 +76,130 @@ export class PlaceComponent implements OnInit, OnDestroy {
     this.startX = event.clientX - this.offsetX;
     this.startY = event.clientY - this.offsetY;
     this.renderer.addClass(this.canvas, 'dragging');
+  }
 
+  onMouseEnterCanvas(): void {
+    this.isMouseOnCanvas = true;
+  }
+
+  onMouseLeaveCanvas(): void {
+    this.clearOverlay()
+    this.isMouseOnCanvas = false;
+  }
+
+  private addToOverlayBlocks(x: number, y: number) {
+    if (0 <= x && x < 300 && 0 <= y && y < 300) {
+      this.overlayBlocks.push({
+        x: x,
+        y: y
+      })
+    }
+  }
+
+  private addToBlocks(x: number, y: number, block: Block) {
+    if (0 <= x && x < 300 && 0 <= y && y < 300) {
+      this.blocks[x][y] = block
+    }
+  }
+
+  private clearOverlay() {
+
+    if (!this.context) return;
+
+    for (const overlayBlock of this.overlayBlocks) {
+      this.context.fillStyle = this.blocks[overlayBlock.x][overlayBlock.y].color
+      this.context.fillRect(
+        overlayBlock.x * this.pixelSize,
+        overlayBlock.y * this.pixelSize,
+        this.pixelSize,
+        this.pixelSize
+      );
+    }
+    this.overlayBlocks = []
+  }
+
+  private drawOverlayToCanvas(
+    x: number,
+    y: number,
+    size: number,
+    matrix: (string | null)[][],
+    temp: boolean
+  ) {
+    if (!this.context) return;
+
+    // check if mismatch, it happens rarely
+    if (size !== matrix.length) return;
+
+    const delta = Math.floor(size / 2)
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
+        const color = matrix[i][j]
+        if (!color) {
+          continue;
+        }
+
+        this.context.fillStyle = color
+        const dx = x + i - delta
+        const dy = y + j - delta
+        if (temp) {
+          this.addToBlocks(dx, dy, {
+            color: color,
+            user: null
+          })
+        } else {
+          this.addToOverlayBlocks(dx, dy)
+        }
+        this.context.fillRect(
+          dx * this.pixelSize,
+          dy * this.pixelSize,
+          this.pixelSize,
+          this.pixelSize
+        )
+      }
+    }
+  }
+
+  private drawOverlay(x: number, y: number) {
+
+    // check if can draw overlay
+    if (!this.tool.shadows) return;
+
+    if (this.tool.selectedTool === "brush") {
+      this.drawOverlayToCanvas(x, y, this.tool.brushSize, this.tool.brushMatrix, false)
+    } else if (this.tool.selectedTool === "image" && this.tool.originalImage) {
+      this.drawOverlayToCanvas(x, y, this.tool.imgSize, this.tool.imageMatrix, false)
+    }
   }
 
   onMouseMove(event: MouseEvent): void {
-    if (!this.isDragging) return;
+
+    // Position the tooltip next to the mouse
+    if (this.canvasTooltip) {
+
+      // find mouse coords
+      const rect = this.containerRef.nativeElement.getBoundingClientRect()
+      const scaledMouseX = event.clientX - rect.x; // - canvasRect.left;
+      const scaledMouseY = event.clientY - rect.y;  //- canvasRect.top;
+
+      // draw box
+      this.canvasTooltip.nativeElement.style.left = scaledMouseX + 25 + 'px';
+      this.canvasTooltip.nativeElement.style.top = scaledMouseY + 'px';
+    }
+
+    // draw overlay
+    if (!this.isDragging) {
+
+      const x = Math.floor(event.offsetX / this.pixelSize);
+      const y = Math.floor(event.offsetY / this.pixelSize);
+      this.hoverName = this.blocks[x][y].user
+
+      // clean prev overlay
+      this.clearOverlay()
+
+      this.drawOverlay(x, y)
+      return
+    }
+
     const newX = event.clientX - this.startX;
     const newY = event.clientY - this.startY;
     this.findOffset(newX, newY)
@@ -87,17 +220,52 @@ export class PlaceComponent implements OnInit, OnDestroy {
     this.findOffset(x, y);
   }
 
-
   constructor(
     private placeService: PlaceService,
     private readonly authService: OAuthService,
     public readonly popupService: PopupService,
     private dialog: MatDialog,
     private cdRef: ChangeDetectorRef,
-    private renderer: Renderer2) { }
+    private renderer: Renderer2) {
+  }
+
+
+  receiveData(data: Tool) {
+    this.tool = data;
+  }
 
   ngOnInit(): void {
-    this.placeService.getPixels().subscribe({
+
+    // set default values
+    this.tool = {
+      selectedTool: null,
+      brushColor: {value: 'red', text: "punane", rgb: [255, 0, 0]},
+      brushSize: 1,
+      imgSize: 10,
+      originalImage: null,
+      editedImage: null,
+      imageMatrix: [],
+      brushMatrix: [["red"]],
+      shadows: false,
+      names: false
+    }
+    this.hoverName = null
+
+    // init map
+    const size = 300
+    this.blocks = new Array(size)
+    for (let i = 0; i < size; i++) {
+      this.blocks[i] = new Array(size)
+      for (let j = 0; j < size; j++) {
+        this.blocks[i][j] = {
+          color: "white",
+          user: null
+        }
+      }
+    }
+    this.overlayBlocks = []
+
+    this.placeService$ = this.placeService.getPixels().subscribe({
       next: (value: PixelResponse[]) => {
         this.loading = false;
         // setup objects
@@ -114,26 +282,46 @@ export class PlaceComponent implements OnInit, OnDestroy {
 
         // draw canvas
         for (const pixelResponse of value) {
+          // update map
+          this.blocks[pixelResponse.x][pixelResponse.y] = {
+            color: pixelResponse.color,
+            user: pixelResponse.user
+          }
+
+          // draw on canvas
           this.context.fillStyle = pixelResponse.color
           this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
         }
 
         // connect to websocket
         this.placeService.connect().subscribe(
-          (pixelResponse: PixelResponse) => {
-            this.context.fillStyle = pixelResponse.color
-            this.context.fillRect(pixelResponse.x * this.pixelSize, pixelResponse.y * this.pixelSize, this.pixelSize, this.pixelSize);
+          (pixelResponses: PixelResponse[]) => {
+            for (const pixelResponse of pixelResponses) {
+              // update blocks
+              this.addToBlocks(pixelResponse.x, pixelResponse.y, {
+                color: pixelResponse.color,
+                user: pixelResponse.user
+              })
+              // draw block
+              this.context.fillStyle = pixelResponse.color
+              this.context.fillRect(
+                pixelResponse.x * this.pixelSize,
+                pixelResponse.y * this.pixelSize,
+                this.pixelSize,
+                this.pixelSize
+              )
+            }
           }
         );
-      }})
+      }
+    })
   }
 
   ngOnDestroy() {
+    if (this.placeService$) {
+      this.placeService$.unsubscribe()
+    }
     this.placeService.disconnect()
-  }
-
-  selectColor(color: string): void {
-    this.selectedColor = color;
   }
 
   private findOffset(newX: number, newY: number): void {
@@ -172,6 +360,16 @@ export class PlaceComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (!this.tool.selectedTool) {
+      this.popupService.addPopup("Tool not selected");
+      return;
+    }
+
+    if (this.tool.selectedTool === "image" && !this.tool.originalImage) {
+      this.popupService.addPopup("Image not selected");
+      return;
+    }
+
     if (!this.canPlacePixel()) {
       this.popupService.addPopup("Placing too fast");
       return;
@@ -180,27 +378,15 @@ export class PlaceComponent implements OnInit, OnDestroy {
     const x = Math.floor(event.offsetX / this.pixelSize);
     const y = Math.floor(event.offsetY / this.pixelSize);
 
-    // place dummy pixel until backend responds
-    this.context.fillStyle = this.selectedColor
-    this.context.fillRect(x * this.pixelSize, y * this.pixelSize, this.pixelSize, this.pixelSize);
-    this.context.fillStyle = "grey"
-    this.context.fillRect(x * this.pixelSize, y * this.pixelSize, 1, 1);
-    this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize, 1, 1);
-    this.context.fillRect(x * this.pixelSize, y * this.pixelSize + 3, 1, 1);
-    this.context.fillRect(x * this.pixelSize + 3, y * this.pixelSize + 3, 1, 1);
+    // place dummy pixels until backend responds
+    if (this.tool.selectedTool === "image" && this.tool.originalImage) {
+      this.drawOverlayToCanvas(x, y, this.tool.imgSize, this.tool.imageMatrix, true)
+    } else if (this.tool.selectedTool === "brush") {
+      this.drawOverlayToCanvas(x, y, this.tool.brushSize, this.tool.brushMatrix, true)
+    }
 
     // send request to backend
-    this.placeService.send(x, y, this.selectedColor)
-  }
-
-  toggleMenu() {
-    this.isMenuOpen = !this.isMenuOpen;
-  }
-
-  showHelp() {
-    this.dialog.open(HelpDialogComponent, {
-      autoFocus: false, // Prevents dialog from auto-closing on click inside
-    });
+    this.placeService.send(x, y, this.tool)
   }
 }
 

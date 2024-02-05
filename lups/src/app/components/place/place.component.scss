@@ -1,17 +1,58 @@
 @import 'src/variables';
 
-.container {
-  height: 100%;
+
+.main-container {
   width: 100%;
-  justify-content: center;
-  display: flex;
+  height: 100%;
+  background-color: red;
 }
 
-.canvas-container {
-  position: relative;
-  width: min(100%, 1200px); /* Adjust as needed */
-  height: min(100%, 1200px); /* Adjust as needed */
-  overflow: hidden;
+.canvas {
+  &-button {
+    position: absolute;
+    left: 2%;
+    top: calc(50% - 50px);
+    z-index: 99;
+  }
+  &-popup {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 99;
+  }
+  &-tooltip {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+    border: 1px solid #000;
+    z-index: 100;
+    pointer-events: none;
+  }
+  &-container {
+    position: relative;
+    width: min(100%, 1200px); /* Adjust as needed */
+    height: min(100%, 1200px); /* Adjust as needed */
+    overflow: hidden;
+  }
+
+  &-container-wrapper {
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    display: flex;
+  }
+}
+
+
+.drawer {
+  height: 100%;
+  width: 200px;
+  background-color: lightgrey;
+  border: 0;
+}
+
+::ng-deep .menu {
+  background: orange;
 }
 
 canvas {
@@ -19,45 +60,81 @@ canvas {
   image-rendering: pixelated;
 }
 
-.settings {
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
   position: absolute;
-  left: 0;
+  cursor: pointer;
   top: 0;
+  left: 0;
+  right: 0;
   bottom: 0;
-  display: flex;
-  height: fit-content;
-  background-color: $third-color;
+  background-color: orangered;
+  -webkit-transition: .2s;
+  transition: .2s;
+  border-radius: 34px;
+  //border: 2px solid orangered
+}
 
-  .burger {
-    padding: 10px;
-    width: fit-content;
-    transition: 0.3s;
-    color: $main-color;
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .2s;
+  transition: .2s;
+  border-radius: 50%;
+}
 
-    &:hover {
-      color: $second-color;
-      background-color: $third-color;
-      cursor: pointer;
-    }
-  }
+input:checked + .slider {
+  background-color: #61e516;
+}
 
-  .color {
-    width: 25px;
-    height: 25px;
-    margin: 0 10px;
-    border: 2px $main-color solid;
+input:checked + .slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
 
-    &:hover {
-      cursor: pointer;
-    }
 
-    &.selected {
-      border: 2px black dashed;
-    }
-  }
+.counter-container {
+  text-align: center;
+  margin-top: 20px;
+}
 
-  .buttons {
-    display: flex;
-    align-items: center;
-  }
+.counter {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.button-up,
+.button-down {
+  font-size: 16px;
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.button-up {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+
+.button-down {
+  background-color: #f44336; /* Red */
+  color: white;
 }
