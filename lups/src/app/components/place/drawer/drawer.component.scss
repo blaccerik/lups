@@ -1,6 +1,5 @@
 
 .container {
-  background-color: yellow;
   display: flex;
   flex-direction: column;
   padding-top: 10px;
@@ -10,6 +9,8 @@
   margin-bottom: 10px;
   text-align: center;
   font-size: 20px;
+  color: white;
+  //text-outline: white 14px;
 }
 
 .component {
@@ -163,4 +164,8 @@
   &-input {
     display: none;
   }
+}
+
+::ng-deep .menu {
+  background: lightblue;
 }

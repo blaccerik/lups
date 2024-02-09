@@ -1,4 +1,6 @@
 import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {HelpDialogComponent} from "../help-dialog/help-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 
 export interface Color {
   value: string
@@ -45,6 +47,8 @@ export class DrawerComponent implements OnInit {
 
   @Output() dataEvent = new EventEmitter<Tool>();
 
+  constructor(private dialog: MatDialog) {
+  }
 
   ngOnInit(): void {
 
@@ -270,4 +274,10 @@ export class DrawerComponent implements OnInit {
     return canvas.toDataURL();
   }
 
+  showHelp() {
+    console.log("ewewew")
+    this.dialog.open(HelpDialogComponent, {
+      autoFocus: false, // Prevents dialog from auto-closing on click inside
+    });
+  }
 }

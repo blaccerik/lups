@@ -19,61 +19,61 @@ services:
     volumes:
       - image_data:/usr/src/app/images
 
-  worker:
-    container_name: worker
-    build:
-      context: celeryr
-    command: celery --app worker.tasks worker --concurrency=1 --pool prefork
-    environment:
-      - REDIS_BROKER_URL=redis
-      - POSTGRES_USER=erik
-      - POSTGRES_PASSWORD=erik
-      - POSTGRES_BROKER_URL=postgres:5432
-      - POSTGRES_DATABASE=postgres
-    depends_on:
-      - redis
-      - postgres
-    networks:
-      - lups
-    deploy:
-      resources:
-        limits:
-          cpus: '2'  # Adjust the CPU limit as needed
-          memory: 4G  # Adjust the memory limit as needed
-    volumes:
-      - image_data:/usr/src/app/images
-
-  dashboard:
-    container_name: dashboard
-    build:
-      context: celeryr
-    command: celery --app worker.tasks flower --port=5555
-    ports:
-      - "5555:5555"
-    environment:
-      - REDIS_BROKER_URL=redis://redis:6379/0
-      - POSTGRES_USER=erik
-      - POSTGRES_PASSWORD=erik
-      - POSTGRES_BROKER_URL=postgres:5432
-      - POSTGRES_DATABASE=postgres
-    depends_on:
-      - redis
-      - worker
-    networks:
-      - lups
-
-  beat:
-    container_name: beat
-    build:
-      context: celeryr
-    command: celery --app beat beat
-    environment:
-      - REDIS_BROKER_URL=redis://redis:6379/0
-    depends_on:
-      - redis
-      - worker
-    networks:
-      - lups
+#  worker:
+#    container_name: worker
+#    build:
+#      context: celeryr
+#    command: celery --app worker.tasks worker --concurrency=1 --pool prefork
+#    environment:
+#      - REDIS_BROKER_URL=redis
+#      - POSTGRES_USER=erik
+#      - POSTGRES_PASSWORD=erik
+#      - POSTGRES_BROKER_URL=postgres:5432
+#      - POSTGRES_DATABASE=postgres
+#    depends_on:
+#      - redis
+#      - postgres
+#    networks:
+#      - lups
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '2'  # Adjust the CPU limit as needed
+#          memory: 4G  # Adjust the memory limit as needed
+#    volumes:
+#      - image_data:/usr/src/app/images
+#
+#  dashboard:
+#    container_name: dashboard
+#    build:
+#      context: celeryr
+#    command: celery --app worker.tasks flower --port=5555
+#    ports:
+#      - "5555:5555"
+#    environment:
+#      - REDIS_BROKER_URL=redis://redis:6379/0
+#      - POSTGRES_USER=erik
+#      - POSTGRES_PASSWORD=erik
+#      - POSTGRES_BROKER_URL=postgres:5432
+#      - POSTGRES_DATABASE=postgres
+#    depends_on:
+#      - redis
+#      - worker
+#    networks:
+#      - lups
+#
+#  beat:
+#    container_name: beat
+#    build:
+#      context: celeryr
+#    command: celery --app beat beat
+#    environment:
+#      - REDIS_BROKER_URL=redis://redis:6379/0
+#    depends_on:
+#      - redis
+#      - worker
+#    networks:
+#      - lups
 
   redis:
     container_name: redis

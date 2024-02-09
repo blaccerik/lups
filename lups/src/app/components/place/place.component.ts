@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import {OAuthService} from "angular-oauth2-oidc";
 import {PopupService} from "../../services/popup.service";
-import {MatDialog} from "@angular/material/dialog";
 import {Subscription} from "rxjs";
 import {Tool} from "./drawer/drawer.component";
 
@@ -224,7 +223,6 @@ export class PlaceComponent implements OnInit, OnDestroy {
     private placeService: PlaceService,
     private readonly authService: OAuthService,
     public readonly popupService: PopupService,
-    private dialog: MatDialog,
     private cdRef: ChangeDetectorRef,
     private renderer: Renderer2) {
   }
@@ -388,6 +386,8 @@ export class PlaceComponent implements OnInit, OnDestroy {
     // send request to backend
     this.placeService.send(x, y, this.tool)
   }
+
+
 }
 
 
