@@ -47,8 +47,10 @@ export class DrawerComponent implements OnInit {
 
   @Output() dataEvent = new EventEmitter<Tool>();
 
+
   constructor(private dialog: MatDialog) {
   }
+
 
   ngOnInit(): void {
 
@@ -274,10 +276,12 @@ export class DrawerComponent implements OnInit {
     return canvas.toDataURL();
   }
 
+
   showHelp() {
     console.log("ewewew")
     this.dialog.open(HelpDialogComponent, {
       autoFocus: false, // Prevents dialog from auto-closing on click inside
     });
   }
+
 }
