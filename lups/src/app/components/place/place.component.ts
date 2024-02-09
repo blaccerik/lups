@@ -12,6 +12,7 @@ import {
 import {OAuthService} from "angular-oauth2-oidc";
 import {PopupService} from "../../services/popup.service";
 import {MatDialog} from "@angular/material/dialog";
+
 import {Subscription} from "rxjs";
 import {Tool} from "./drawer/drawer.component";
 
@@ -87,6 +88,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
     this.isMouseOnCanvas = false;
   }
 
+
   private addToOverlayBlocks(x: number, y: number) {
     if (0 <= x && x < 300 && 0 <= y && y < 300) {
       this.overlayBlocks.push({
@@ -103,6 +105,7 @@ export class PlaceComponent implements OnInit, OnDestroy {
   }
 
   private clearOverlay() {
+
 
     if (!this.context) return;
 
@@ -224,7 +227,6 @@ export class PlaceComponent implements OnInit, OnDestroy {
     private placeService: PlaceService,
     private readonly authService: OAuthService,
     public readonly popupService: PopupService,
-    private dialog: MatDialog,
     private cdRef: ChangeDetectorRef,
     private renderer: Renderer2) {
   }

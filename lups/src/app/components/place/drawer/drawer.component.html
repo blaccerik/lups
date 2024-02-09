@@ -48,7 +48,7 @@
     <mat-icon class="icon" inline="true">add_photo_alternate</mat-icon>
     <div *ngIf="!tool.editedImage">lae pilt</div>
     <div *ngIf="tool.editedImage" class="image-wrapper">
-      <img  [src]="tool.editedImage" alt="Image" class="image">
+      <img [src]="tool.editedImage" alt="Image" class="image">
     </div>
     <mat-icon class="image-icon" *ngIf="tool.editedImage" (click)="clearImage($event)">close</mat-icon>
     <input class="image-input" #fileInput type="file" (change)="onFileSelected($event)" accept="image/*">
@@ -71,12 +71,10 @@
       <span class="switch-slider"></span>
     </label>
   </div>
-
-
   <div class="title">
     Lisa
   </div>
-  <div class="component component-hover">
+  <div class="component component-hover" (click)="showHelp()">
     <mat-icon class="icon" inline="true">help</mat-icon>
     abi
   </div>
