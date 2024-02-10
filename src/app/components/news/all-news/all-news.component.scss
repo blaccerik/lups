@@ -1,0 +1,94 @@
+@import 'variables';
+
+.container {
+  margin: 5%;
+}
+
+.news-grid {
+
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.news-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: $main-color;
+  border: 5px solid transparent;
+  //height: fit-content;
+
+  &:hover {
+    margin: 0;
+    border: 5px solid $third-color;
+    cursor: pointer;
+  }
+
+  &-tall {
+    grid-row: span 3;
+  }
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  min-height: 28px;
+}
+
+.news-category {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: $third-color;
+  color: $main-color;
+  padding: 5px;
+  text-transform: uppercase;
+  font-size: 15px;
+}
+
+.news-image {
+  height: 300px;
+  width: 100%;
+  background-color: red;
+
+
+  img {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.news-title {
+  font-size: 20px;
+  padding: 15px 15px 40px;
+  color: $second-color;
+  //word-break: break-all;
+  //white-space: pre-line
+}
+
+.news-info {
+  position: absolute;
+  bottom: 0;
+  border-top: 1px solid $second-color;
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  justify-content: space-between; /* Place creator on the left and date on the right */
+
+}
+
+.news-creator {
+  font-size: 16px;
+  color: $third-color; // You can adjust the color to your preference
+  background-color: $second-color;
+  padding: 5px;
+  text-transform: uppercase;
+}
+
+.news-date {
+  padding: 5px;
+  font-size: 14px;
+  color: #555; // You can adjust the color to your preference
+}
+

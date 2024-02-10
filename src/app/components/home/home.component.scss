@@ -1,0 +1,30 @@
+@import 'variables';
+
+.svh-content {
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  width: 100%;
+  height: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slogan {
+  width: 100%;
+  height: 100%;
+  fill: $main-color;
+  stroke: $main-color;
+  stroke-width: 5px;
+  display: flex;
+  justify-content: center;
+  padding-top: 0;
+}
+
+text {
+  font-size: 70px;
+  stroke-width: 0px;
+}

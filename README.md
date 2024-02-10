@@ -1,72 +1,27 @@
-## Run dev
+# Lups
 
-### Frontend
-```console
-cd lups
-ng serve
-```
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.1.3.
 
-### Database + Backend (debug)
-```console
-docker-compose -f docker-compose.dev.yaml up -d
-python flaskr\run_server.py
-```
-<details>
-<summary>Notes</summary>
-Celery can only be tested in docker else it can't connect to Flask
-</details>  
+## Development server
 
-### Database + Backend (Prod)
-```console
-docker-compose up -d
-```
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-## Run Prod
+## Code scaffolding
 
-### SSH into server
-```console
-ssh user@ip -i pem_file
-ssh erik@52.174.181.107 -i C:\Users\erik\desktop\erikfinal.pem
-```
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-### Stop service (server)
-```console
-sudo systemctl stop nginx
-cd /var/www
-docker compose down
-```
+## Build
 
-### Build and transfer (local machine)
-```console
-cd lups
-ng build
-cd ..
-python transfer_all.py
-```
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-### Start service (server)
-```console
-docker compose up -d
-sudo systemctl start nginx
-```
+## Running unit tests
 
-### (optional) Build tables (server)
-```console
-docker ps
-```
-Flask's container name should be **www-flask-1**
-```console
-docker exec -it www-flask-1 bash
-flask --app run_server:create_app cli create_tables
-```
-<details>
-<summary>Notes</summary>
-This resets database and deletes all files
-</details>
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-### (optional) Database access (server)
-```console
-docker exec -it www-mysql-1 mysql -u erik -p
-use erik_db;
-select * from users;
-```
+## Running end-to-end tests
+
+Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+
+## Further help
+
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.

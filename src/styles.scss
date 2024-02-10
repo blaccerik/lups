@@ -1,0 +1,17 @@
+@import 'variables';
+
+@font-face {
+  font-family: 'Loominguline';
+  src: url('assets/fonts/Loominguline.otf') format('otf');
+}
+
+body {
+  background-image: url("assets/background.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-family: Loominguline, sans-serif;
+}
+
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

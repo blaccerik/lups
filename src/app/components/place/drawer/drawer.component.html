@@ -1,0 +1,78 @@
+<div class="container">
+  <div class="title">
+    Tööriistad
+  </div>
+  <div class="component component-hover" [class.component-selected]="tool.selectedTool === 'brush'"
+       (click)="selectTool('brush')">
+    <mat-icon class="icon" inline="true">brush</mat-icon>
+    pliiats
+  </div>
+  <div class="component component-hover" [class.component-selected]="tool.selectedTool === 'image'"
+       (click)="selectTool('image')">
+    <mat-icon class="icon" inline="true">image</mat-icon>
+    pilt
+  </div>
+  <div class="title">
+    Seaded
+  </div>
+  <div *ngIf="tool.selectedTool === 'brush'" class="component">
+    <mat-icon class="icon" inline="true">aspect_ratio</mat-icon>
+    <div class="counter">
+      <button class="counter-button" (click)="decreaseBrushSize()">-</button>
+      {{tool.brushSize}}
+      <button class="counter-button" (click)="increaseBrushSize()">+</button>
+    </div>
+  </div>
+  <div *ngIf="tool.selectedTool === 'brush'" class="component component-hover" [matMenuTriggerFor]="menu">
+    <mat-icon class="icon icon-border" [style.color]="tool.brushColor.value" inline="true">color_lens
+    </mat-icon>
+    {{tool.brushColor.text}}
+  </div>
+  <mat-menu #menu="matMenu" class="menu">
+    <div mat-menu-item *ngFor="let color of colors" (click)="selectColor(color)">
+      <mat-icon class="color-menu-icon" [ngStyle]="{color: color.value}">texture</mat-icon>
+      {{color.text}}
+    </div>
+  </mat-menu>
+  <div *ngIf="tool.selectedTool === 'image'" class="component">
+    <mat-icon class="icon" inline="true">grid_on</mat-icon>
+    <div class="counter">
+      <button class="counter-button" (click)="decreaseImageSize()">-</button>
+      {{tool.imgSize}}
+      <button class="counter-button" (click)="increaseImageSize()">+</button>
+    </div>
+  </div>
+  <div *ngIf="tool.selectedTool === 'image'" class="component component-hover" (click)="fileInput.click()">
+    <mat-icon class="icon" inline="true">add_photo_alternate</mat-icon>
+    <div *ngIf="!tool.editedImage">lae pilt</div>
+    <div *ngIf="tool.editedImage" class="image-wrapper">
+      <img [src]="tool.editedImage" alt="Image" class="image">
+    </div>
+    <mat-icon class="image-icon" *ngIf="tool.editedImage" (click)="clearImage($event)">close</mat-icon>
+    <input class="image-input" #fileInput type="file" (change)="onFileSelected($event)" accept="image/*">
+  </div>
+  <div class="component">
+    <mat-icon class="icon" inline="true">layers</mat-icon>
+    varjud
+    <label class="switch">
+      <input type="checkbox" [(ngModel)]="tool.shadows" (change)="changeShadows()">
+      <span class="switch-slider"></span>
+    </label>
+  </div>
+  <div class="component">
+    <mat-icon class="icon" inline="true">people</mat-icon>
+    nimed
+    <label class="switch">
+      <input type="checkbox" [(ngModel)]="tool.names" (change)="changeNames()">
+      <span class="switch-slider"></span>
+    </label>
+  </div>
+  <div class="title">
+    Lisa
+  </div>
+  <div class="component component-hover" (click)="showHelp()">
+    <mat-icon class="icon" inline="true">help</mat-icon>
+    abi
+  </div>
+</div>
+
