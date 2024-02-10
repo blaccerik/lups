@@ -1,4 +1,3 @@
-import {PixelResponse, PlaceService} from "../../services/place.service";
 import {
   ChangeDetectorRef,
   Component,
@@ -9,12 +8,16 @@ import {
   Renderer2,
   ViewChild
 } from '@angular/core';
-import {OAuthService} from "angular-oauth2-oidc";
-import {PopupService} from "../../services/popup.service";
-import {MatDialog} from "@angular/material/dialog";
-
+import {MatDrawer, MatDrawerContainer, MatDrawerContent} from "@angular/material/sidenav";
+import {MatIcon} from "@angular/material/icon";
+import {MatIconButton} from "@angular/material/button";
+import {NgForOf, NgIf} from "@angular/common";
 import {Subscription} from "rxjs";
-import {Tool} from "./drawer/drawer.component";
+import {DrawerComponent, Tool} from "./drawer/drawer.component";
+import {PopupService} from "../../services/popup.service";
+import {OAuthService} from "angular-oauth2-oidc";
+import {PixelResponse, PlaceService} from "../../services/place.service";
+import {PopupComponent} from "../popup/popup.component";
 
 interface Block {
   color: string,
@@ -26,10 +29,23 @@ interface OverlayBlock {
   y: number
 }
 
+
 @Component({
   selector: 'app-place',
+  standalone: true,
+  imports: [
+    DrawerComponent,
+    MatDrawer,
+    MatDrawerContainer,
+    MatDrawerContent,
+    MatIcon,
+    MatIconButton,
+    NgForOf,
+    NgIf,
+    PopupComponent
+  ],
   templateUrl: './place.component.html',
-  styleUrls: ['./place.component.scss']
+  styleUrl: './place.component.scss'
 })
 export class PlaceComponent implements OnInit, OnDestroy {
 
@@ -391,5 +407,3 @@ export class PlaceComponent implements OnInit, OnDestroy {
     this.placeService.send(x, y, this.tool)
   }
 }
-
-

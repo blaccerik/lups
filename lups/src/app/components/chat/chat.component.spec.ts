@@ -6,10 +6,12 @@ describe('ChatComponent', () => {
   let component: ChatComponent;
   let fixture: ComponentFixture<ChatComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [ChatComponent]
-    });
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ChatComponent]
+    })
+    .compileComponents();
+    
     fixture = TestBed.createComponent(ChatComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

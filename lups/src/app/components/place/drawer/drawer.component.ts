@@ -1,6 +1,10 @@
-import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
-import {HelpDialogComponent} from "../help-dialog/help-dialog.component";
+import {Component, ElementRef, EventEmitter, Output, ViewChild} from '@angular/core';
+import {MatIcon} from "@angular/material/icon";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {NgForOf, NgIf, NgStyle} from "@angular/common";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatDialog} from "@angular/material/dialog";
+import {HelpDialogComponent} from "../help-dialog/help-dialog.component";
 
 export interface Color {
   value: string
@@ -28,10 +32,28 @@ export interface Tool {
 
 @Component({
   selector: 'app-drawer',
+  standalone: true,
+  imports: [
+    MatIcon,
+    MatIcon,
+    MatMenu,
+    MatMenu,
+    MatMenuItem,
+    MatMenuItem,
+    NgForOf,
+    NgForOf,
+    NgIf,
+    NgIf,
+    ReactiveFormsModule,
+    ReactiveFormsModule,
+    FormsModule,
+    NgStyle,
+    MatMenuTrigger
+  ],
   templateUrl: './drawer.component.html',
-  styleUrls: ['./drawer.component.scss']
+  styleUrl: './drawer.component.scss'
 })
-export class DrawerComponent implements OnInit {
+export class DrawerComponent {
   ALPHA_CUTOFF = 50
   colors: Color[] = [
     {value: 'red', text: "punane", rgb: [255, 0, 0]},
@@ -283,5 +305,4 @@ export class DrawerComponent implements OnInit {
       autoFocus: false, // Prevents dialog from auto-closing on click inside
     });
   }
-
 }

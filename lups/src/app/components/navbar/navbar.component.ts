@@ -1,8 +1,10 @@
 import {Component} from '@angular/core';
-import {OAuthService} from "angular-oauth2-oidc";
+import {NgForOf, NgIf} from "@angular/common";
 import {Router} from "@angular/router";
+import {OAuthService} from "angular-oauth2-oidc";
 import {UserInfoService} from "../../services/user-info.service";
-
+import {MatIcon} from "@angular/material/icon";
+import {MatButton} from "@angular/material/button";
 
 interface Section {
   text: string;
@@ -10,14 +12,21 @@ interface Section {
   link?: string;
   id?: number;
   parentId?: number;
-  // hasChildren?: boolean;
-  // width?: number;
 }
 
 @Component({
   selector: 'app-navbar',
+  standalone: true,
+  imports: [
+    NgForOf,
+    NgForOf,
+    NgIf,
+    NgIf,
+    MatIcon,
+    MatButton,
+  ],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {
   sections: Section[] = [
@@ -32,9 +41,11 @@ export class NavbarComponent {
   ]
 
 
-  constructor(public readonly authService: OAuthService,
-              public readonly userInfoService: UserInfoService,
-              private readonly router: Router) {
+  constructor(
+    public readonly authService: OAuthService,
+    public readonly userInfoService: UserInfoService,
+    private readonly router: Router
+  ) {
   }
 
   isMenuOpen = false;

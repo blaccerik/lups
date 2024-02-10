@@ -34,7 +34,6 @@
       {{color.text}}
     </div>
   </mat-menu>
-
   <div *ngIf="tool.selectedTool === 'image'" class="component">
     <mat-icon class="icon" inline="true">grid_on</mat-icon>
     <div class="counter">
@@ -43,7 +42,6 @@
       <button class="counter-button" (click)="increaseImageSize()">+</button>
     </div>
   </div>
-
   <div *ngIf="tool.selectedTool === 'image'" class="component component-hover" (click)="fileInput.click()">
     <mat-icon class="icon" inline="true">add_photo_alternate</mat-icon>
     <div *ngIf="!tool.editedImage">lae pilt</div>
@@ -53,7 +51,6 @@
     <mat-icon class="image-icon" *ngIf="tool.editedImage" (click)="clearImage($event)">close</mat-icon>
     <input class="image-input" #fileInput type="file" (change)="onFileSelected($event)" accept="image/*">
   </div>
-
   <div class="component">
     <mat-icon class="icon" inline="true">layers</mat-icon>
     varjud
@@ -62,7 +59,6 @@
       <span class="switch-slider"></span>
     </label>
   </div>
-
   <div class="component">
     <mat-icon class="icon" inline="true">people</mat-icon>
     nimed
@@ -79,3 +75,4 @@
     abi
   </div>
 </div>
+

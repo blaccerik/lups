@@ -6,10 +6,12 @@ describe('SingleNewsComponent', () => {
   let component: SingleNewsComponent;
   let fixture: ComponentFixture<SingleNewsComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [SingleNewsComponent]
-    });
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [SingleNewsComponent]
+    })
+    .compileComponents();
+    
     fixture = TestBed.createComponent(SingleNewsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

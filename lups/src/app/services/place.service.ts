@@ -1,10 +1,10 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import {map, Observable, retry, Subject} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
-import {environment} from "../../environments/environment";
 import {webSocket} from "rxjs/webSocket";
 import {Tool} from "../components/place/drawer/drawer.component";
+import {environment} from "../../environments/environment";
 
 export interface PixelResponse {
   x: number,
@@ -20,7 +20,6 @@ interface PixelResponseCompressed {
   u: string
 }
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -33,7 +32,6 @@ export class PlaceService {
   ];
 
   constructor(private http: HttpClient, private oauthService: OAuthService) {
-
     let token = ""
     if (this.oauthService.hasValidIdToken()) {
       token = this.oauthService.getIdToken();

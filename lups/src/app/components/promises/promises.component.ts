@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import {NgForOf, NgStyle} from "@angular/common";
 
 interface promise {
   title: string,
@@ -9,8 +9,14 @@ interface promise {
 
 @Component({
   selector: 'app-promises',
+  standalone: true,
+  imports: [
+    NgForOf,
+    NgForOf,
+    NgStyle
+  ],
   templateUrl: './promises.component.html',
-  styleUrls: ['./promises.component.scss']
+  styleUrl: './promises.component.scss'
 })
 export class PromisesComponent {
   promises: promise[] = [

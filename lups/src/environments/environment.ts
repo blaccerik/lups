@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  wsUrl: "some text",
+  production: true,
+  wsUrl: "wss://lyps.ee",
 };

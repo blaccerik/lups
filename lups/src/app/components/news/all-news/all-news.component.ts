@@ -1,15 +1,23 @@
 import {Component, ElementRef} from '@angular/core';
-import {NewsResponse, NewsService} from "../../../services/news.service";
+import {InfiniteScrollModule} from "ngx-infinite-scroll";
+import {NgForOf, NgIf} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
-
+import {NewsResponse, NewsService} from "../../../services/news.service";
 
 @Component({
   selector: 'app-all-news',
+  standalone: true,
+    imports: [
+        InfiniteScrollModule,
+        NgForOf,
+        NgForOf,
+        NgIf,
+        NgIf
+    ],
   templateUrl: './all-news.component.html',
-  styleUrls: ['./all-news.component.scss']
+  styleUrl: './all-news.component.scss'
 })
 export class AllNewsComponent {
-
   constructor(
     private route: ActivatedRoute,
     private newsService: NewsService,

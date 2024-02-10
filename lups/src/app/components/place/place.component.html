@@ -5,7 +5,7 @@
       <mat-icon>{{drawer.opened ? "arrow_back_ios" : "arrow_forward_ios"}}</mat-icon>
     </button>
     <div class="canvas-popup">
-      <app-not-logged-in-popup [text]="popup" *ngFor="let popup of popupService.getPopups()"></app-not-logged-in-popup>
+      <app-popup [text]="popup" *ngFor="let popup of popupService.getPopups()"></app-popup>
     </div>
     <div class="square-7" *ngIf="loading"></div>
     <div class="canvas-container-wrapper" *ngIf="!loading">
@@ -35,6 +35,6 @@
   </mat-drawer-content>
   <mat-drawer #drawer [opened]="isSideDrawerOpen" mode="side" class="drawer">
     <app-drawer (dataEvent)="receiveData($event)"></app-drawer>
-
   </mat-drawer>
 </mat-drawer-container>
+

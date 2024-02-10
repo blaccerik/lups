@@ -4,6 +4,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class UserInfoService {
+
+  constructor() { }
+
   get googleId(): string {
     return this._googleId;
   }
@@ -26,5 +29,4 @@ export class UserInfoService {
   private _userName: string;
   private _picture: string;
   private _googleId: string;
-
 }

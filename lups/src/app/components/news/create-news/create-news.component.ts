@@ -1,13 +1,54 @@
 import {Component, Input} from '@angular/core';
+import {MatButton} from "@angular/material/button";
+import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
+import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatIcon} from "@angular/material/icon";
+import {MatInput} from "@angular/material/input";
+import {MatOption} from "@angular/material/autocomplete";
+import {MatSelect} from "@angular/material/select";
+import {NgIf} from "@angular/common";
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Router} from "@angular/router";
-import {NewsId, NewsService} from "../../../services/news.service";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {OAuthService} from "angular-oauth2-oidc";
+import {NewsId, NewsService} from "../../../services/news.service";
 
 @Component({
   selector: 'app-create-news',
+  standalone: true,
+  imports: [
+    MatButton,
+    MatButton,
+    MatCard,
+    MatCard,
+    MatCardActions,
+    MatCardActions,
+    MatCardContent,
+    MatCardContent,
+    MatCardHeader,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardTitle,
+    MatError,
+    MatError,
+    MatFormField,
+    MatFormField,
+    MatIcon,
+    MatIcon,
+    MatInput,
+    MatInput,
+    MatLabel,
+    MatLabel,
+    MatOption,
+    MatOption,
+    MatSelect,
+    MatSelect,
+    NgIf,
+    NgIf,
+    ReactiveFormsModule,
+    ReactiveFormsModule
+  ],
   templateUrl: './create-news.component.html',
-  styleUrls: ['./create-news.component.scss']
+  styleUrl: './create-news.component.scss'
 })
 export class CreateNewsComponent {
   @Input() edit_file: File | null;

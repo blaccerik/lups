@@ -1,4 +1,7 @@
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
+import {CreateNewsComponent} from "../create-news/create-news.component";
+import {MatIcon} from "@angular/material/icon";
+import {NgIf} from "@angular/common";
 import {NewsResponse, NewsService} from "../../../services/news.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {UserInfoService} from "../../../services/user-info.service";
@@ -7,8 +10,16 @@ import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-single-news',
+  standalone: true,
+  imports: [
+    CreateNewsComponent,
+    MatIcon,
+    MatIcon,
+    NgIf,
+    NgIf
+  ],
   templateUrl: './single-news.component.html',
-  styleUrls: ['./single-news.component.scss']
+  styleUrl: './single-news.component.scss'
 })
 export class SingleNewsComponent {
   constructor(

@@ -1,9 +1,8 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import { Injectable } from '@angular/core';
 import {map, Observable} from "rxjs";
-import {Message} from "../components/chat/chat.component";
+import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
-
+import {Message} from "../components/chat/chat.component";
 
 export interface ChatReceive {
   type: string
@@ -83,10 +82,10 @@ export class ChatService {
 
   newChat(): Observable<ChatData> {
     return this.http.get<ChatData>(this.url + "/new").pipe(
-      map(c => {
-        c.editing = false
-        return c
-      })
+        map(c => {
+          c.editing = false
+          return c
+        })
     )
   }
 }

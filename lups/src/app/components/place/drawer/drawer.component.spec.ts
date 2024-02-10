@@ -6,10 +6,12 @@ describe('DrawerComponent', () => {
   let component: DrawerComponent;
   let fixture: ComponentFixture<DrawerComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [DrawerComponent]
-    });
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DrawerComponent]
+    })
+    .compileComponents();
+    
     fixture = TestBed.createComponent(DrawerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

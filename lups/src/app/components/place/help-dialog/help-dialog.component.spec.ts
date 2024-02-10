@@ -6,10 +6,12 @@ describe('HelpDialogComponent', () => {
   let component: HelpDialogComponent;
   let fixture: ComponentFixture<HelpDialogComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [HelpDialogComponent]
-    });
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [HelpDialogComponent]
+    })
+    .compileComponents();
+    
     fixture = TestBed.createComponent(HelpDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
