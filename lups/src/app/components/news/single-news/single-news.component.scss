@@ -1,0 +1,137 @@
+@import 'src/variables';
+
+
+// Overall container
+.news-article {
+
+  padding: 5%;
+
+  // Title styling
+  .title {
+    background-color: $main-color;
+    color: $second-color;
+    padding: 2% 5%;
+    //padding: 2% 5% 2% 10%;
+    font-size: 40px;
+    font-weight: 600;
+    box-shadow: 10px 10px $third-color;
+    word-wrap: break-word;
+    width: 70%;
+    @media (max-width: $menuBreakpoint) {
+      width: 90%;
+    }
+  }
+
+  .under-title {
+    width: fit-content;
+    display: flex;
+    //padding: 2%;
+    background-color: $second-color;
+    color: $main-color;
+    box-shadow: 10px 10px $third-color;
+
+    .creator {
+      font-size: 20px;
+      margin: 15px;
+      white-space: nowrap;
+      //width: fit-content;
+      //padding-right: 10%;
+    }
+
+    .date {
+      margin: auto;
+      margin-right: 15px;
+      font-size: 15px;
+    }
+    .category {
+      font-size: 15px;
+      margin: auto;
+      padding: 5px;
+      color: $second-color;
+      margin-right: 15px;
+      background-color: $third-color;
+      text-transform: uppercase;
+    }
+
+    .icon {
+      font-size: 18px;
+      margin: auto;
+      margin-right: 15px;
+      width: 20px;
+      border-radius: 50%;
+      //border: 2px solid whitesmoke;
+      height: 20px;
+      padding: 0 5px;
+      background-color: $main-color;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $second-color;
+      transition: 0.1s linear;
+
+      &:hover {
+        cursor: pointer;
+        background-color: $third-color;
+        //color: $third-color;
+      }
+    }
+  }
+
+  .article {
+    margin-top: 5%;
+    width: 70%;
+    background-color: $main-color;
+    padding: 2% 5% 0 5%;
+    box-shadow: 10px 10px $second-color;
+
+    @media (max-width: $menuBreakpoint) {
+      width: 90%;
+    }
+
+    // Image styling
+    .image {
+      width: 100%;
+      aspect-ratio: 2;
+      img {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    }
+
+    .text {
+      font-size: 22px;
+      padding: 5% 0;
+      white-space: pre-line;
+    }
+  }
+
+  //
+  //  img {
+  //    display: block; /* or display: inline-block; */
+  //    width: 100%;
+  //    height: 100%;
+  //  }
+  //
+  //}
+  //
+  //.text {
+  //  font-size: 20px;
+  //  padding: 2% 5%;
+  //  background-color: #fffbdf;
+  //  box-shadow: 10px 10px $second-color;
+  //
+  //
+  //}
+
+  //// Placeholder text
+  //.no-image {
+  //  font-style: italic;
+  //  color: #888;
+  //}
+  //
+  //// Hide image container when no image is available
+  //.no-image {
+  //  display: none;
+  //}
+}

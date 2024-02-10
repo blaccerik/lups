@@ -1,0 +1,14 @@
+fastapi
+websockets
+uvicorn
+SQLAlchemy
+celery
+psycopg2
+redis
+deep-translator
+google-auth
+google-auth-oauthlib
+Pillow
+sse-starlette
+python-multipart
+

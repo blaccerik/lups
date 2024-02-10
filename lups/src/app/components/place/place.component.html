@@ -1,0 +1,40 @@
+
+<mat-drawer-container class="main-container" autosize>
+  <mat-drawer-content class="canvas-wrapper">
+    <button mat-icon-button class="canvas-button" (click)="drawer.toggle()">
+      <mat-icon>{{drawer.opened ? "arrow_back_ios" : "arrow_forward_ios"}}</mat-icon>
+    </button>
+    <div class="canvas-popup">
+      <app-not-logged-in-popup [text]="popup" *ngFor="let popup of popupService.getPopups()"></app-not-logged-in-popup>
+    </div>
+    <div class="square-7" *ngIf="loading"></div>
+    <div class="canvas-container-wrapper" *ngIf="!loading">
+      <div #canvasContainer class="canvas-container">
+        <canvas #canvasElement
+                width="1200"
+                height="1200"
+                (contextmenu)="placePixel($event)"
+                (mousedown)="onMouseDown($event)"
+                (mousemove)="onMouseMove($event)"
+                (mouseup)="onMouseUpGlobal($event)"
+                (wheel)="onWheel($event)"
+                (mouseenter)="onMouseEnterCanvas()"
+                (mouseleave)="onMouseLeaveCanvas()"
+                [style.transform]="'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + scale + ')'">
+        </canvas>
+        <div #canvasTooltip class="canvas-tooltip" *ngIf="isMouseOnCanvas && tool.names">
+          <div *ngIf="hoverName">
+            {{hoverName}}
+          </div>
+          <div *ngIf="!hoverName">
+            Kasutaja puudub
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-drawer-content>
+  <mat-drawer #drawer [opened]="isSideDrawerOpen" mode="side" class="drawer">
+    <app-drawer (dataEvent)="receiveData($event)"></app-drawer>
+
+  </mat-drawer>
+</mat-drawer-container>

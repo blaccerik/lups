@@ -1,27 +1,72 @@
-# Lups
+## Run dev
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.1.3.
+### Frontend
+```console
+cd lups
+ng serve
+```
 
-## Development server
+### Database + Backend (debug)
+```console
+docker-compose -f docker-compose.dev.yaml up -d
+python flaskr\run_server.py
+```
+<details>
+<summary>Notes</summary>
+Celery can only be tested in docker else it can't connect to Flask
+</details>  
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+### Database + Backend (Prod)
+```console
+docker-compose up -d
+```
 
-## Code scaffolding
+## Run Prod
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### SSH into server
+```console
+ssh user@ip -i pem_file
+ssh erik@52.174.181.107 -i C:\Users\erik\desktop\erikfinal.pem
+```
 
-## Build
+### Stop service (server)
+```console
+sudo systemctl stop nginx
+cd /var/www
+docker compose down
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Build and transfer (local machine)
+```console
+cd lups
+ng build
+cd ..
+python transfer_all.py
+```
 
-## Running unit tests
+### Start service (server)
+```console
+docker compose up -d
+sudo systemctl start nginx
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### (optional) Build tables (server)
+```console
+docker ps
+```
+Flask's container name should be **www-flask-1**
+```console
+docker exec -it www-flask-1 bash
+flask --app run_server:create_app cli create_tables
+```
+<details>
+<summary>Notes</summary>
+This resets database and deletes all files
+</details>
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### (optional) Database access (server)
+```console
+docker exec -it www-mysql-1 mysql -u erik -p
+use erik_db;
+select * from users;
+```
