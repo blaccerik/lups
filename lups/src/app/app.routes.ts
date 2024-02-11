@@ -6,6 +6,7 @@ import {SingleNewsComponent} from "./components/news/single-news/single-news.com
 import {CreateNewsComponent} from "./components/news/create-news/create-news.component";
 import {AllNewsComponent} from "./components/news/all-news/all-news.component";
 import {ChatComponent} from "./components/chat/chat.component";
+import {FamilyFeudComponent} from "./components/family-feud/family-feud.component";
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -17,5 +18,5 @@ export const routes: Routes = [
   {path: "news/:id", component: SingleNewsComponent},
   // {path: "test", component: TestComponent},
   {path: "place", component: PlaceComponent},
-  // {path: "familyfeud", component: FamiliyFeudComponent}
+  {path: "familyfeud", component: FamilyFeudComponent}
 ];
