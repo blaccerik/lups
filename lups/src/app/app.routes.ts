@@ -7,6 +7,9 @@ import {CreateNewsComponent} from "./components/news/create-news/create-news.com
 import {AllNewsComponent} from "./components/news/all-news/all-news.component";
 import {ChatComponent} from "./components/chat/chat.component";
 import {FamilyFeudComponent} from "./components/family-feud/family-feud.component";
+import {AdminboardComponent} from "./components/family-feud/adminboard/adminboard.component";
+import {GameboardComponent} from "./components/family-feud/gameboard/gameboard.component";
+import {authGuard} from "./guards/auth.guard";
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -18,5 +21,7 @@ export const routes: Routes = [
   {path: "news/:id", component: SingleNewsComponent},
   // {path: "test", component: TestComponent},
   {path: "place", component: PlaceComponent},
-  {path: "familyfeud", component: FamilyFeudComponent}
+  {path: "familyfeud", component: FamilyFeudComponent},
+  {path: "familyfeud/:id", component: GameboardComponent},
+  {path: "familyfeud/edit/:id", component: AdminboardComponent, canActivate: [authGuard]}
 ];

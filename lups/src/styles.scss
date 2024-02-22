@@ -15,3 +15,8 @@ body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+// for family feud
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-shape: 25px;
+}

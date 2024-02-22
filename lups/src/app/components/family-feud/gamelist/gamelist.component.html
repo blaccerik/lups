@@ -1,0 +1,16 @@
+<div class="popup-wrapper">
+  <div class="popup-wrapper-center">
+    <div class="popup-container">
+      <mat-progress-spinner class="spinner" *ngIf="games() === null" mode="indeterminate" color="accent"></mat-progress-spinner>
+      <div *ngIf="games() && games()?.length === 0">Pole mänge</div>
+      <div class="popup-list" *ngIf="games() && games()?.length !== 0">
+        <div class="popup-list-item" *ngFor="let game of games()" (click)="click(game.code)">
+          Code: {{game.code}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

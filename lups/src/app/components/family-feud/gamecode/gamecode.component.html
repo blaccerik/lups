@@ -1,2 +1,7 @@
-<input [(ngModel)]="userInput" placeholder="Enter text">
-<button (click)="onSendClick()">enter</button>
+<div class="popup-wrapper">
+  <div class="popup">
+    <div class="pinBox" [formGroup]="form">
+      <input class="pinEntry" type=text maxlength=4 autocomplete=off formControlName="code" placeholder="KOOD" (keyup.enter)="onEnterPress()">
+    </div>
+  </div>
+</div>

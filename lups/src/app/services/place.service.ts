@@ -27,9 +27,6 @@ export class PlaceService {
 
   private subject: any;
   private messagesSubject = new Subject<PixelResponse[]>();
-  predefinedColors = [
-    "red", "green", "blue", "yellow", "purple", "orange", "black", "white"
-  ];
 
   constructor(private http: HttpClient, private oauthService: OAuthService) {
     let token = ""

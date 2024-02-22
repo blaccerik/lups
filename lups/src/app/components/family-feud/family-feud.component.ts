@@ -1,29 +1,54 @@
-import { Component } from '@angular/core';
-import {MatDialog} from "@angular/material/dialog";
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {GamecodeComponent} from "./gamecode/gamecode.component";
+import {FormsModule} from "@angular/forms";
+import {NgForOf, NgIf} from "@angular/common";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {GameboardComponent} from "./gameboard/gameboard.component";
+import {ActivatedRoute, Router} from "@angular/router";
+import {GamebannerComponent} from "./gamebanner/gamebanner.component";
+import {GamelistComponent} from "./gamelist/gamelist.component";
+import {OAuthService} from "angular-oauth2-oidc";
+import {FamilyfeudService, Game} from "../../services/familyfeud.service";
 
 @Component({
   selector: 'app-family-feud',
   standalone: true,
-  imports: [],
+  imports: [
+    FormsModule,
+    NgIf,
+    MatProgressSpinner,
+    GameboardComponent,
+    GamebannerComponent,
+    NgForOf
+  ],
   templateUrl: './family-feud.component.html',
   styleUrl: './family-feud.component.scss'
 })
 export class FamilyFeudComponent {
 
-  constructor(public dialog: MatDialog) {
+  private oauthService = inject(OAuthService)
+  private router = inject(Router)
+  private familyfeudService = inject(FamilyfeudService)
+  private dialog = inject(MatDialog)
+  create() {
+    if (!this.oauthService.hasValidIdToken()) {
+      localStorage.setItem('originalUrl', window.location.pathname);
+      this.oauthService.initLoginFlow('google');
+      return
+    }
+    this.familyfeudService.createGame().subscribe(
+      game => {
+        this.router.navigate(['/familyfeud/edit', game.code]);
+      }
+    )
   }
 
-  create() {
-
+  games() {
+    this.dialog.open(GamelistComponent);
   }
 
   join() {
-    const dialogRef = this.dialog.open(GamecodeComponent);
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      console.log(result)
-    });
+    this.dialog.open(GamecodeComponent);
   }
 }

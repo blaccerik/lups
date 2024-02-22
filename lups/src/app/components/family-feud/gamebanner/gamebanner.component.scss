@@ -1,0 +1,24 @@
+.logo-container {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-wrapper {
+  z-index: 0;
+  background: radial-gradient(white 10%, mediumblue 70%);
+  padding: 50px 100px ;
+}
+
+.logo {
+  text-transform: uppercase;
+  font-family: fantasy;
+  font-size: 100px;
+  font-weight: 700;
+  background: linear-gradient(to bottom, yellow, darkorange);
+  -webkit-background-clip: text; /* for WebKit browsers like Chrome and Safari */
+  color: transparent;
+  -webkit-text-stroke: 1px black; /* Adjust the pixel value as needed for the border thickness */
+}

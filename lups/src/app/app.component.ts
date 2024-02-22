@@ -26,8 +26,9 @@ export class AppComponent {
       showDebugInformation: true,
     });
     this.oauthService.loadDiscoveryDocumentAndTryLogin().then((a) => {
-      console.log("disc", a)
+      console.log("discovery", a)
       if (this.oauthService.hasValidIdToken()) {
+        console.log("ID TOKEN IS VALID")
         this.oauthService.loadUserProfile().then((r: any) => {
           this.userInfoService.userName = r.info.name
           this.userInfoService.picture = r.info.picture
@@ -35,17 +36,16 @@ export class AppComponent {
           const url = localStorage.getItem("originalUrl")
           if (url) {
             localStorage.removeItem("originalUrl")
-            this.router.navigate([url]).then(r => {
-              console.log(r)
-            })
+            this.router.navigate([url])
           }
 
         }).catch((error: any) => {
-          console.log("catch")
+          console.log("ERROR LOADING USER PROFILE")
           console.log("error", error)
 
-          // todo reimplement this
+          // // todo reimplement this
           localStorage.removeItem("id_token")
+          sessionStorage.removeItem("id_token")
           this.oauthService.revokeTokenAndLogout().then(r => {
             this.router.navigate([""])
           }).catch(e => {
@@ -53,8 +53,9 @@ export class AppComponent {
           })
         })
       } else {
-        console.log("not valid")
+        console.log("ID TOKEN IS NOT VALID")
       }
     });
+    // this.oauthService.setupAutomaticSilentRefresh();
   }
 }

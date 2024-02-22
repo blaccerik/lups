@@ -1,1 +1,55 @@
-<p>adminboard works!</p>
+<div class="center" *ngIf="loading()">
+  <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+</div>
+<div class="container" *ngIf="!loading()">
+  <div class="settings">
+    <div class="settings-box">
+      data: {{totalRounds()}} {{totalQuestions()}}
+      <button (click)="save()">save</button>
+    </div>
+
+  </div>
+  <div class="rounds">
+    <div class="rounds-box">
+      <div class="rounds-title">
+        gameboard
+      </div>
+      <div *ngFor="let gameRound of gameData()">
+        <button (click)="moveRound(gameRound, true)">up</button>
+        <div *ngIf="!gameRound.editing">
+          round: {{gameRound.round_number}} question: {{gameRound.question}}
+          <div *ngIf="hasErrorText(gameRound.question)">error</div>
+          <button (click)="toggleEditQuestion(gameRound)">Edit</button>
+        </div>
+        <div *ngIf="gameRound.editing">
+          <input matInput [(ngModel)]="gameRound.question" maxlength="20" placeholder="Hesburger">
+          <button (click)="toggleEditQuestion(gameRound)">Ok</button>
+        </div>
+        <button (click)="removeRound(gameRound)">remove</button>
+
+        <div *ngFor="let answer of gameRound.answers">
+          <div *ngIf="!answer.editing">
+            Text: {{answer.text}} Points: {{answer.points}}
+            <div *ngIf="hasErrorText(answer.text)">error</div>
+            <button (click)="toggleEditAnswer(answer)">Edit</button>
+          </div>
+          <div *ngIf="answer.editing">
+            <input matInput [(ngModel)]="answer.text" maxlength="10" placeholder="Hesburger">
+            <input matInput [(ngModel)]="answer.points" #points="ngModel" type="number" min="1" max="100">
+            <button (click)="toggleEditAnswer(answer)">Ok</button>
+            <div *ngIf="points.invalid && points.touched">
+              pask
+            </div>
+          </div>
+          <button (click)="removeQuestion(gameRound, answer)">remove question</button>
+        </div>
+        <button (click)="addQuestion(gameRound)">add question</button>
+        <button (click)="moveRound(gameRound, false)">down</button>
+      </div>
+      <button mat-mini-fab color="accent" (click)="addRound()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+  </div>
+</div>
