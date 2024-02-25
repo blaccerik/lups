@@ -41,6 +41,7 @@ export class AdminboardComponent implements OnInit {
 
   gameData = signal<GameRound[]>([])
   loading = signal(true)
+  code = signal<string | null>(null)
 
   totalRounds = computed(() => 3)
 
@@ -50,6 +51,7 @@ export class AdminboardComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const code = params["id"]
+      this.code.set(code)
       this.familyfeudService.getGameByCode(code).subscribe(
         data => {
           console.log(data)
@@ -164,7 +166,13 @@ export class AdminboardComponent implements OnInit {
 
   save() {
     const error = this.hasError()
-    console.log(error)
+    const code = this.code()
+    if (code) {
+      this.familyfeudService.postGameByCode(code, this.gameData()).subscribe(
+        data => {
+          console.log(data)
+        }
+      )
+    }
   }
-
 }

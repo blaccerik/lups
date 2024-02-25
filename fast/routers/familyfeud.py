@@ -3,11 +3,11 @@ import logging
 import random
 from typing import List
 
-from fastapi import APIRouter, Depends, WebSocket
+from fastapi import APIRouter, Depends, WebSocket, Path, Body
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from schemas.familyfeud import Answer, GameRoundData, GameRound
+from schemas.familyfeud import Answer, GameRoundData, GameRound, Code
 from services.chat_service import read_user
 from services.games.family import read_games_by_user, create_game_by_user, read_game, create_game_data, \
     start_game_by_user
@@ -51,11 +51,13 @@ async def get_game_data(
 
 @router.post("/games/{code}")
 async def post_data(
-        code: str,
-        data: List[GameRound],
+        code: str = Path(min_length=4, max_length=4),
+        data: List[GameRound] = Body(),
         user: User = Depends(get_current_user),
         postgres_client: Session = Depends(get_db)
 ):
+    print("Received code:", code)
+    print("Received data:", data)
     user_id = read_user(user, postgres_client)
     create_game_data(code, data, user_id, postgres_client)
     return read_game(code, user_id, postgres_client)

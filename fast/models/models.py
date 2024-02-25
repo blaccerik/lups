@@ -82,13 +82,25 @@ class DBFamilyFeudGame(Base):
     started = Column(Boolean, nullable=False, default=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
-class DBFamilyFeudQuestion(Base):
-    __tablename__ = 'family_feud_question'
+class DBFamilyFeudRound(Base):
+    __tablename__ = 'family_feud_round'
     id = Column(Integer, primary_key=True)
-    code = Column(String(4), ForeignKey('family_feud_game.code'))
+    game_code = Column(String(4), ForeignKey('family_feud_game.code', ondelete="CASCADE"), nullable=False)
+    question = Column(String(25), nullable=False)
     round_number = Column(Integer, nullable=False)
-    text = Column(String(20), nullable=False)
+
+    def __repr__(self):
+        return f'{self.game_code} {self.id} {str(self.round_number)} {self.question}'
+
+class DBFamilyFeudAnswer(Base):
+    __tablename__ = 'family_feud_answer'
+    id = Column(Integer, primary_key=True)
+    round_id = Column(Integer, ForeignKey('family_feud_round.id', ondelete="CASCADE"), nullable=False)
+    text = Column(String(25), nullable=False)
     points = Column(Integer, nullable=False)
+
+    def __repr__(self):
+        return f'{self.round_id} {self.text} {self.points}'
 
 
 

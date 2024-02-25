@@ -80,4 +80,9 @@ export class FamilyfeudService {
   getGameByCode(code: string) {
     return this.http.get<GameRound[]>(this.url + "/games/" + code)
   }
+
+  postGameByCode(code: string, gameRounds: GameRound[]) {
+
+    return this.http.post<GameRound[]>(this.url + "/games/" + code, gameRounds)
+  }
 }
