@@ -93,7 +93,7 @@ def create_game_data(code: str, rounds: List[GameRound], user_id: int, session: 
     # add new data
     for r_index in range(len(rounds)):
         r = rounds[r_index]
-        ffr = DBFamilyFeudRound(round_number=r_index, question=r.question, game_code=code)
+        ffr = DBFamilyFeudRound(round_number=r_index + 1, question=r.question, game_code=code)
         session.add(ffr)
         session.flush()
         for a in r.answers:

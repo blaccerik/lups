@@ -14,42 +14,67 @@
       <div class="rounds-title">
         gameboard
       </div>
-      <div *ngFor="let gameRound of gameData()">
-        <button (click)="moveRound(gameRound, true)">up</button>
-        <div *ngIf="!gameRound.editing">
-          round: {{gameRound.round_number}} question: {{gameRound.question}}
-          <div *ngIf="hasErrorText(gameRound.question)">error</div>
-          <button (click)="toggleEditQuestion(gameRound)">Edit</button>
-        </div>
-        <div *ngIf="gameRound.editing">
-          <input matInput [(ngModel)]="gameRound.question" maxlength="20" placeholder="Hesburger">
-          <button (click)="toggleEditQuestion(gameRound)">Ok</button>
-        </div>
-        <button (click)="removeRound(gameRound)">remove</button>
 
-        <div *ngFor="let answer of gameRound.answers">
-          <div *ngIf="!answer.editing">
-            Text: {{answer.text}} Points: {{answer.points}}
-            <div *ngIf="hasErrorText(answer.text)">error</div>
-            <button (click)="toggleEditAnswer(answer)">Edit</button>
-          </div>
-          <div *ngIf="answer.editing">
-            <input matInput [(ngModel)]="answer.text" maxlength="10" placeholder="Hesburger">
-            <input matInput [(ngModel)]="answer.points" #points="ngModel" type="number" min="1" max="100">
-            <button (click)="toggleEditAnswer(answer)">Ok</button>
-            <div *ngIf="points.invalid && points.touched">
-              pask
-            </div>
-          </div>
-          <button (click)="removeQuestion(gameRound, answer)">remove question</button>
+      <div class="round" *ngFor="let gameRound of gameData()">
+        <div class="round-buttons">
+
+          <button mat-mini-fab color="accent" (click)="moveRound(gameRound, true)">
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+
+          <div class="round-buttons-button">{{gameRound.round_number}}</div>
+
+          <button mat-mini-fab color="accent" (click)="moveRound(gameRound, false)">
+            <mat-icon>arrow_downward</mat-icon>
+          </button>
+
         </div>
-        <button (click)="addQuestion(gameRound)">add question</button>
-        <button (click)="moveRound(gameRound, false)">down</button>
+        <div class="round-answers">
+          <div class="round-answers-title-box">
+            <mat-icon>help_outline</mat-icon>
+            <div *ngIf="!gameRound.editing" class="round-answers-title">
+              {{gameRound.question}}
+            </div>
+            <div *ngIf="!gameRound.editing && hasErrorText(gameRound.question)">error</div>
+            <button *ngIf="!gameRound.editing" mat-icon-button matTooltip="Muuda"
+                    (click)="toggleEditQuestion(gameRound)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <input class="round-answers-input" *ngIf="gameRound.editing" [(ngModel)]="gameRound.question" maxlength="20" placeholder="Hesburger">
+            <button *ngIf="gameRound.editing" mat-icon-button matTooltip="Muuda"
+                    (click)="toggleEditQuestion(gameRound)">
+              <mat-icon>done</mat-icon>
+            </button>
+          </div>
+
+
+          <div *ngFor="let answer of gameRound.answers">
+            <div *ngIf="!answer.editing">
+              Text: {{answer.text}} Points: {{answer.points}}
+              <div *ngIf="hasErrorText(answer.text)">error</div>
+              <button (click)="toggleEditAnswer(answer)">Edit</button>
+            </div>
+            <div *ngIf="answer.editing">
+              <input matInput [(ngModel)]="answer.text" maxlength="10" placeholder="Hesburger">
+              <input matInput [(ngModel)]="answer.points" #points="ngModel" type="number" min="1" max="100">
+              <button (click)="toggleEditAnswer(answer)">Ok</button>
+              <div *ngIf="points.invalid && points.touched">
+                pask
+              </div>
+            </div>
+            <button (click)="removeQuestion(gameRound, answer)">remove question</button>
+          </div>
+          <button (click)="addQuestion(gameRound)">add question</button>
+        </div>
+
+        <button mat-mini-fab color="warn" (click)="removeRound(gameRound)">
+          <mat-icon>remove</mat-icon>
+        </button>
       </div>
-      <button mat-mini-fab color="accent" (click)="addRound()">
+
+      <button class="rounds-add" mat-mini-fab color="accent" (click)="addRound()">
         <mat-icon>add</mat-icon>
       </button>
     </div>
-
   </div>
 </div>

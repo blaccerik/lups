@@ -45,7 +45,18 @@ async def get_game_data(
         user: User = Depends(get_current_user),
         postgres_client: Session = Depends(get_db)
 ):
+    # return [
+    #     GameRound(answers=[Answer(text='tere', points=100)], round_number=0, question='erik'),
+    #     GameRound(answers=[Answer(text='tere', points=50), Answer(text='tere', points=25),
+    #                        Answer(text='333333', points=25)], round_number=1, question='ertikkk'),
+    #     GameRound(answers=[Answer(text='tere', points=91), Answer(text='tere', points=1), Answer(text='tere', points=1),
+    #                        Answer(text='tere', points=1), Answer(text='tere', points=1), Answer(text='tere', points=1),
+    #                        Answer(text='tere', points=1), Answer(text='tere', points=1), Answer(text='tere', points=1),
+    #                        Answer(text='tere', points=1)], round_number=2, question='super long questrtrt'),
+    #     GameRound(answers=[Answer(text='tere', points=100)], round_number=3, question='343434')]
+
     user_id = read_user(user, postgres_client)
+    print(read_game(code, user_id, postgres_client))
     return read_game(code, user_id, postgres_client)
 
 

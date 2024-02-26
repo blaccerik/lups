@@ -6,10 +6,11 @@ import {MatDialog} from "@angular/material/dialog";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {MatIcon} from "@angular/material/icon";
-import {MatIconButton, MatMiniFabButton} from "@angular/material/button";
+import {MatFabButton, MatIconButton, MatMiniFabButton} from "@angular/material/button";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-adminboard',
@@ -26,7 +27,9 @@ import {MatInput} from "@angular/material/input";
     MatLabel,
     MatInput,
     MatError,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatTooltip,
+    MatFabButton
   ],
   templateUrl: './adminboard.component.html',
   styleUrl: './adminboard.component.scss'
