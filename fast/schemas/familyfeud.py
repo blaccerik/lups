@@ -4,7 +4,7 @@ from pydantic import BaseModel, constr, conint
 
 
 class Answer(BaseModel):
-    text: constr(max_length=25)
+    text: constr(min_length=1, max_length=25)
     points: conint(ge=1, le=100)
 
 
@@ -22,7 +22,7 @@ class Game(BaseModel):
 class GameRound(BaseModel):
     answers: List[Answer]
     round_number: int
-    question: constr(max_length=25)
+    question: constr(min_length=1, max_length=20)
 
 class Code(BaseModel):
     code: constr(min_length=4, max_length=4)

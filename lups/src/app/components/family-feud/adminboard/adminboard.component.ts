@@ -167,6 +167,27 @@ export class AdminboardComponent implements OnInit {
     return text.length == 0
   }
 
+  dontAddUp(gameRound: GameRound) {
+    return gameRound.answers.map(a => a.points)
+      .reduce((partialSum, a) => partialSum + a, 0) !== 100;
+  }
+
+  canAddAnswer(gameRound: GameRound) {
+    return gameRound.answers.length < 10
+  }
+
+  canAddRound() {
+    return this.gameData().length < 10
+  }
+
+  onInputChange(answer: Answer) {
+    if (answer.points < 1) {
+      answer.points = 1;
+    } else if (answer.points > 100) {
+      answer.points = 100;
+    }
+  }
+
   save() {
     const error = this.hasError()
     const code = this.code()

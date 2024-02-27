@@ -33,7 +33,6 @@
 
 
 .rounds {
-  background-color: greenyellow;
   width: 75%;
   &-title {
     text-transform: uppercase;
@@ -61,7 +60,7 @@
 }
 
 .round {
-  width: 80%;
+  width: 85%;
   margin: 5%;
   border-radius: 15px;
   padding: 10px;
@@ -94,13 +93,26 @@
   }
 
   &-answers {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    border-radius: 15px;
     width: 75%;
     background-color: dodgerblue;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 10px;
+
+    &-error {
+      font-size: 20px;
+      color: white;
+      background-color: red;
+      padding: 5px;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
 
     &-title-box {
+      width: calc(100% - 15px);
       background-color: gold;
       display: flex;
       align-items: center;
@@ -129,6 +141,72 @@
         border-color: #007bff; /* Change to the desired focus color */
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add a subtle box shadow on focus */
       }
+    }
+
+    &-add {
+      margin-top: 10px;
+    }
+  }
+
+  &-answer {
+    width: calc(95% - 15px);
+    margin-top: 10px;
+    background-color: gold;
+    border-radius: 5px;
+
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;  /* Allow items to wrap to the next line */
+
+    &-addup {
+      text-align: center;
+      text-transform: uppercase;
+      width: calc(95% - 25px);
+      margin-top: 10px;
+      background-color: red;
+      border-radius: 5px;
+      color: white;
+      font-size: 18px;
+      font-weight: 400;
+      margin-left: 10px;
+      padding: 10px;
+    }
+
+    &-remove {
+      margin-left: auto;
+      margin-right: 10px;
+    }
+
+    &-text {
+      font-size: 18px;
+      font-weight: 400;
+      margin-left: 10px;
+    }
+
+    &-input {
+      margin-left: 10px;
+      box-sizing: border-box;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 18px;
+      width: fit-content;
+
+
+      &:focus {
+        outline: none;
+        border-color: #007bff; /* Change to the desired focus color */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add a subtle box shadow on focus */
+      }
+    }
+
+    &-error {
+      font-size: 20px;
+      color: white;
+      background-color: red;
+      padding: 5px;
+      border-radius: 5px;
+      text-transform: uppercase;
     }
   }
 }
