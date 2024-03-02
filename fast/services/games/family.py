@@ -42,7 +42,7 @@ def user_has_game(code: str, user_id: int, session: Session):
     game = session.query(DBFamilyFeudGame).filter(and_(
         DBFamilyFeudGame.code == code,
         DBFamilyFeudGame.user_id == user_id
-    ))
+    )).first()
     if not game:
         raise HTTPException(status_code=403, detail="User does not have that game")
 

@@ -6,7 +6,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {MatIcon} from "@angular/material/icon";
-import {MatFabButton, MatIconButton, MatMiniFabButton} from "@angular/material/button";
+import {MatButton, MatFabButton, MatIconButton, MatMiniFabButton} from "@angular/material/button";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
@@ -29,7 +29,8 @@ import {MatTooltip} from "@angular/material/tooltip";
     MatError,
     ReactiveFormsModule,
     MatTooltip,
-    MatFabButton
+    MatFabButton,
+    MatButton
   ],
   templateUrl: './adminboard.component.html',
   styleUrl: './adminboard.component.scss'
@@ -45,33 +46,37 @@ export class AdminboardComponent implements OnInit {
   gameData = signal<GameRound[]>([])
   loading = signal(true)
   code = signal<string | null>(null)
+  counter = signal(0)
+  totalRounds = computed(() => this.gameData().length)
+  totalQuestions = computed(() =>
+    this.gameData().reduce((sum, round) => sum + round.answers.length, 0));
 
-  totalRounds = computed(() => 3)
-
-  totalQuestions = computed(() => 3);
-
+  undo() {
+    const code = this.code()
+    if (!code) {
+      return
+    }
+    this.loading.set(true)
+    this.familyfeudService.getGameByCode(code).subscribe(
+      data => {
+        console.log(data)
+        this.gameData.set(data)
+        this.loading.set(false)
+        this.counter.set(data.length)
+      }
+    )
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      const code = params["id"]
-      this.code.set(code)
-      this.familyfeudService.getGameByCode(code).subscribe(
-        data => {
-          console.log(data)
-          this.gameData.set(data)
-          this.loading.set(false)
-        }
-      )
+      this.code.set(params["id"])
+      this.undo()
     });
   }
 
   removeRound(gameRound: GameRound) {
     this.gameData.update(rounds => {
-        const filteredRounds = rounds.filter(round => round !== gameRound)
-        for (let i = 0; i < filteredRounds.length; i++) {
-          filteredRounds[i].round_number = i + 1
-        }
-        return filteredRounds
+        return rounds.filter(round => round !== gameRound)
       }
     )
   }
@@ -79,9 +84,10 @@ export class AdminboardComponent implements OnInit {
   addRound() {
     this.gameData.update(items => [...items, {
       answers: [],
-      round_number: items.length + 1,
+      round_number: this.counter() + 1,
       question: ""
     }])
+    this.counter.set(this.counter() + 1)
   }
 
   addQuestion(gameRound: GameRound) {
@@ -113,19 +119,20 @@ export class AdminboardComponent implements OnInit {
 
   moveRound(gameRound: GameRound, up: boolean) {
     const data = this.gameData()
-    const current = gameRound.round_number
-    if (up && current > 1) {
-      const otherRound = data[current - 2]
-      otherRound.round_number = current
-      gameRound.round_number = current - 1
-    } else if (!up && current < data.length) {
-      const otherRound = data[current]
-      otherRound.round_number = current
-      gameRound.round_number = current + 1
+    const index = data.indexOf(gameRound)
+
+    // const current = gameRound.round_number
+    if (!up && index < data.length - 1) {
+      const otherRound = data[index + 1]
+      data[index + 1] = gameRound
+      data[index] = otherRound
     }
-    this.gameData.update(gameRounds =>
-      gameRounds.sort((a, b) => a.round_number - b.round_number)
-    )
+    else if (up && index > 0) {
+      const otherRound = data[index - 1]
+      data[index - 1] = gameRound
+      data[index] = otherRound
+    }
+    this.gameData.update(() => data)
   }
 
   toggleEditQuestion(gameRound: GameRound) {
@@ -192,9 +199,12 @@ export class AdminboardComponent implements OnInit {
     const error = this.hasError()
     const code = this.code()
     if (code) {
+      this.loading.set(true)
       this.familyfeudService.postGameByCode(code, this.gameData()).subscribe(
         data => {
-          console.log(data)
+          this.gameData.set(data)
+          this.loading.set(false)
+          this.counter.set(data.length)
         }
       )
     }

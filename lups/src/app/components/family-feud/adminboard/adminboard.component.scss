@@ -13,27 +13,31 @@
   min-height: 100%;
   box-sizing: border-box;
   display: flex;
-  flex-direction: row;
-  padding: 5%;
-  gap: 10%;
+  flex-direction: column;
+  align-items: center;
 }
 
 .settings {
-  width: 25%;
-  height: 100%;
-  background-color: red;
-
+  &-stats {
+    background-color: gold;
+    border-radius: 5px;
+    padding: 7px;
+  }
   &-box {
-    margin: 15px;
-    background-color: green;
+    width: 70%;
+    margin: 5% 0;
+    background-color: dodgerblue;
     box-shadow: 0 0 0 5px black, 0 0 0 10px gold, 0 0 0 15px black;
     border-radius: 15px;
+    padding: 2% 5%;
+    display: flex;
+    flex-direction: row;
+    gap: 2%;
   }
 }
 
 
 .rounds {
-  width: 75%;
   &-title {
     text-transform: uppercase;
     width: 100%;
@@ -44,8 +48,10 @@
     border-bottom: 5px solid black;
     text-align: center;
   }
+
   &-box {
-    //margin: 15px;
+    width: 80%;
+    margin-bottom: 5%;
     background-color: dodgerblue;
     box-shadow: 0 0 0 5px black, 0 0 0 10px gold, 0 0 0 15px black;
     border-radius: 15px;
@@ -127,6 +133,7 @@
       font-weight: 400;
       margin-left: 15px;
     }
+
     &-input {
       margin-left: 15px;
 
@@ -156,7 +163,7 @@
 
     display: flex;
     align-items: center;
-    flex-wrap: wrap;  /* Allow items to wrap to the next line */
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
 
     &-addup {
       text-align: center;

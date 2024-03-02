@@ -2,101 +2,105 @@
   <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
 </div>
 <div class="container" *ngIf="!loading()">
-  <div class="settings">
-    <div class="settings-box">
-      data: {{totalRounds()}} {{totalQuestions()}}
-      <button [disabled]="hasError()" (click)="save()">save</button>
-    </div>
+  <div class="settings-box">
+    <button mat-raised-button color="accent" (click)="undo()">
+      <mat-icon>rotate_left</mat-icon>reload
+    </button>
+    <button mat-raised-button color="accent" [disabled]="hasError()" (click)="save()">
+      <mat-icon>save</mat-icon>save
+    </button>
+    <button mat-raised-button color="accent" [disabled]="hasError()">
+      <mat-icon>play_arrow</mat-icon>start game
+    </button>
+
   </div>
+  <div class="rounds-box">
+    <div class="rounds-title">
+      gameboard ({{code()}})
+    </div>
 
-  <div class="rounds">
-    <div class="rounds-box">
-      <div class="rounds-title">
-        gameboard
+    <div class="round" *ngFor="let gameRound of gameData()">
+      <div class="round-buttons">
+
+        <button mat-mini-fab color="accent" (click)="moveRound(gameRound, true)">
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
+
+        <div class="round-buttons-button">{{ gameRound.round_number }}</div>
+
+        <button mat-mini-fab color="accent" (click)="moveRound(gameRound, false)">
+          <mat-icon>arrow_downward</mat-icon>
+        </button>
+
       </div>
-
-      <div class="round" *ngFor="let gameRound of gameData()">
-        <div class="round-buttons">
-
-          <button mat-mini-fab color="accent" (click)="moveRound(gameRound, true)">
-            <mat-icon>arrow_upward</mat-icon>
+      <div class="round-answers">
+        <div class="round-answers-title-box">
+          <mat-icon>help_outline</mat-icon>
+          <div *ngIf="!gameRound.editing" class="round-answers-title">
+            {{ gameRound.question }}
+          </div>
+          <div class="round-answers-error" *ngIf="!gameRound.editing && hasErrorText(gameRound.question)">
+            missing
+          </div>
+          <button *ngIf="!gameRound.editing" mat-icon-button matTooltip="Muuda"
+                  (click)="toggleEditQuestion(gameRound)">
+            <mat-icon>edit</mat-icon>
           </button>
-
-          <div class="round-buttons-button">{{gameRound.round_number}}</div>
-
-          <button mat-mini-fab color="accent" (click)="moveRound(gameRound, false)">
-            <mat-icon>arrow_downward</mat-icon>
-          </button>
-
-        </div>
-        <div class="round-answers">
-          <div class="round-answers-title-box">
-            <mat-icon>help_outline</mat-icon>
-            <div *ngIf="!gameRound.editing" class="round-answers-title">
-              {{gameRound.question}}
-            </div>
-            <div class="round-answers-error" *ngIf="!gameRound.editing && hasErrorText(gameRound.question)">
-              missing
-            </div>
-            <button *ngIf="!gameRound.editing" mat-icon-button matTooltip="Muuda"
-                    (click)="toggleEditQuestion(gameRound)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <input class="round-answers-input" *ngIf="gameRound.editing" [(ngModel)]="gameRound.question" maxlength="20"
-                   placeholder="Hesburger">
-            <button *ngIf="gameRound.editing" mat-icon-button matTooltip="Muuda"
-                    (click)="toggleEditQuestion(gameRound)">
-              <mat-icon>done</mat-icon>
-            </button>
-          </div>
-          <div class="round-answer-addup" *ngIf="dontAddUp(gameRound)">
-            Point sum must be 100!
-          </div>
-          <div class="round-answer" *ngFor="let answer of gameRound.answers">
-            <div class="round-answer-text" *ngIf="!answer.editing">
-              {{answer.text}}
-            </div>
-            <div class="round-answer-error" *ngIf="!answer.editing && hasErrorText(answer.text)">
-              missing
-            </div>
-            <div class="round-answer-text" *ngIf="!answer.editing">
-              {{answer.points}}
-            </div>
-            <button *ngIf="!answer.editing" mat-icon-button matTooltip="Muuda"
-                    (click)="toggleEditAnswer(answer)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <input class="round-answer-gap round-answer-input" *ngIf="answer.editing" [(ngModel)]="answer.text"
-                   maxlength="25" placeholder="Hesburger">
-            <input class="round-answer-gap round-answer-input"
-                   *ngIf="answer.editing"
-                   [(ngModel)]="answer.points"
-                   type="number"
-                   min="1"
-                   max="100"
-                   (input)="onInputChange(answer)">
-            <button *ngIf="answer.editing" mat-icon-button matTooltip="Muuda"
-                    (click)="toggleEditAnswer(answer)">
-              <mat-icon>done</mat-icon>
-            </button>
-            <button *ngIf="!answer.editing" class="round-answer-remove" mat-mini-fab color="warn"
-                    (click)="removeQuestion(gameRound, answer)">
-              <mat-icon>remove</mat-icon>
-            </button>
-          </div>
-          <button *ngIf="canAddAnswer(gameRound)" class="round-answers-add" mat-mini-fab color="accent" (click)="addQuestion(gameRound)">
-            <mat-icon>add</mat-icon>
+          <input class="round-answers-input" *ngIf="gameRound.editing" [(ngModel)]="gameRound.question" maxlength="20"
+                 placeholder="Hesburger">
+          <button *ngIf="gameRound.editing" mat-icon-button matTooltip="Muuda"
+                  (click)="toggleEditQuestion(gameRound)">
+            <mat-icon>done</mat-icon>
           </button>
         </div>
-
-        <button mat-mini-fab color="warn" (click)="removeRound(gameRound)">
-          <mat-icon>remove</mat-icon>
+        <div class="round-answer-addup" *ngIf="dontAddUp(gameRound)">
+          Point sum must be 100!
+        </div>
+        <div class="round-answer" *ngFor="let answer of gameRound.answers">
+          <div class="round-answer-text" *ngIf="!answer.editing">
+            {{ answer.text }}
+          </div>
+          <div class="round-answer-error" *ngIf="!answer.editing && hasErrorText(answer.text)">
+            missing
+          </div>
+          <div class="round-answer-text" *ngIf="!answer.editing">
+            {{ answer.points }}
+          </div>
+          <button *ngIf="!answer.editing" mat-icon-button matTooltip="Muuda"
+                  (click)="toggleEditAnswer(answer)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <input class="round-answer-gap round-answer-input" *ngIf="answer.editing" [(ngModel)]="answer.text"
+                 maxlength="25" placeholder="Hesburger">
+          <input class="round-answer-gap round-answer-input"
+                 *ngIf="answer.editing"
+                 [(ngModel)]="answer.points"
+                 type="number"
+                 min="1"
+                 max="100"
+                 (input)="onInputChange(answer)">
+          <button *ngIf="answer.editing" mat-icon-button matTooltip="Muuda"
+                  (click)="toggleEditAnswer(answer)">
+            <mat-icon>done</mat-icon>
+          </button>
+          <button *ngIf="!answer.editing" class="round-answer-remove" mat-mini-fab color="warn"
+                  (click)="removeQuestion(gameRound, answer)">
+            <mat-icon>remove</mat-icon>
+          </button>
+        </div>
+        <button *ngIf="canAddAnswer(gameRound)" class="round-answers-add" mat-mini-fab color="accent"
+                (click)="addQuestion(gameRound)">
+          <mat-icon>add</mat-icon>
         </button>
       </div>
 
-      <button *ngIf="canAddRound()" class="rounds-add" mat-mini-fab color="accent" (click)="addRound()">
-        <mat-icon>add</mat-icon>
+      <button mat-mini-fab color="warn" (click)="removeRound(gameRound)">
+        <mat-icon>remove</mat-icon>
       </button>
     </div>
+
+    <button *ngIf="canAddRound()" class="rounds-add" mat-mini-fab color="accent" (click)="addRound()">
+      <mat-icon>add</mat-icon>
+    </button>
   </div>
 </div>

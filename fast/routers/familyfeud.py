@@ -56,7 +56,6 @@ async def get_game_data(
     #     GameRound(answers=[Answer(text='tere', points=100)], round_number=3, question='343434')]
 
     user_id = read_user(user, postgres_client)
-    print(read_game(code, user_id, postgres_client))
     return read_game(code, user_id, postgres_client)
 
 
