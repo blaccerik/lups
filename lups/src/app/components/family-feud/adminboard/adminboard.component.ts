@@ -59,10 +59,12 @@ export class AdminboardComponent implements OnInit {
     this.loading.set(true)
     this.familyfeudService.getGameByCode(code).subscribe(
       data => {
-        console.log(data)
-        this.gameData.set(data)
+        if (data.started) {
+          this.router.navigate(["/familyfeud/admin", data.code])
+        }
+        this.gameData.set(data.rounds)
         this.loading.set(false)
-        this.counter.set(data.length)
+        this.counter.set(data.rounds.length)
       }
     )
   }
@@ -126,8 +128,7 @@ export class AdminboardComponent implements OnInit {
       const otherRound = data[index + 1]
       data[index + 1] = gameRound
       data[index] = otherRound
-    }
-    else if (up && index > 0) {
+    } else if (up && index > 0) {
       const otherRound = data[index - 1]
       data[index - 1] = gameRound
       data[index] = otherRound
@@ -195,16 +196,29 @@ export class AdminboardComponent implements OnInit {
     }
   }
 
+  start() {
+    const error = this.hasError()
+    const code = this.code()
+    if (code && !error) {
+      this.familyfeudService.setGameStatus(code, true).subscribe(
+        data => {
+          this.router.navigate(["/familyfeud/admin", data.code])
+          console.log(data)
+        }
+      )
+    }
+  }
+
   save() {
     const error = this.hasError()
     const code = this.code()
-    if (code) {
+    if (code && !error) {
       this.loading.set(true)
       this.familyfeudService.postGameByCode(code, this.gameData()).subscribe(
         data => {
-          this.gameData.set(data)
+          this.gameData.set(data.rounds)
           this.loading.set(false)
-          this.counter.set(data.length)
+          this.counter.set(data.rounds.length)
         }
       )
     }

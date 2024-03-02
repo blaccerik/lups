@@ -10,6 +10,7 @@ import {FamilyFeudComponent} from "./components/family-feud/family-feud.componen
 import {AdminboardComponent} from "./components/family-feud/adminboard/adminboard.component";
 import {GameboardComponent} from "./components/family-feud/gameboard/gameboard.component";
 import {authGuard} from "./guards/auth.guard";
+import {LivegameComponent} from "./components/family-feud/livegame/livegame.component";
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -23,5 +24,6 @@ export const routes: Routes = [
   {path: "place", component: PlaceComponent},
   {path: "familyfeud", component: FamilyFeudComponent},
   {path: "familyfeud/:id", component: GameboardComponent},
+  {path: "familyfeud/admin/:id", component: LivegameComponent, canActivate: [authGuard]},
   {path: "familyfeud/edit/:id", component: AdminboardComponent, canActivate: [authGuard]}
 ];

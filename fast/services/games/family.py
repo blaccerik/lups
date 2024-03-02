@@ -7,16 +7,17 @@ from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from models.models import DBFamilyFeudGame, DBUser, DBFamilyFeudAnswer, DBFamilyFeudRound
-from schemas.familyfeud import Game, Answer, GameRound, Code
-from utils.schemas import User
+from models.models import DBFamilyFeudGame, DBFamilyFeudAnswer, DBFamilyFeudRound
+from schemas.familyfeud import Game, Answer, GameRound, GameData, GameStatus
+
 logger = logging.getLogger("FamilyService")
+
 
 def read_games_by_user(user_id: int, session: Session):
     games = session.query(DBFamilyFeudGame).filter(
         DBFamilyFeudGame.user_id == user_id
     ).all()
-    return [Game(auth=g.auth, code=g.code) for g in games]
+    return [Game(auth=g.auth, code=g.code, started=g.started) for g in games]
 
 
 def create_game_by_user(user_id: int, session: Session):
@@ -35,7 +36,7 @@ def create_game_by_user(user_id: int, session: Session):
     ffg = DBFamilyFeudGame(code=code, auth=auth, user_id=user_id)
     session.add(ffg)
     session.commit()
-    return Game(auth=auth, code=code)
+    return Game(auth=auth, code=code, started=False)
 
 
 def user_has_game(code: str, user_id: int, session: Session):
@@ -45,9 +46,11 @@ def user_has_game(code: str, user_id: int, session: Session):
     )).first()
     if not game:
         raise HTTPException(status_code=403, detail="User does not have that game")
+    return game
 
-def read_game(code: str, user_id: int, session: Session):
-    user_has_game(code, user_id, session)
+
+def read_game(code: str, user_id: int, session: Session) -> GameData:
+    game = user_has_game(code, user_id, session)
 
     # get results
     results = session.query(DBFamilyFeudRound, DBFamilyFeudAnswer).filter(and_(
@@ -63,11 +66,16 @@ def read_game(code: str, user_id: int, session: Session):
             data[db_r.id].answers.append(a)
         else:
             data[db_r.id] = GameRound(round_number=db_r.round_number, question=db_r.question, answers=[a])
-    return [r for r in data.values()]
+
+    return GameData(
+        rounds=[r for r in data.values()],
+        started=game.started,
+        code=game.code,
+        auth=game.auth
+    )
 
 
 def create_game_data(code: str, rounds: List[GameRound], user_id: int, session: Session):
-
     MAX_ROUNDS = 10
     MAX_ANSWERS = 10
 
@@ -102,25 +110,9 @@ def create_game_data(code: str, rounds: List[GameRound], user_id: int, session: 
     session.commit()
 
 
-    # # check if user has that game
-    # user_has_game(code, user_id, session)
-    #
-    # for d in rounds:
-    #     ffq = DBFamilyFeudQuestion(code=code, round_number=d.round_number, text=d.question.text, points=d.question.points)
-    #     session.add(ffq)
-    # session.commit()
-
-def start_game_by_user(code: str, user_id: int, session: Session):
-    game = read_game(code, user_id, session)
-
-    # check if points match
-    for game_round in game:
-        total = 0
-        for question in game_round.answers:
-            total += question.points
-        if total != 100:
-            raise HTTPException(status_code=400, detail="Round does not have 100 points")
-
-
-
-
+def set_game_status(code: str, user_id: int, game_status: GameStatus, session: Session):
+    game = user_has_game(code, user_id, session)
+    game.started = game_status.started
+    session.add(game)
+    session.commit()
+    return Game(auth=game.auth, code=game.code, started=game.started)

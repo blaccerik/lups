@@ -1,16 +1,13 @@
-import asyncio
 import logging
-import random
 from typing import List
 
 from fastapi import APIRouter, Depends, WebSocket, Path, Body
-from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from schemas.familyfeud import Answer, GameRoundData, GameRound, Code
+from schemas.familyfeud import GameRound, GameStatus
 from services.chat_service import read_user
 from services.games.family import read_games_by_user, create_game_by_user, read_game, create_game_data, \
-    start_game_by_user
+    set_game_status
 from utils.auth import get_current_user
 from utils.database import get_db
 from utils.schemas import User
@@ -45,16 +42,6 @@ async def get_game_data(
         user: User = Depends(get_current_user),
         postgres_client: Session = Depends(get_db)
 ):
-    # return [
-    #     GameRound(answers=[Answer(text='tere', points=100)], round_number=0, question='erik'),
-    #     GameRound(answers=[Answer(text='tere', points=50), Answer(text='tere', points=25),
-    #                        Answer(text='333333', points=25)], round_number=1, question='ertikkk'),
-    #     GameRound(answers=[Answer(text='tere', points=91), Answer(text='tere', points=1), Answer(text='tere', points=1),
-    #                        Answer(text='tere', points=1), Answer(text='tere', points=1), Answer(text='tere', points=1),
-    #                        Answer(text='tere', points=1), Answer(text='tere', points=1), Answer(text='tere', points=1),
-    #                        Answer(text='tere', points=1)], round_number=2, question='super long questrtrt'),
-    #     GameRound(answers=[Answer(text='tere', points=100)], round_number=3, question='343434')]
-
     user_id = read_user(user, postgres_client)
     return read_game(code, user_id, postgres_client)
 
@@ -66,21 +53,21 @@ async def post_data(
         user: User = Depends(get_current_user),
         postgres_client: Session = Depends(get_db)
 ):
-    print("Received code:", code)
-    print("Received data:", data)
+    logger.info(f"{code} {data}")
     user_id = read_user(user, postgres_client)
     create_game_data(code, data, user_id, postgres_client)
     return read_game(code, user_id, postgres_client)
 
 
-@router.post("/games/{code}/start")
+@router.post("/games/{code}/status")
 async def start_game(
         code: str,
+        game_status: GameStatus,
         user: User = Depends(get_current_user),
         postgres_client: Session = Depends(get_db),
 ):
     user_id = read_user(user, postgres_client)
-    return start_game_by_user(code, user_id, postgres_client)
+    return set_game_status(code, user_id, game_status, postgres_client)
 
 
 @router.websocket("/ws/{code}")
@@ -91,21 +78,21 @@ async def websocket_endpoint(
 ):
     await websocket.accept()
     print(code, auth)
-    await asyncio.sleep(1)
-    try:
-        while True:
-            data = GameRoundData(current=random.randrange(4, 12), total=random.randrange(4, 12), questions=[
-                Answer(text="tere", points=3),
-                Answer(text="tere", points=33),
-                Answer(text="tere", points=32),
-                Answer(text="tere", points=322),
-            ])
-            await websocket.send_text(data.model_dump_json())
-            await asyncio.sleep(3)
-    except (ValidationError or ValueError) as ve:
-        logger.error(ve)
-        await websocket.close()
-    except Exception as e:
-        logger.error(e)
-    finally:
-        pass
+    # await asyncio.sleep(1)
+    # try:
+    #     while True:
+    #         data = GameRoundData(current=random.randrange(4, 12), total=random.randrange(4, 12), questions=[
+    #             Answer(text="tere", points=3),
+    #             Answer(text="tere", points=33),
+    #             Answer(text="tere", points=32),
+    #             Answer(text="tere", points=322),
+    #         ])
+    #         await websocket.send_text(data.model_dump_json())
+    #         await asyncio.sleep(3)
+    # except (ValidationError or ValueError) as ve:
+    #     logger.error(ve)
+    #     await websocket.close()
+    # except Exception as e:
+    #     logger.error(e)
+    # finally:
+    #     pass

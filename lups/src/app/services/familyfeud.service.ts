@@ -14,10 +14,10 @@ export interface Answer {
 }
 
 interface GameData {
-  current: number
-  total: number
-  question: string
-  answers: Answer[]
+  rounds: GameRound[]
+  started: boolean
+  code: string
+  auth: string
 }
 
 export interface GameRound {
@@ -30,6 +30,7 @@ export interface GameRound {
 export interface Game {
   code: string
   auth: string
+  stared: boolean
 }
 
 @Injectable({
@@ -40,7 +41,7 @@ export class FamilyfeudService {
   private http = inject(HttpClient)
   private oauthService = inject(OAuthService)
   private subject: any;
-  gameData: WritableSignal<GameData | null> = signal(null);
+  gameData: WritableSignal<any | null> = signal(null);
 
   connect(code: string) {
     console.log(environment.wsUrl)
@@ -57,7 +58,7 @@ export class FamilyfeudService {
 
     // get websocket
     this.subject.pipe(retry({delay: 1000})).subscribe(
-      (data: GameData) => {
+      (data: any) => {
         console.log(data)
         this.gameData.set(data)
       })
@@ -78,11 +79,14 @@ export class FamilyfeudService {
   }
 
   getGameByCode(code: string) {
-    return this.http.get<GameRound[]>(this.url + "/games/" + code)
+    return this.http.get<GameData>(this.url + "/games/" + code)
   }
 
   postGameByCode(code: string, gameRounds: GameRound[]) {
+    return this.http.post<GameData>(this.url + "/games/" + code, gameRounds)
+  }
 
-    return this.http.post<GameRound[]>(this.url + "/games/" + code, gameRounds)
+  setGameStatus(code: string, started: boolean) {
+    return this.http.post<Game>(this.url + "/games/" + code + "/status", {started: started})
   }
 }
