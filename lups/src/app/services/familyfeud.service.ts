@@ -13,7 +13,7 @@ export interface Answer {
   editing?: boolean
 }
 
-interface GameData {
+export interface GameData {
   rounds: GameRound[]
   started: boolean
   code: string

@@ -66,9 +66,12 @@ def read_game(code: str, user_id: int, session: Session) -> GameData:
             data[db_r.id].answers.append(a)
         else:
             data[db_r.id] = GameRound(round_number=db_r.round_number, question=db_r.question, answers=[a])
+    rounds = list(data.values())
+    for r in rounds:
+        r.answers.sort(key=lambda x: x.points, reverse=True)
 
     return GameData(
-        rounds=[r for r in data.values()],
+        rounds=rounds,
         started=game.started,
         code=game.code,
         auth=game.auth

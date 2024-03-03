@@ -1,3 +1,45 @@
-<p>livegame works!</p>
+<div class="center" *ngIf="loading()">
+  <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+</div>
+<div class="container" *ngIf="!loading()">
+  <div class="settings-box">
 
-<button (click)="stop()">stop</button>
+    <button mat-mini-fab color="accent" (click)="move(true)">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <button mat-raised-button color="accent" (click)="strike()">
+      <mat-icon>cancel</mat-icon>strike
+    </button>
+
+    <button mat-raised-button color="accent" (click)="stop()">
+      <mat-icon>stop_arrow</mat-icon>stop game
+    </button>
+
+    <button mat-mini-fab color="accent" (click)="move(false)">
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+  </div>
+  <div class="round">
+    <div class="round-title">
+      {{currentRound().round_number}}. {{currentRound().question}}
+      <div class="round-strikes">
+        <div class="round-strikes-item" *ngFor="let i of getRange()">
+          X
+        </div>
+      </div>
+    </div>
+    <div class="round-box">
+      <div class="round-item" [ngClass]="{'round-revealed': answer.revealed}" *ngFor="let answer of currentRound().answers">
+        {{answer.points.toLocaleString('en-US', { minimumIntegerDigits: 2 })}}
+        {{answer.text}}
+        <button *ngIf="!answer.revealed" mat-icon-button (click)="show(answer)">
+          <mat-icon>visibility_off</mat-icon>
+        </button>
+        <button *ngIf="answer.revealed" mat-icon-button (click)="show(answer)">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
