@@ -1,5 +1,6 @@
 .logo-container {
-  position: absolute;
+  background-color: mediumblue;
+  height: 25%;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -9,7 +10,7 @@
 .logo-wrapper {
   z-index: 0;
   background: radial-gradient(white 10%, mediumblue 70%);
-  padding: 50px 100px ;
+  //padding: 50px 100px ;
 }
 
 .logo {

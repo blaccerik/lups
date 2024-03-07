@@ -1,10 +1,11 @@
 import {inject, Injectable, signal, WritableSignal} from '@angular/core';
-import {retry} from "rxjs";
+import {retry, Subject} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
 import {environment} from "../../environments/environment";
 import {webSocket} from "rxjs/webSocket";
 import {toSignal} from "@angular/core/rxjs-interop";
+import {PixelResponse} from "./place.service";
 
 export interface Answer {
   text: string
@@ -33,6 +34,20 @@ export interface Game {
   stared: boolean
 }
 
+export interface LiveGameAnswer {
+  text: string
+  points: number
+  revealed: boolean
+}
+
+export interface LiveGame {
+  type: string
+  answers: LiveGameAnswer[]
+  number: number
+  question: string
+  strikes: number
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -41,32 +56,31 @@ export class FamilyfeudService {
   private http = inject(HttpClient)
   private oauthService = inject(OAuthService)
   private subject: any;
-  gameData: WritableSignal<any | null> = signal(null);
+  private roundSubject = new Subject<LiveGame>();
 
-  connect(code: string) {
-    console.log(environment.wsUrl)
-    this.gameData.set(null)
+  connect(code: string, auth: string) {
     if (this.subject) {
       this.subject.unsubscribe()
     }
-    if (this.oauthService.hasValidIdToken()) {
-      const token = this.oauthService.getIdToken();
-      this.subject = webSocket(`${environment.wsUrl}/api/familyfeud/ws/${code}?auth=${token}`);
-    } else {
-      this.subject = webSocket(`${environment.wsUrl}/api/familyfeud/ws/${code}`);
-    }
+    this.subject = webSocket(`${environment.wsUrl}/api/familyfeud/ws/${code}?auth=${auth}`);
 
     // get websocket
     this.subject.pipe(retry({delay: 1000})).subscribe(
-      (data: any) => {
-        console.log(data)
-        this.gameData.set(data)
+      (data: LiveGame) => {
+        this.roundSubject.next(data)
       })
+    return this.roundSubject.asObservable();
   }
 
   disconnect() {
     if (this.subject) {
       this.subject.unsubscribe()
+    }
+  }
+
+  sendData(data: LiveGame) {
+    if (this.subject) {
+      this.subject.next(data)
     }
   }
 

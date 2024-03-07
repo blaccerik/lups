@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 import {PromisesComponent} from "./components/promises/promises.component";
 import {HomeComponent} from "./components/home/home.component";
 import {PlaceComponent} from "./components/place/place.component";
@@ -7,10 +7,10 @@ import {CreateNewsComponent} from "./components/news/create-news/create-news.com
 import {AllNewsComponent} from "./components/news/all-news/all-news.component";
 import {ChatComponent} from "./components/chat/chat.component";
 import {FamilyFeudComponent} from "./components/family-feud/family-feud.component";
-import {AdminboardComponent} from "./components/family-feud/adminboard/adminboard.component";
-import {GameboardComponent} from "./components/family-feud/gameboard/gameboard.component";
+import {GameBoardComponent} from "./components/family-feud/gameboard/game-board.component";
 import {authGuard} from "./guards/auth.guard";
-import {LivegameComponent} from "./components/family-feud/livegame/livegame.component";
+import {AdminEditComponent} from "./components/family-feud/adminedit/admin-edit.component";
+import {AdminBoardComponent} from "./components/family-feud/adminboard/admin-board.component";
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -23,7 +23,7 @@ export const routes: Routes = [
   // {path: "test", component: TestComponent},
   {path: "place", component: PlaceComponent},
   {path: "familyfeud", component: FamilyFeudComponent},
-  {path: "familyfeud/:id", component: GameboardComponent},
-  {path: "familyfeud/admin/:id", component: LivegameComponent, canActivate: [authGuard]},
-  {path: "familyfeud/edit/:id", component: AdminboardComponent, canActivate: [authGuard]}
+  {path: "familyfeud/:id", component: GameBoardComponent},
+  {path: "familyfeud/admin/:id", component: AdminBoardComponent, canActivate: [authGuard]},
+  {path: "familyfeud/edit/:id", component: AdminEditComponent, canActivate: [authGuard]}
 ];

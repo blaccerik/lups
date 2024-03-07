@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, signal} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {OAuthService} from "angular-oauth2-oidc";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Answer, FamilyfeudService, Game, GameData, GameRound} from "../../../services/familyfeud.service";
@@ -7,6 +7,7 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatButton, MatIconButton, MatMiniFabButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-livegame',
@@ -21,10 +22,10 @@ import {MatIcon} from "@angular/material/icon";
     MatIconButton,
     NgClass
   ],
-  templateUrl: './livegame.component.html',
-  styleUrl: './livegame.component.scss'
+  templateUrl: './admin-board.component.html',
+  styleUrl: './admin-board.component.scss'
 })
-export class LivegameComponent implements OnInit {
+export class AdminBoardComponent implements OnInit, OnDestroy {
   private oauthService = inject(OAuthService)
   private router = inject(Router)
   private familyfeudService = inject(FamilyfeudService)
@@ -32,7 +33,9 @@ export class LivegameComponent implements OnInit {
   private route = inject(ActivatedRoute)
 
   code = signal<string | null>(null)
+  auth = signal<string | null>(null)
   loading = signal(true)
+  wsloading = signal(true)
   strikes = signal(0)
   game = signal<GameData>({
     rounds: [],
@@ -47,6 +50,16 @@ export class LivegameComponent implements OnInit {
     round_number: -1
   })
 
+  familyfeudService$: Subscription
+
+  ngOnDestroy(): void {
+    console.log("destroy")
+    this.familyfeudService.disconnect()
+    if (this.familyfeudService$) {
+      this.familyfeudService$.unsubscribe()
+    }
+  }
+
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const code = params["id"]
@@ -57,11 +70,36 @@ export class LivegameComponent implements OnInit {
             this.router.navigate(["/familyfeud/edit", data.code])
           }
           this.loading.set(false)
+          this.auth.set(data.auth)
           this.game.set(data)
           this.currentRound.set(data.rounds[0])
+          this.familyfeudService$ = this.familyfeudService.connect(code, data.auth).subscribe(
+            data => {
+              console.log("admin", data)
+              this.wsloading.set(false)
+            }
+          )
         }
       )
     });
+  }
+
+  sendData() {
+    const data = this.currentRound()
+    const strikes = this.strikes()
+    this.familyfeudService.sendData({
+      answers: data.answers.map(a => {
+        return {
+          text: a.text,
+          points: a.points,
+          revealed: !!a.revealed
+        }
+      }),
+      type: "game",
+      number: data.round_number,
+      question: data.question,
+      strikes: strikes
+    })
   }
 
   strike() {
@@ -69,10 +107,12 @@ export class LivegameComponent implements OnInit {
     if (value < 3) {
       this.strikes.set(value + 1)
     }
+    this.sendData()
   }
 
   show(answer: Answer) {
     answer.revealed = !answer.revealed
+    this.sendData()
   }
 
   move(backward: boolean) {
@@ -84,11 +124,13 @@ export class LivegameComponent implements OnInit {
       game.rounds.forEach(g => g.answers.forEach(a => a.revealed = false))
       this.game.set(game)
       this.currentRound.set(game.rounds[index - 1])
+      this.sendData()
     } else if (!backward && index < game.rounds.length - 1) {
       this.strikes.set(0)
       game.rounds.forEach(g => g.answers.forEach(a => a.revealed = false))
       this.game.set(game)
       this.currentRound.set(game.rounds[index + 1])
+      this.sendData()
     }
   }
 
@@ -106,6 +148,4 @@ export class LivegameComponent implements OnInit {
       )
     }
   }
-
-  protected readonly Array = Array;
 }

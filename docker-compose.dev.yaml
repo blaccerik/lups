@@ -46,6 +46,7 @@ services:
 #      - lups
   redis:
     container_name: redis
+    restart: unless-stopped
     image: redis:6-alpine
     ports:
       - "6379:6379"
@@ -68,6 +69,7 @@ services:
     networks:
       - lups
   pgadmin:
+    restart: unless-stopped
     image: dpage/pgadmin4
     container_name: pgadmin
     depends_on:

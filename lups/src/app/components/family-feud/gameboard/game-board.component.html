@@ -1,0 +1,12 @@
+<app-gamebanner></app-gamebanner>
+<div class="container">
+  <div *ngIf="game().number === -1" class="spinner">
+    <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+  </div>
+  <div *ngIf="game().number !== -1">
+    <div>{{game().question}}</div>
+    <button routerLink="/familyfeud/erik">erok</button>
+  </div>
+</div>
+
+

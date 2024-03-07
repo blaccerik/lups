@@ -4,7 +4,7 @@ import {GamecodeComponent} from "./gamecode/gamecode.component";
 import {FormsModule} from "@angular/forms";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {GameboardComponent} from "./gameboard/gameboard.component";
+import {GameBoardComponent} from "./gameboard/game-board.component";
 import {ActivatedRoute, Router} from "@angular/router";
 import {GamebannerComponent} from "./gamebanner/gamebanner.component";
 import {GamelistComponent} from "./gamelist/gamelist.component";
@@ -18,7 +18,7 @@ import {FamilyfeudService, Game} from "../../services/familyfeud.service";
     FormsModule,
     NgIf,
     MatProgressSpinner,
-    GameboardComponent,
+    GameBoardComponent,
     GamebannerComponent,
     NgForOf
   ],

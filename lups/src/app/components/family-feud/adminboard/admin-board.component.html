@@ -1,7 +1,7 @@
-<div class="center" *ngIf="loading()">
+<div class="center" *ngIf="loading() || wsloading()">
   <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
 </div>
-<div class="container" *ngIf="!loading()">
+<div class="container" *ngIf="!loading() && !wsloading()">
   <div class="settings-box">
 
     <button mat-mini-fab color="accent" (click)="move(true)">

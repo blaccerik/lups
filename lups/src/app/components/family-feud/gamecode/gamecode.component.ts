@@ -42,7 +42,7 @@ export class GamecodeComponent implements OnInit {
   onEnterPress(): void {
     this.dialogRef.close();
     if (this.form.valid) {
-      const code = this.form.get('code')!.value;
+      const code = this.form.get('code')!.value.toLowerCase();
       this.router.navigate(['/familyfeud', code]);
     }
   }

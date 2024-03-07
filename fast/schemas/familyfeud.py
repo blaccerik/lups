@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List
 
 from pydantic import BaseModel, constr, conint
@@ -35,6 +36,24 @@ class GameData(BaseModel):
 
 class GameStatus(BaseModel):
     started: bool
+
+
+class LiveGameType(str, Enum):
+    game = "game"
+    error = "error"
+
+class LiveGameAnswer(BaseModel):
+    text: str
+    points: int
+    revealed: bool
+
+class LiveGame(BaseModel):
+    type: LiveGameType
+    answers: List[LiveGameAnswer]
+    number: int
+    question: str
+    strikes: int
+
 
 # class GameReceiveData(BaseModel):
 #     round_number: int

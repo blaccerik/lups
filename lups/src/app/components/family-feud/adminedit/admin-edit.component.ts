@@ -32,10 +32,10 @@ import {MatTooltip} from "@angular/material/tooltip";
     MatFabButton,
     MatButton
   ],
-  templateUrl: './adminboard.component.html',
-  styleUrl: './adminboard.component.scss'
+  templateUrl: './admin-edit.component.html',
+  styleUrl: './admin-edit.component.scss'
 })
-export class AdminboardComponent implements OnInit {
+export class AdminEditComponent implements OnInit {
   private oauthService = inject(OAuthService)
   private router = inject(Router)
   private familyfeudService = inject(FamilyfeudService)

@@ -4,11 +4,12 @@ import string
 from typing import List
 
 from fastapi import HTTPException
+from redis.client import Redis
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from models.models import DBFamilyFeudGame, DBFamilyFeudAnswer, DBFamilyFeudRound
-from schemas.familyfeud import Game, Answer, GameRound, GameData, GameStatus
+from schemas.familyfeud import Game, Answer, GameRound, GameData, GameStatus, LiveGame, LiveGameType, LiveGameAnswer
 
 logger = logging.getLogger("FamilyService")
 
@@ -113,9 +114,29 @@ def create_game_data(code: str, rounds: List[GameRound], user_id: int, session: 
     session.commit()
 
 
-def set_game_status(code: str, user_id: int, game_status: GameStatus, session: Session):
+async def set_game_status(code: str, user_id: int, game_status: GameStatus, session: Session, redis_client: Redis):
     game = user_has_game(code, user_id, session)
     game.started = game_status.started
     session.add(game)
     session.commit()
+
+    # add first round to redis
+    if game_status.started:
+        game_data = read_game(code, user_id, session)
+        first_round = game_data.rounds[0]
+        answers = [
+            LiveGameAnswer(text=answer.text, points=answer.points, revealed=False) for answer in first_round.answers]
+        lg = LiveGame(
+            type=LiveGameType.game,
+            answers=answers,
+            number=first_round.round_number,
+            question=first_round.question,
+            strikes=0
+        )
+        await redis_client.hset("games", code, lg.model_dump_json())
     return Game(auth=game.auth, code=game.code, started=game.started)
+
+
+def read_game_by_code(code: str, session: Session):
+    game = session.query(DBFamilyFeudGame).get(code)
+    return game

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GameboardComponent } from './gameboard.component';
+import { AdminEditComponent } from './admin-edit.component';
 
-describe('GameboardComponent', () => {
-  let component: GameboardComponent;
-  let fixture: ComponentFixture<GameboardComponent>;
+describe('AdminboardComponent', () => {
+  let component: AdminEditComponent;
+  let fixture: ComponentFixture<AdminEditComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GameboardComponent]
+      imports: [AdminEditComponent]
     })
     .compileComponents();
-    
-    fixture = TestBed.createComponent(GameboardComponent);
+
+    fixture = TestBed.createComponent(AdminEditComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
