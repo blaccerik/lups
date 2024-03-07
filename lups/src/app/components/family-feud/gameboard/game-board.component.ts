@@ -1,11 +1,10 @@
-import {Component, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {NgIf} from "@angular/common";
-import {ChatService} from "../../../services/chat.service";
-import {FamilyfeudService, GameData, GameRound, LiveGame} from "../../../services/familyfeud.service";
+import {FamilyfeudService, LiveGame} from "../../../services/familyfeud.service";
 import {GamebannerComponent} from "../gamebanner/gamebanner.component";
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
-import {Subscription, switchMap} from "rxjs";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-gameboard',
