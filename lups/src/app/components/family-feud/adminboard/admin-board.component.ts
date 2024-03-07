@@ -1,8 +1,6 @@
 import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
-import {OAuthService} from "angular-oauth2-oidc";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Answer, FamilyfeudService, GameData, GameRound} from "../../../services/familyfeud.service";
-import {MatDialog} from "@angular/material/dialog";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatButton, MatIconButton, MatMiniFabButton} from "@angular/material/button";
