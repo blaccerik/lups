@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {OAuthService} from "angular-oauth2-oidc";
 import {ActivatedRoute, Router} from "@angular/router";
-import {Answer, FamilyfeudService, Game, GameData, GameRound} from "../../../services/familyfeud.service";
+import {Answer, FamilyfeudService, GameData, GameRound} from "../../../services/familyfeud.service";
 import {MatDialog} from "@angular/material/dialog";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
@@ -26,10 +26,8 @@ import {Subscription} from "rxjs";
   styleUrl: './admin-board.component.scss'
 })
 export class AdminBoardComponent implements OnInit, OnDestroy {
-  private oauthService = inject(OAuthService)
   private router = inject(Router)
   private familyfeudService = inject(FamilyfeudService)
-  private dialog = inject(MatDialog)
   private route = inject(ActivatedRoute)
 
   code = signal<string | null>(null)
@@ -117,7 +115,7 @@ export class AdminBoardComponent implements OnInit, OnDestroy {
 
   move(backward: boolean) {
     const game = this.game()
-    const gameRound  = this.currentRound()
+    const gameRound = this.currentRound()
     const index = game.rounds.indexOf(gameRound)
     if (backward && index > 0) {
       this.strikes.set(0)
