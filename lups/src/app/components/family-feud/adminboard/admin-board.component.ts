@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {Answer, FamilyfeudService, GameData, GameRound} from "../../../services/familyfeud.service";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
@@ -46,6 +46,17 @@ export class AdminBoardComponent implements OnInit, OnDestroy {
     round_number: -1
   })
 
+  constructor() {
+    // send data when ws is loaded
+    effect(() => {
+      console.log("called effect")
+      if (!this.loading()) {
+        this.sendData()
+      }
+    })
+  }
+
+
   familyfeudService$: Subscription
 
   ngOnDestroy(): void {
@@ -57,6 +68,9 @@ export class AdminBoardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+
+
     this.route.params.subscribe(params => {
       const code = params["id"]
       this.code.set(code)

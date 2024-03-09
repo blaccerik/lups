@@ -1,12 +1,80 @@
 .spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  //width: 100%;
+  //display: flex;
+  //justify-content: center;
+  //align-items: center;
 }
 
 .container {
-  background-color: mediumblue;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  background: linear-gradient(180deg, mediumblue 25%, darkblue 90%);
   width: 100%;
-  min-height: 75%;
-  box-sizing: border-box;
+  height: 75%;
+}
+
+.board {
+  width: 90%;
+  height: 90%;
+  background: rgb(74,55,210);
+  background: radial-gradient(circle, rgba(74,55,210,1) 24%, rgba(10,21,148,1) 53%);
+  border-radius: 30%;
+  box-shadow: 0 0 0 5px black, 0 0 0 10px orange, 0 0 0 15px black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  //justify-content: center;
+
+  &-question {
+    border-radius: 5px;
+    box-shadow: 0 0 0 5px orange, 0 0 0 10px black;
+    background-color: black;
+    text-transform: uppercase;
+    color: white;
+    text-align: center;
+    font-size: 25px;
+    width: 50%;
+    height: 30px;
+    margin-top: calc(1% + 20px);
+  }
+
+  &-box {
+    border-radius: 5px;
+    box-shadow: 0 0 0 5px orange, 0 0 0 10px black;
+    background-color: black;
+    width: 80%;
+    height: 50%;
+    margin-top: calc(2% + 20px);
+    columns: 2;
+    column-gap: 5%;
+    padding: 2%;
+  }
+
+  &-item {
+    //height: 18%;
+
+    //padding: 5px 5px 5px 15px;
+    margin-bottom: 5%;
+    width: 80%;
+    background-color: cornflowerblue;
+    border: 2px solid white;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 15px;
+    color: white;
+  }
+
+  &-points {
+    border-radius: 5px;
+    box-shadow: 0 0 0 5px orange, 0 0 0 10px black;
+    background-color: black;
+    text-transform: uppercase;
+    color: white;
+    text-align: center;
+    font-size: 28px;
+    width: 100px;
+    height: 30px;
+    margin-top: calc(2% + 20px);
+  }
 }

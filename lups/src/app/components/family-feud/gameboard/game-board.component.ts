@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {NgIf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {FamilyfeudService, LiveGame} from "../../../services/familyfeud.service";
 import {GamebannerComponent} from "../gamebanner/gamebanner.component";
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
@@ -13,7 +13,8 @@ import {Subscription} from "rxjs";
     MatProgressSpinner,
     NgIf,
     GamebannerComponent,
-    RouterLink
+    RouterLink,
+    NgForOf
   ],
   templateUrl: './game-board.component.html',
   styleUrl: './game-board.component.scss'
@@ -32,6 +33,8 @@ export class GameBoardComponent implements OnInit, OnDestroy {
   })
   loading = signal(true)
 
+  points = signal(0)
+
   familyfeudService$: Subscription
 
   ngOnInit(): void {
@@ -45,6 +48,10 @@ export class GameBoardComponent implements OnInit, OnDestroy {
             return
           }
           this.game.set(data)
+          this.points.set(data.answers
+            .filter(answer => answer.revealed)
+            .reduce((sum, answer) => sum + answer.points, 0)
+          )
         }
       )
     });

@@ -3,9 +3,14 @@
   <div *ngIf="game().number === -1" class="spinner">
     <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
   </div>
-  <div *ngIf="game().number !== -1">
-    <div>{{game().question}}</div>
-    <button routerLink="/familyfeud/erik">erok</button>
+  <div *ngIf="game().number !== -1" class="board">
+    <div class="board-question">{{game().question}}</div>
+    <div class="board-box">
+      <div class="board-item" *ngFor="let answer of game().answers">
+        {{answer.text}}
+      </div>
+    </div>
+    <div class="board-points">{{points()}}</div>
   </div>
 </div>
 

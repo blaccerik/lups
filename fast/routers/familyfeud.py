@@ -124,13 +124,14 @@ async def websocket_endpoint(
     try:
         while True:
             live_game = LiveGame(**json.loads(await websocket.receive_text()))
+            logger.info(live_game)
             if is_authenticated:
                 await redis_client.hset("games", code, live_game.model_dump_json())
                 for client in connected_clients[code]:
                     try:
                         await client.send_text(live_game.model_dump_json())
                     except Exception as ee:
-                        print(websocket, client, ee)
+                        logger.error(f"{websocket} {client} {ee}")
     except (ValidationError or ValueError) as ve:
         logger.error(ve)
         await websocket.close()
