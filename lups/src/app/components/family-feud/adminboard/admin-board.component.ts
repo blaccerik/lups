@@ -51,7 +51,7 @@ export class AdminBoardComponent implements OnInit, OnDestroy {
     effect(() => {
       console.log("called effect")
       if (!this.loading()) {
-        this.sendData()
+        this.sendData(0)
       }
     })
   }
@@ -94,9 +94,9 @@ export class AdminBoardComponent implements OnInit, OnDestroy {
     });
   }
 
-  sendData() {
+  sendData(strikes: number) {
     const data = this.currentRound()
-    const strikes = this.strikes()
+    // const strikes = this.strikes()
     this.familyfeudService.sendData({
       answers: data.answers.map(a => {
         return {
@@ -117,12 +117,12 @@ export class AdminBoardComponent implements OnInit, OnDestroy {
     if (value < 3) {
       this.strikes.set(value + 1)
     }
-    this.sendData()
+    this.sendData(this.strikes())
   }
 
   show(answer: Answer) {
     answer.revealed = !answer.revealed
-    this.sendData()
+    this.sendData(0)
   }
 
   move(backward: boolean) {
@@ -134,13 +134,13 @@ export class AdminBoardComponent implements OnInit, OnDestroy {
       game.rounds.forEach(g => g.answers.forEach(a => a.revealed = false))
       this.game.set(game)
       this.currentRound.set(game.rounds[index - 1])
-      this.sendData()
+      this.sendData(0)
     } else if (!backward && index < game.rounds.length - 1) {
       this.strikes.set(0)
       game.rounds.forEach(g => g.answers.forEach(a => a.revealed = false))
       this.game.set(game)
       this.currentRound.set(game.rounds[index + 1])
-      this.sendData()
+      this.sendData(0)
     }
   }
 
