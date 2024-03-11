@@ -5,7 +5,7 @@ services:
     container_name: certbot
     restart: unless-stopped
     image: certbot/certbot
-    command: certonly --standalone -d lyps.ee
+    command: certonly --standalone -d lyps.ee --email wajtkassikack@gmail.com --agree-tos --no-eff-email
     volumes:
       - cert_data:/etc/letsencrypt
     environment:
