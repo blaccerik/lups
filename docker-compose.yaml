@@ -20,7 +20,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - certificate_data:/etc/letsencrypt
+      - cert_data:/etc/letsencrypt
     depends_on:
       - certbot
   fastapi:
