@@ -13,8 +13,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./letsencrypt:/etc/letsencrypt
-      - ./nginx:/var/log/nginx
+      - certificate_data:/etc/letsencrypt
   fastapi:
     container_name: fastapi
     restart: unless-stopped
@@ -101,7 +100,7 @@ networks:
     driver: bridge
 
 volumes:
-  cert_data:
+  certificate_data:
   postgres_data:
   image_data:
   redis_data:

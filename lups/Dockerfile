@@ -23,8 +23,12 @@ RUN ng build
 FROM nginx:alpine
 
 # Install bash for debugging purposes
-RUN apk update && apk add bash
+RUN apk update && apk add bash && apk add certbot
 
+# Generate cert
+RUN certbot certonly --standalone -d lyps.ee -n --agree-tos -m erik@example.com
+
+# Copy conf
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy the built Angular app from the previous stage into the Nginx directory
