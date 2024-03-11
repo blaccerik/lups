@@ -1,0 +1,219 @@
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: mediumblue;
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  background-color: mediumblue;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.settings {
+  &-stats {
+    background-color: gold;
+    border-radius: 5px;
+    padding: 7px;
+  }
+  &-box {
+    width: 78%;
+    margin: 3% 0;
+    background-color: dodgerblue;
+    box-shadow: 0 0 0 5px black, 0 0 0 10px gold, 0 0 0 15px black;
+    border-radius: 15px;
+    padding: 1%;
+    display: flex;
+    flex-direction: row;
+    gap: 2%;
+  }
+}
+
+
+.rounds {
+  &-title {
+    text-transform: uppercase;
+    width: 100%;
+    margin: 1%;
+    font-size: 40px;
+    color: white;
+    font-weight: 600;
+    border-bottom: 5px solid black;
+    text-align: center;
+  }
+
+  &-box {
+    width: 80%;
+    margin-bottom: 5%;
+    background-color: dodgerblue;
+    box-shadow: 0 0 0 5px black, 0 0 0 10px gold, 0 0 0 15px black;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  &-add {
+    margin: 25px;
+  }
+}
+
+.round {
+  width: 85%;
+  margin: 5%;
+  border-radius: 15px;
+  padding: 10px;
+  background: linear-gradient(blue, darkblue);
+  box-shadow: 0 0 0 5px black, 0 0 0 10px gold, 0 0 0 15px black;
+  display: flex;
+  flex-direction: row;
+  gap: 3%;
+  justify-content: center;
+  align-items: center;
+
+  &-buttons {
+    display: flex;
+    flex-direction: column;
+
+    &-button {
+      margin: 10% 0;
+      background-color: gold;
+      border-radius: 25px;
+      font-size: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 450;
+      width: 40px;
+      height: 40px;
+      box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+    }
+  }
+
+  &-answers {
+    border-radius: 15px;
+    width: 75%;
+    background-color: dodgerblue;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 10px;
+
+    &-error {
+      font-size: 20px;
+      color: white;
+      background-color: red;
+      padding: 5px;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
+
+    &-title-box {
+      width: calc(100% - 15px);
+      background-color: gold;
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      padding-left: 15px;
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+    }
+
+    &-title {
+      font-size: 20px;
+      font-weight: 400;
+      margin-left: 15px;
+    }
+
+    &-input {
+      margin-left: 15px;
+
+      box-sizing: border-box;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 20px;
+
+      &:focus {
+        outline: none;
+        border-color: #007bff; /* Change to the desired focus color */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add a subtle box shadow on focus */
+      }
+    }
+
+    &-add {
+      margin-top: 10px;
+    }
+  }
+
+  &-answer {
+    width: calc(95% - 15px);
+    margin-top: 10px;
+    background-color: gold;
+    border-radius: 5px;
+
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+
+    &-addup {
+      text-align: center;
+      text-transform: uppercase;
+      width: calc(95% - 25px);
+      margin-top: 10px;
+      background-color: red;
+      border-radius: 5px;
+      color: white;
+      font-size: 18px;
+      font-weight: 400;
+      margin-left: 10px;
+      padding: 10px;
+    }
+
+    &-remove {
+      margin-left: auto;
+      margin-right: 10px;
+    }
+
+    &-text {
+      font-size: 18px;
+      font-weight: 400;
+      margin-left: 10px;
+    }
+
+    &-input {
+      margin-left: 10px;
+      box-sizing: border-box;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 18px;
+      width: fit-content;
+
+
+      &:focus {
+        outline: none;
+        border-color: #007bff; /* Change to the desired focus color */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add a subtle box shadow on focus */
+      }
+    }
+
+    &-error {
+      font-size: 20px;
+      color: white;
+      background-color: red;
+      padding: 5px;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
+  }
+}

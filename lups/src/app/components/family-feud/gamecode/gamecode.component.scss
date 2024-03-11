@@ -1,0 +1,51 @@
+
+
+.popup {
+  background: linear-gradient(blue, darkblue);
+  padding: 30px;
+
+  border-radius: 15px;
+  border: 5px solid black;
+  outline: 7px solid gold;
+  box-shadow: 0 0 0 10px black;
+  //width: 500px;
+
+  display: flex;
+  flex-direction: row;
+
+  &-wrapper {
+    //border-radius: 15px;
+    //border: 5px solid black;
+
+    background-color: black;
+    padding: 10px;
+  }
+  //outline: 7px solid gold;
+  //box-shadow: 0 0 0 10px black;
+}
+
+.pinBox {
+  background-color: dodgerblue;
+  border-radius: 15px;
+  border: 5px solid black;
+}
+
+.pinEntry {
+  text-transform: uppercase;
+  padding-left: 50px;
+  font-family: courier, monospaced, serif;
+  font-size: 100px;
+  height: 100px;
+  width: 400px;
+  letter-spacing: 40px;
+  background-color: transparent;
+  border: 0;
+  outline: none;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px;
+  justify-content: space-between;
+}

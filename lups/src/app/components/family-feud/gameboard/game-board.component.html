@@ -1,0 +1,33 @@
+<app-gamebanner></app-gamebanner>
+<div class="container">
+  <div *ngIf="game().number === -1" class="spinner">
+    <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+  </div>
+  <div *ngIf="game().number !== -1" class="board">
+    <div class="board-question">{{game().question}}</div>
+    <div class="board-box">
+      <div *ngIf="showStrike" class="board-strikes">
+        <div *ngFor="let strike of strikes()">
+          <div class="board-strike">
+            X
+          </div>
+
+        </div>
+      </div>
+      <div class="board-item" *ngFor="let answer of answers()">
+        <div class="board-text" *ngIf="answer.revealed">
+          {{answer.text}}
+        </div>
+        <div class="board-points" *ngIf="answer.revealed">
+          {{answer.points}}
+        </div>
+        <div class="board-number" *ngIf="!answer.revealed && answer.number !== -1">
+          {{answer.number}}
+        </div>
+      </div>
+    </div>
+    <div class="board-total-points">{{points()}}</div>
+  </div>
+</div>
+
+

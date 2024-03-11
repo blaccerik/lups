@@ -38,6 +38,7 @@ export class NavbarComponent {
     {text: "Meelelahutus", id: 3, isSeen: false},
     {text: "Lõuend", parentId: 3, isSeen: false, link: "/place"},
     {text: "Vambolai", parentId: 3, isSeen: false, link: "/chat"},
+    {text: "Rooside sõda", parentId: 3, isSeen: false, link: "/familyfeud"},
   ]
 
 
