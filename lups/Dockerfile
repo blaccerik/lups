@@ -26,7 +26,7 @@ FROM nginx:alpine
 RUN apk update && apk add bash && apk add certbot
 
 # Generate cert
-RUN certbot certonly --standalone --preferred-challenges http -d lyps.ee
+RUN certbot certonly --standalone --preferred-challenges http -d lyps.ee --email wajtkassikack@gmail.com --agree-tos
 
 # Copy conf
 COPY nginx.conf /etc/nginx/nginx.conf
