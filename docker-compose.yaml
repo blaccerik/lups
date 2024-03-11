@@ -2,6 +2,8 @@ version: '3.8'
 
 services:
   certbot:
+    container_name: certbot
+    restart: unless-stopped
     image: certbot/certbot
     command: certonly --standalone -d lyps.ee
     volumes:
