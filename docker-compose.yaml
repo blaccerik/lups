@@ -109,7 +109,7 @@ networks:
     driver: bridge
 
 volumes:
-  certificate_data:
+  cert_data:
   postgres_data:
   image_data:
   redis_data:
