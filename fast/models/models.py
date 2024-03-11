@@ -86,7 +86,7 @@ class DBFamilyFeudRound(Base):
     __tablename__ = 'family_feud_round'
     id = Column(Integer, primary_key=True)
     game_code = Column(String(4), ForeignKey('family_feud_game.code', ondelete="CASCADE"), nullable=False)
-    question = Column(String(25), nullable=False)
+    question = Column(String(40), nullable=False)
     round_number = Column(Integer, nullable=False)
 
     def __repr__(self):
@@ -108,7 +108,7 @@ def init_db():
 
     print("start")
     # Drop all tables
-    Base.metadata.drop_all(engine)
+    # Base.metadata.drop_all(engine)
 
     print("dropped")
     # Create all tables

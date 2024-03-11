@@ -46,7 +46,7 @@
                   (click)="toggleEditQuestion(gameRound)">
             <mat-icon>edit</mat-icon>
           </button>
-          <input class="round-answers-input" *ngIf="gameRound.editing" [(ngModel)]="gameRound.question" maxlength="20"
+          <input class="round-answers-input" *ngIf="gameRound.editing" [(ngModel)]="gameRound.question" maxlength="40"
                  placeholder="Hesburger">
           <button *ngIf="gameRound.editing" mat-icon-button matTooltip="Muuda"
                   (click)="toggleEditQuestion(gameRound)">

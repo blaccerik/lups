@@ -24,7 +24,7 @@ class Game(BaseModel):
 class GameRound(BaseModel):
     answers: List[Answer]
     round_number: int
-    question: constr(min_length=1, max_length=20)
+    question: constr(min_length=1, max_length=40)
 
 
 class GameData(BaseModel):
