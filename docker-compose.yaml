@@ -1,6 +1,13 @@
 version: '3.8'
 
 services:
+  certbot:
+    image: certbot/certbot
+    command: certonly --standalone -d lyps.ee
+    volumes:
+      - cert_data:/etc/letsencrypt
+    environment:
+      - CERTBOT_IS_INSIDE_DOCKER=true
   nginx:
     container_name: nginx
     restart: unless-stopped
@@ -14,6 +21,8 @@ services:
       - "443:443"
     volumes:
       - certificate_data:/etc/letsencrypt
+    depends_on:
+      - certbot
   fastapi:
     container_name: fastapi
     restart: unless-stopped

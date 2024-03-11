@@ -23,15 +23,7 @@ RUN ng build
 FROM nginx:alpine
 
 # Install bash for debugging purposes
-RUN apk update && apk add bash && apk add certbot
-
-
-# Expose the ports for HTTP and HTTPS
-EXPOSE 80
-EXPOSE 443
-
-# Generate cert
-RUN certbot certonly --standalone --preferred-challenges http -d lyps.ee --email wajtkassikack@gmail.com --agree-tos
+RUN apk update && apk add bash
 
 # Copy conf
 COPY nginx.conf /etc/nginx/nginx.conf
