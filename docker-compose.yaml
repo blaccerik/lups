@@ -33,19 +33,19 @@ services:
     tty: true
     volumes:
       - cert_data:/etc/letsencrypt
-#  nginx:
-#    container_name: nginx
-#    restart: unless-stopped
-#    build:
-#      context: lups/.
-#      dockerfile: Dockerfile
-#    networks:
-#      - lups
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    volumes:
-#      - cert_data:/etc/letsencrypt
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    build:
+      context: lups/.
+      dockerfile: Dockerfile
+    networks:
+      - lups
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - cert_data:/etc/letsencrypt
 #  fastapi:
 #    container_name: fastapi
 #    restart: unless-stopped
