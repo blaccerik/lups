@@ -31,6 +31,8 @@ services:
     command: [ "bash" ]
     stdin_open: true
     tty: true
+    volumes:
+      - cert_data:/etc/letsencrypt
 #  nginx:
 #    container_name: nginx
 #    restart: unless-stopped
