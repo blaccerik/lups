@@ -14,4 +14,4 @@ def get_chat_messages(chat_id: int, session: Session) -> List[ChatMessage]:
         DBMessage.chat_id == chat_id,
         DBMessage.deleted == False
     )).all()[-MESSAGES_SIZE:]
-    return [ChatMessage(text_model=m.text_model, owner=m.owner) for m in messages]
+    return [ChatMessage(text=m.text, owner=m.owner) for m in messages]

@@ -32,9 +32,8 @@ class DBMessage(Base):
     id = Column(Integer, primary_key=True)
     chat_id = Column(Integer, ForeignKey('chats.id'), nullable=False)
     text = Column(String(512), nullable=False)
-    text_model = Column(String(512), nullable=False)
     language = Column(Enum("estonia", "english", name="message_language_enum"), nullable=False)
-    owner = Column(Enum("user", "model", name="message_owner_enum"), nullable=False)
+    owner = Column(String(10), nullable=False)
     deleted = Column(Boolean, nullable=False, default=False)
 
     def __repr__(self):
@@ -82,7 +81,6 @@ class DBFamilyFeudGame(Base):
     started = Column(Boolean, nullable=False, default=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
-
 class DBFamilyFeudRound(Base):
     __tablename__ = 'family_feud_round'
     id = Column(Integer, primary_key=True)
@@ -92,7 +90,6 @@ class DBFamilyFeudRound(Base):
 
     def __repr__(self):
         return f'{self.game_code} {self.id} {str(self.round_number)} {self.question}'
-
 
 class DBFamilyFeudAnswer(Base):
     __tablename__ = 'family_feud_answer'

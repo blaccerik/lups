@@ -1,5 +1,4 @@
 import json
-import json
 import logging
 import uuid
 
@@ -9,49 +8,45 @@ from redis import Redis
 from sqlalchemy.orm import Session
 from sse_starlette import EventSourceResponse
 
+from schemas.chat import ChatUpdate, ChatPostRespond, ChatMessage
 from services.chat_service import read_user, read_chats_by_user, read_messages, user_has_chat, create_chat, task_stream, \
     create_message, update_chat_title
 from utils.auth import get_current_user
+from utils.celery_config import celery_app
 from utils.database import get_db
 from utils.redis_database import get_redis
-from utils.schemas import User, ChatPost, ChatPostRespond, ChatUpdate
+from utils.schemas import User
 
 router = APIRouter(prefix="/api/chat")
 logger = logging.getLogger("Chat")
 
-from utils.celery_config import celery_app
-
 
 @router.get("/")
-async def get_chats(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_chats(
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
     user_id = read_user(current_user, db)
     chats = read_chats_by_user(user_id, db)
     return chats
 
 
-@router.get("/test")
-async def test():
-
-    # send task to worker
-    task = celery_app.send_task("stream", args=[
-        13,
-        333,
-        "est"
-    ])
-
-    return task.id
-
-
 @router.get("/new")
-async def get_chat(current_user: User = Depends(get_current_user), postgres_client: Session = Depends(get_db)):
+async def get_chat(
+        current_user: User = Depends(get_current_user),
+        postgres_client: Session = Depends(get_db)
+):
     user_id = read_user(current_user, postgres_client)
     chat_response = create_chat(user_id, postgres_client)
     return chat_response
 
 
 @router.get("/{chat_id}")
-async def get_chat_by_id(chat_id: int, current_user: User = Depends(get_current_user),
-                         postgres_client: Session = Depends(get_db)):
+async def get_chat_by_id(
+        chat_id: int,
+        current_user: User = Depends(get_current_user),
+        postgres_client: Session = Depends(get_db)
+):
     user_id = read_user(current_user, postgres_client)
     return read_messages(chat_id, user_id, postgres_client)
 
@@ -60,8 +55,7 @@ async def get_chat_by_id(chat_id: int, current_user: User = Depends(get_current_
 async def update_chat(
         chat_id: int,
         chat_update: ChatUpdate,
-        current_user:
-        User = Depends(get_current_user),
+        current_user: User = Depends(get_current_user),
         postgres_client: Session = Depends(get_db)
 ):
     user_id = read_user(current_user, postgres_client)
@@ -74,7 +68,7 @@ async def update_chat(
 @router.post("/{chat_id}")
 async def post_chat_by_id(
         chat_id: int,
-        chat_post: ChatPost,
+        chat_message: ChatMessage,
         current_user: User = Depends(get_current_user),
         redis_client: Redis = Depends(get_redis),
         postgres_client: Session = Depends(get_db)
@@ -83,32 +77,27 @@ async def post_chat_by_id(
     if await redis_client.sismember("chats", str(chat_id)):
         raise HTTPException(status_code=403, detail="Chat is in queue")
 
-    user_id = read_user(current_user, postgres_client)
-
     # check if user has chat
+    user_id = read_user(current_user, postgres_client)
     await user_has_chat(chat_id, user_id, postgres_client)
 
     # add message to database
-    dbm_id = create_message(chat_id, chat_post, postgres_client)
-
-    # create stream link
-    stream_id = uuid.uuid4().hex
+    dbm_id = create_message(chat_id, chat_message, postgres_client)
 
     # lock chat
     await redis_client.sadd("chats", str(chat_id))
 
     # send task to worker
+    stream_id = uuid.uuid4().hex
     task = celery_app.send_task("stream", args=[
         chat_id,
         stream_id,
-        chat_post.language_type.value
+        chat_message.language.value
     ])
 
     # save stream
     await redis_client.hset("streams", stream_id, json.dumps({
-        "task": task.id,
-        "chat": chat_id,
-        "lang": chat_post.language_type.value
+        "task": task.id
     }))
     return ChatPostRespond(stream_id=stream_id, message_id=dbm_id)
 
@@ -126,7 +115,7 @@ async def delete_chat_stream(
     task_id = data["task"]
     a = AbortableAsyncResult(task_id)
     r = a.abort()
-    print("abort", r)
+    logger.info(f"Aborted {task_id} {r}")
     return
 
 

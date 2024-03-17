@@ -1,4 +1,8 @@
+from typing import List
+
 from llama_cpp import Llama
+
+from schemas.schemas import ChatMessage
 
 
 class ModelLoader(object):
@@ -32,15 +36,15 @@ class ModelLoader(object):
         self.llm = Llama(model_path=model_name, verbose=False)
         print("model loaded")
 
-    def format_chat(self, messages):
+    def format_chat(self, messages: List[ChatMessage]):
         text = """<|im_start|>system
 A conversation between a User and Vambola. Vambola is an AI chatbot for lyps.ee. Lyps is a political party in Estonia<|im_end|>
 """
         for m in messages:
             if m.owner == "user":
-                text += f"<|im_start|>user\n{m.text_model}<|im_end|>\n"
+                text += f"<|im_start|>user\n{m.text}<|im_end|>\n"
             else:
-                text += f"<|im_start|>vambola\n{m.text_model}<|im_end|>\n"
+                text += f"<|im_start|>vambola\n{m.text}<|im_end|>\n"
         text += "<|im_start|>vambola\n"
         return text
 
