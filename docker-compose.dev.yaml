@@ -47,6 +47,7 @@ services:
 
   worker:
     container_name: worker
+    restart: unless-stopped
     build:
       context: worker
     command: celery --app main worker --concurrency=1 --pool prefork
@@ -70,8 +71,8 @@ services:
       - redis_data:/data
   postgres:
     container_name: postgres
-    image: postgres:alpine
     restart: unless-stopped
+    image: postgres:alpine
     ports:
       - "5432:5432"
     environment:
@@ -83,9 +84,9 @@ services:
     networks:
       - lups
   pgadmin:
+    container_name: pgadmin
     restart: unless-stopped
     image: dpage/pgadmin4
-    container_name: pgadmin
     depends_on:
       - postgres
     ports:
