@@ -1,0 +1,34 @@
+<button mat-icon-button class="toggle-button" (click)="toggleSidenav()">
+  <mat-icon>{{isSidenavOpen ? "arrow_forward_ios" : "arrow_back_ios"}}</mat-icon>
+</button>
+<div *ngIf="!hasLoaded()" class="spinner">
+  <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+</div>
+<div #scrollContainer *ngIf="hasLoaded()" class="chat-box">
+  <div *ngFor="let message of messages" class="chat-line">
+    <div class="chat-message">
+      <div class="chat-owner">
+        {{message.message_owner === "user" ? "Kasutaja" : "Vambola"}}:
+      </div>
+      {{message.message_text}}
+    </div>
+  </div>
+</div>
+<div class="chat-input">
+  <mat-form-field appearance="outline" class="chat-input-box">
+    <mat-label>Kirjuta siia midagi</mat-label>
+    <input matInput type="text" [(ngModel)]="textField" (keyup.enter)="send()">
+    <button matSuffix mat-icon-button aria-label="Clear" *ngIf="textField" (click)="textField=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+  <button *ngIf="!isStreaming" mat-mini-fab color="primary" class="chat-input-button" (click)="send()">
+    <mat-icon>send</mat-icon>
+  </button>
+  <button *ngIf="isStreaming" mat-mini-fab color="primary" class="chat-input-button" (click)="cancel()">
+    <mat-icon>clear</mat-icon>
+  </button>
+  <button mat-mini-fab color="primary" class="chat-input-button" (click)="createNew()">
+    new
+  </button>
+</div>

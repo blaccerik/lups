@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {map, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
@@ -34,8 +34,10 @@ export interface ChatData {
 })
 export class ChatService {
   private url = 'api/chat';
+  private http = inject(HttpClient)
 
-  constructor(private http: HttpClient, private oauthService: OAuthService) {}
+  language = signal('english')
+  model = signal("small")
 
   getMessages(id: number): Observable<Message[]> {
     return this.http.get<Message[]>(this.url + "/" + id)
