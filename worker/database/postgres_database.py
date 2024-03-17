@@ -1,10 +1,8 @@
 import os
-from contextlib import contextmanager
 
-from sqlalchemy import create_engine, Column, String, Integer, ForeignKey, Boolean, Enum, Text, Date, func, \
-    PrimaryKeyConstraint
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = f"postgresql://{os.environ.get('POSTGRES_USER', 'erik')}:" \
                f"{os.environ.get('POSTGRES_PASSWORD', 'erik')}@" \

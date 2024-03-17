@@ -1,7 +1,11 @@
+import time
+
+from billiard.exceptions import SoftTimeLimitExceeded
 from celery import Celery
 
 from database.postgres_database import SessionLocal
 from database.redis_database import get_client
+from services.chat import get_chat_messages
 from task.predict_task import PredictTask
 
 # Python 3.11.8
@@ -21,9 +25,24 @@ def stream(self, chat_id, stream_id, language):
     redis_client = get_client()
     postgres_client = SessionLocal()
 
-    print(chat_id, stream_id, language)
-    print(self.cpp_model)
+    messages = get_chat_messages(chat_id, postgres_client)
+    print(messages)
 
+    text = """hello"""
+    total_text = ""
+    t1 = time.time()
+    try:
+        for index, text_part in enumerate(self.cpp_model.stream(text)):
+            if self.is_aborted():
+                print("aborted")
+                break
+            total_text += text_part
+            time.sleep(0.05)
+    except SoftTimeLimitExceeded:
+        print("time limit")
+    t2 = time.time()
+    print(f"Total text:\n{total_text}")
+    print(f"Time taken: {t2 - t1}")
     redis_client.close()
     postgres_client.close()
 

@@ -1,6 +1,5 @@
-import time
-
 from llama_cpp import Llama
+
 
 class ModelLoader(object):
     llm = None
@@ -46,18 +45,11 @@ A conversation between a User and Vambola. Vambola is an AI chatbot for lyps.ee.
         return text
 
     def stream(self, text):
-        print(f"input text:\n{text}")
-        t1 = time.time()
         stream = self.llm(prompt=text,
                           stream=True,
                           stop=["<|im_end|>"],
                           max_tokens=1000,
                           **self.config)
-        total = ""
         for output in stream:
             text_part = output['choices'][0]['text']
             yield text_part
-            total += text_part
-        t2 = time.time()
-        print(f"output text:\n{total}")
-        print(f"time taken {t2 - t1}")
