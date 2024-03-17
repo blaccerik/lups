@@ -68,22 +68,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
   }
 
-  onSubmit() {
-    if (this.form.valid) {
-      // Do something with the form data
-      console.log(this.form.value);
-    } else {
-      // Handle invalid form
-      console.log('Form is invalid');
-    }
-  }
 
-  isSidenavOpen = false;
   isStreaming = false;
 
-  toggleSidenav() {
-    this.isSidenavOpen = !this.isSidenavOpen;
-  }
 
   hasLoaded(): boolean {
     return this.messagesLoaded
