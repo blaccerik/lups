@@ -44,6 +44,20 @@ services:
 #      - worker
 #    networks:
 #      - lups
+
+  worker:
+    container_name: worker
+    build:
+      context: worker
+    command: celery --app main worker --concurrency=1 --pool prefork
+    environment:
+      - POSTGRES_USER=erik
+      - POSTGRES_PASSWORD=erik
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - lups
   redis:
     container_name: redis
     restart: unless-stopped

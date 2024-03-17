@@ -5,7 +5,7 @@ DATABASE_URI = f"redis://{os.environ.get('REDIS_BROKER_URL', 'localhost')}:6379/
 print(DATABASE_URI)
 
 celery_app = Celery(
-    'tasks',
+    'main',
     broker=DATABASE_URI,  # Replace with your Redis server configuration
     backend=DATABASE_URI,  # Replace with your Redis server configuration
 )

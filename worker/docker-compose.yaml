@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  worker:
+    container_name: worker
+    build:
+      context: .
+    command: celery --app main worker --concurrency=1 --pool prefork
+    environment:
+      - POSTGRES_USER=erik
+      - POSTGRES_PASSWORD=erik
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - lups

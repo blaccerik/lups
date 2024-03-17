@@ -29,6 +29,19 @@ async def get_chats(current_user: User = Depends(get_current_user), db: Session 
     return chats
 
 
+@router.get("/test")
+async def test():
+
+    # send task to worker
+    task = celery_app.send_task("stream", args=[
+        13,
+        333,
+        "est"
+    ])
+
+    return task.id
+
+
 @router.get("/new")
 async def get_chat(current_user: User = Depends(get_current_user), postgres_client: Session = Depends(get_db)):
     user_id = read_user(current_user, postgres_client)

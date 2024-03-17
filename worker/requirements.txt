@@ -1,0 +1,7 @@
+celery
+flower
+redis
+psycopg2
+llama-cpp-python
+SQLAlchemy
+huggingface_hub
