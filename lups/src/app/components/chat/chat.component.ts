@@ -1,4 +1,14 @@
-import {AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, signal, ViewChild} from '@angular/core';
+import {
+  AfterViewChecked,
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild
+} from '@angular/core';
 import {MatDrawer, MatDrawerContainer, MatDrawerContent} from "@angular/material/sidenav";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ChatData, ChatReceive, ChatSend, ChatService} from "../../services/chat.service";
@@ -34,12 +44,17 @@ export interface Message {
   styleUrl: './chat.component.scss'
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
+  private route = inject(ActivatedRoute)
+  private chatService = inject(ChatService)
   drawerOpen = signal(false)
+  chatId = signal(0)
+  chats = signal<ChatData[]>([])
+
 
   textField: string;
   messages: Message[];
-  chatId: number;
-  chats: ChatData[]
+  // chatId: number;
+  // chats: ChatData[]
   streamId: string;
   messagesLoaded: boolean;
   form: FormGroup;
@@ -54,18 +69,23 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     // {display: 'Suur', value: 'large'},
   ];
 
-  constructor(private chatService: ChatService,
+  constructor(
               private router: Router,
               private oauthService: OAuthService,
               public userInfoService: UserInfoService,
               private observer: BreakpointObserver,
-              private route: ActivatedRoute,
               private fb: FormBuilder
   ) {
-    this.form = this.fb.group({
-      language: ['english', Validators.required],
-      model: ['small', Validators.required],
-    });
+    //   const chats = this.chats()
+    //   console.log("effect", chats)
+    //   if (chats.length) {
+    //     this.router.navigate(['/chat', chats[0].chat_id]);
+    //   }
+    // });
+    // this.form = this.fb.group({
+    //   language: ['english', Validators.required],
+    //   model: ['small', Validators.required],
+
   }
 
 
@@ -83,33 +103,54 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnInit() {
-
     // load all user chats
-    this.chatService.getChats().subscribe({
-      next: (chats: ChatData[]) => {
-        this.chats = chats
-
+    this.chatService.getChats().subscribe(
+      chats => {
+        // this.chatService.chats.set(chats)
         // listen to url changes
         this.route.params.subscribe(params => {
-          console.log("params", params)
-          // no chat id
           const chatId = params["id"]
           if (!chatId) {
-            const lastChat = this.chats[this.chats.length - 1]
+            const lastChat = chats[chats.length - 1]
+            console.log("new", lastChat.chat_id)
+            // this.chatId.set(lastChat.chat_id)
+            this.chatService.chatId.set(lastChat.chat_id)
             this.router.navigate(['/chat', lastChat.chat_id]);
           } else {
-            this.loadComponent(chatId)
+            this.chatService.chatId.set(chatId)
           }
         })
       }
-    })
+    )
+
+
+    //   next: (chats: ChatData[]) => {
+    //     this.chats = chats
+
+    // // listen to url changes
+    // this.route.params.subscribe(params => {
+    //   console.log("params", params["id"])
+    //   // no chat id
+    //   // this.chatId.set(params["id"])
+    //
+    //   // const chatId = params["id"]
+    //   // console.log(chatId)
+    //   // if (!chatId) {
+    //   //   const lastChat = this.chats[this.chats.length - 1]
+    //     this.router.navigate(['/chat', 1]);
+    //   // } else {
+    //   //   // this.loadComponent(chatId)
+    //   // }
+    // })
+    // }
+    // })
 
 
   }
 
   loadComponent(id: number) {
     console.log("compobnent load", id)
-    this.chatId = id
+    // this.chatId = id
     this.messagesLoaded = false
     this.messages = []
     this.textField = ""
@@ -122,22 +163,22 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     // get all messages in a chat
-    this.getAllMessagesInChat()
+    // this.getAllMessagesInChat()
   }
 
-  private getAllMessagesInChat(): void {
-    this.chatService.getMessages(this.chatId).subscribe({
-      next: (messages: Message[]) => {
-        console.log(messages)
-        this.messages = messages;
-        this.messagesLoaded = true;
-      },
-      error: err => {
-        console.log(err)
-        // this.router.navigate([""])
-      }
-    })
-  }
+  // private getAllMessagesInChat(): void {
+  //   this.chatService.getMessages(this.chatId).subscribe({
+  //     next: (messages: Message[]) => {
+  //       console.log(messages)
+  //       this.messages = messages;
+  //       this.messagesLoaded = true;
+  //     },
+  //     error: err => {
+  //       console.log(err)
+  //       // this.router.navigate([""])
+  //     }
+  //   })
+  // }
 
   ngAfterViewChecked() {
     this.scrollToBottom();
@@ -214,18 +255,18 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       message_text: "Loading..."
     })
 
-    this.chatService.postMessage(this.chatId, message).subscribe({
-      next: chatSendRespond => {
-        console.log("stream id", chatSendRespond)
-        this.streamId = chatSendRespond.stream_id
-        this.updateUserMessageId(chatSendRespond.message_id)
-        this.streamSubscription = this.chatService.getStreamMessages(this.streamId).subscribe({
-          next: chatReceive => {
-            this.updateModelMessage(chatReceive)
-          }
-        })
-      }
-    })
+    // this.chatService.postMessage(this.chatId, message).subscribe({
+    //   next: chatSendRespond => {
+    //     console.log("stream id", chatSendRespond)
+    //     this.streamId = chatSendRespond.stream_id
+    //     this.updateUserMessageId(chatSendRespond.message_id)
+    //     this.streamSubscription = this.chatService.getStreamMessages(this.streamId).subscribe({
+    //       next: chatReceive => {
+    //         this.updateModelMessage(chatReceive)
+    //       }
+    //     })
+    //   }
+    // })
     this.textField = ""
   }
 
@@ -241,26 +282,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.messagesLoaded = false
     this.chatService.newChat().subscribe({
       next: (chatData: ChatData) => {
-        this.chats.push(chatData)
+        // this.chats.push(chatData)
         this.router.navigate(["chat", chatData.chat_id])
       }
     })
   }
 
-  toggleEdit(chat: ChatData) {
-    if (chat.editing) {
-      this.chatService.editChatTitle(chat.chat_id, chat.title).subscribe()
-    }
-    chat.editing = !chat.editing
-  }
 
-  onTitleChange(event: Event, chat: ChatData): void {
-    const inputValue = (event.target as HTMLInputElement).value;
-    // Update the title of the item
-    chat.title = inputValue;
-  }
-
-  selectChat(id: number) {
-    this.router.navigate(["chat", id])
-  }
 }

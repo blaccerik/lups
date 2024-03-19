@@ -18,7 +18,6 @@
         </mat-select>
       </mat-form-field>
     </div>
-
     <div class="settings-box" style="background-color: deepskyblue">
       <mat-icon class="settings-box-icon">language</mat-icon>
       <div class="settings-box-title">Keel</div>
@@ -36,32 +35,32 @@
     </div>
   </form>
   <div class="drawer-title">
-    VESTLUSED
+    VESTLUSED {{chatService.chatId()}}
   </div>
-<!--  <div class="chats-container">-->
-<!--    <div *ngFor="let chat of chats">-->
-<!--      <div *ngIf="!chat.editing"-->
-<!--           [ngClass]="{'chats-selected':chat.chat_id == chatId,'chats-box': true,}"-->
-<!--           (click)="selectChat(chat.chat_id)">-->
-<!--        <div class="chats-title">-->
-<!--          {{chat.title}}-->
-<!--        </div>-->
-<!--        <button mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">-->
-<!--          <mat-icon>edit</mat-icon>-->
-<!--        </button>-->
-<!--      </div>-->
-<!--      <div *ngIf="chat.editing" class="chats-box">-->
-<!--        <input-->
-<!--          class="chats-input"-->
-<!--          type="text"-->
-<!--          [value]="chat.title"-->
-<!--          (input)="onTitleChange($event, chat)"-->
-<!--          maxlength="100"-->
-<!--        />-->
-<!--        <button mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">-->
-<!--          <mat-icon>done</mat-icon>-->
-<!--        </button>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
+  <div class="chats-container">
+    <div *ngFor="let chat of chats()">
+      <div *ngIf="!chat.editing"
+           [ngClass]="{'chats-selected':chat.chat_id === chatId(),'chats-box': true,}"
+           (click)="selectChat(chat.chat_id)">
+        <div class="chats-title">
+          {{chat.title}}
+        </div>
+        <button mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+      <div *ngIf="chat.editing" class="chats-box">
+        <input
+          class="chats-input"
+          type="text"
+          [value]="chat.title"
+          (input)="onTitleChange($event, chat)"
+          maxlength="100"
+        />
+        <button mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
+          <mat-icon>done</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

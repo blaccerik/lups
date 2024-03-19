@@ -38,6 +38,8 @@ export class ChatService {
 
   language = signal('english')
   model = signal("small")
+  chatId = signal(0)
+  chats = signal<ChatData[]>([])
 
   getMessages(id: number): Observable<Message[]> {
     return this.http.get<Message[]>(this.url + "/" + id)
