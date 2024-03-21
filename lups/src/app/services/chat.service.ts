@@ -1,8 +1,10 @@
-import {inject, Injectable, signal} from '@angular/core';
-import {map, Observable} from "rxjs";
+import {computed, effect, inject, Injectable, OnDestroy, Signal, signal} from '@angular/core';
+import {map, Observable, Subscription} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {OAuthService} from "angular-oauth2-oidc";
 import {Message} from "../components/chat/chat.component";
+import {toSignal} from "@angular/core/rxjs-interop";
+import {ActivatedRoute, Params} from "@angular/router";
 
 export interface ChatReceive {
   type: string
@@ -38,8 +40,23 @@ export class ChatService {
 
   language = signal('english')
   model = signal("small")
-  chatId = signal(0)
-  chats = signal<ChatData[]>([])
+  chats = signal([] as ChatData[])
+
+  constructor() {
+    this.http.get<ChatData[]>(this.url + "/").subscribe(data => {
+      this.chats.set(data)
+    })
+  }
+
+
+  // chatId = signal(0)
+  // private chats$ =  this.http.get<ChatData[]>(this.url + "/")
+  // chats: Signal<ChatData[]> = toSignal(this.chats$, {initialValue: []});
+  //
+  // test = computed(() => {
+  //   return this.chats()
+  // })
+
 
   getMessages(id: number): Observable<Message[]> {
     return this.http.get<Message[]>(this.url + "/" + id)

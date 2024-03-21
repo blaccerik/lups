@@ -7,8 +7,9 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatIconButton} from "@angular/material/button";
 import {ChatData, ChatService} from "../../../services/chat.service";
-import {throwIfEmpty} from "rxjs";
-import {Router} from "@angular/router";
+import {map, throwIfEmpty} from "rxjs";
+import {ActivatedRoute, Params, Router} from "@angular/router";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app-chat-drawer',
@@ -29,8 +30,13 @@ import {Router} from "@angular/router";
   templateUrl: './chat-drawer.component.html',
   styleUrl: './chat-drawer.component.scss'
 })
-export class ChatDrawerComponent implements OnInit {
+export class ChatDrawerComponent {
+  private activatedRoute = inject(ActivatedRoute)
   chatService = inject(ChatService)
+  chatId$ = this.activatedRoute.params.pipe(map(
+    data => Number(data["id"]) ?? 0
+  ))
+  chatId = toSignal(this.chatId$, {initialValue: 0} )
   router = inject(Router)
   fb = inject(FormBuilder)
   form = this.fb.group({
@@ -47,25 +53,15 @@ export class ChatDrawerComponent implements OnInit {
     {display: 'Suur', value: 'large'},
   ];
 
-  constructor() {
-    effect(() => {
-      console.log(this.chatService.chatId())
-    })
-  }
+  // constructor() {
+  //   effect(() => {
+  //     console.log("chat id", this.chatId(), typeof this.chatId())
+  //     for (const chat of this.chatService.chats()) {
+  //       console.log("chat", chat.chat_id, typeof chat.chat_id )
+  //     }
+  //   })
+  // }
 
-  chats = signal<ChatData[]>([])
-  chatId = signal(0)
-
-
-  // test = input.required<number>();
-  // @Input({required: true}) item!: number;
-
-  ngOnInit() {
-    // this.chatService.getChats().subscribe(data => {
-    //   console.log("data", data)
-    //   this.chats.set(data)
-    // })
-  }
 
   onSubmit() {
     if (this.form.valid) {
@@ -80,6 +76,7 @@ export class ChatDrawerComponent implements OnInit {
     const inputValue = (event.target as HTMLInputElement).value;
     // Update the title of the item
     chat.title = inputValue;
+    this.chatService.chats.set([...this.chatService.chats()])
   }
 
   selectChat(id: number) {
@@ -87,6 +84,10 @@ export class ChatDrawerComponent implements OnInit {
   }
 
   toggleEdit(chat: ChatData) {
+    if (chat.title === "") {
+      return
+    }
+
     if (chat.editing) {
       this.chatService.editChatTitle(chat.chat_id, chat.title).subscribe()
     }

@@ -3,7 +3,7 @@
     SEADED
   </div>
   <form [formGroup]="form" class="settings-container">
-    <div class="settings-box" style="background-color: gold">
+    <div class="settings-box" style="background-color: gold; border-color: goldenrod">
       <mat-icon class="settings-box-icon">memory</mat-icon>
       <div class="settings-box-title">Mudel</div>
       <mat-icon class="settings-box-info"
@@ -18,7 +18,7 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="settings-box" style="background-color: deepskyblue">
+    <div class="settings-box" style="background-color: deepskyblue; border-color: cornflowerblue">
       <mat-icon class="settings-box-icon">language</mat-icon>
       <div class="settings-box-title">Keel</div>
       <mat-icon class="settings-box-info"
@@ -35,17 +35,19 @@
     </div>
   </form>
   <div class="drawer-title">
-    VESTLUSED {{chatService.chatId()}}
+    VESTLUSED
   </div>
   <div class="chats-container">
-    <div *ngFor="let chat of chats()">
+    <div *ngFor="let chat of chatService.chats()">
       <div *ngIf="!chat.editing"
-           [ngClass]="{'chats-selected':chat.chat_id === chatId(),'chats-box': true,}"
-           (click)="selectChat(chat.chat_id)">
+           [ngClass]="{'chats-selected': chat.chat_id === chatId()}"
+           (click)="selectChat(chat.chat_id)"
+           class="chats-box"
+      >
         <div class="chats-title">
           {{chat.title}}
         </div>
-        <button mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
+        <button class="chats-button" mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
           <mat-icon>edit</mat-icon>
         </button>
       </div>
@@ -55,9 +57,9 @@
           type="text"
           [value]="chat.title"
           (input)="onTitleChange($event, chat)"
-          maxlength="100"
+          maxlength="50"
         />
-        <button mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
+        <button class="chats-button" mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
           <mat-icon>done</mat-icon>
         </button>
       </div>

@@ -12,15 +12,16 @@ import {
 import {MatDrawer, MatDrawerContainer, MatDrawerContent} from "@angular/material/sidenav";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ChatData, ChatReceive, ChatSend, ChatService} from "../../services/chat.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, Params, Router} from "@angular/router";
 import {OAuthService} from "angular-oauth2-oidc";
 import {UserInfoService} from "../../services/user-info.service";
 import {BreakpointObserver} from "@angular/cdk/layout";
-import {Subscription} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {ChatBoxComponent} from "./chat-box/chat-box.component";
 import {ChatDrawerComponent} from "./chat-drawer/chat-drawer.component";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 export interface Message {
   message_id: number
@@ -43,13 +44,15 @@ export interface Message {
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
-export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
-  private route = inject(ActivatedRoute)
+export class ChatComponent implements OnDestroy, OnInit, AfterViewChecked {
+  private activatedRoute = inject(ActivatedRoute)
   private chatService = inject(ChatService)
   drawerOpen = signal(false)
   chatId = signal(0)
   chats = signal<ChatData[]>([])
 
+  route$ = this.activatedRoute.params
+  route = toSignal(this.route$, {initialValue: {} as Params} )
 
   textField: string;
   messages: Message[];
@@ -76,6 +79,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
               private observer: BreakpointObserver,
               private fb: FormBuilder
   ) {
+
     //   const chats = this.chats()
     //   console.log("effect", chats)
     //   if (chats.length) {
@@ -86,6 +90,23 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     //   language: ['english', Validators.required],
     //   model: ['small', Validators.required],
 
+
+    // navigate to chat with id
+    effect(() => {
+      const chats = this.chatService.chats()
+      const route = this.route()
+      const chatId = route["id"]
+      if (!chatId && chats.length > 0) {
+        const lastChat = chats[chats.length - 1]
+        this.router.navigate(['/chat', lastChat.chat_id]);
+      }
+    })
+  }
+
+  ngOnInit(): void {
+    this.chatService.getChats().subscribe(data => {
+
+    })
   }
 
 
@@ -102,51 +123,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  ngOnInit() {
-    // load all user chats
-    this.chatService.getChats().subscribe(
-      chats => {
-        // this.chatService.chats.set(chats)
-        // listen to url changes
-        this.route.params.subscribe(params => {
-          const chatId = params["id"]
-          if (!chatId) {
-            const lastChat = chats[chats.length - 1]
-            console.log("new", lastChat.chat_id)
-            // this.chatId.set(lastChat.chat_id)
-            this.chatService.chatId.set(lastChat.chat_id)
-            this.router.navigate(['/chat', lastChat.chat_id]);
-          } else {
-            this.chatService.chatId.set(chatId)
-          }
-        })
-      }
-    )
-
-
-    //   next: (chats: ChatData[]) => {
-    //     this.chats = chats
-
-    // // listen to url changes
-    // this.route.params.subscribe(params => {
-    //   console.log("params", params["id"])
-    //   // no chat id
-    //   // this.chatId.set(params["id"])
-    //
-    //   // const chatId = params["id"]
-    //   // console.log(chatId)
-    //   // if (!chatId) {
-    //   //   const lastChat = this.chats[this.chats.length - 1]
-    //     this.router.navigate(['/chat', 1]);
-    //   // } else {
-    //   //   // this.loadComponent(chatId)
-    //   // }
-    // })
-    // }
-    // })
-
-
-  }
 
   loadComponent(id: number) {
     console.log("compobnent load", id)
@@ -287,6 +263,5 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       }
     })
   }
-
 
 }
