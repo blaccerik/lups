@@ -10,6 +10,8 @@ import {ChatData, ChatService} from "../../../services/chat.service";
 import {map, throwIfEmpty} from "rxjs";
 import {ActivatedRoute, Params, Router} from "@angular/router";
 import {toSignal} from "@angular/core/rxjs-interop";
+import {MatDivider} from "@angular/material/divider";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-chat-drawer',
@@ -25,7 +27,9 @@ import {toSignal} from "@angular/core/rxjs-interop";
     NgClass,
     NgForOf,
     NgIf,
-    MatIconButton
+    MatIconButton,
+    MatDivider,
+    MatProgressSpinner
   ],
   templateUrl: './chat-drawer.component.html',
   styleUrl: './chat-drawer.component.scss'
@@ -79,8 +83,10 @@ export class ChatDrawerComponent {
     this.chatService.chats.set([...this.chatService.chats()])
   }
 
-  selectChat(id: number) {
-    this.router.navigate(["chat", id])
+  selectChat(chat: ChatData) {
+    if (!chat.editing) {
+      this.router.navigate(["chat", chat.chat_id])
+    }
   }
 
   toggleEdit(chat: ChatData) {
