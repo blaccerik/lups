@@ -1,8 +1,36 @@
-<div class="container">
-<!--  {{messages()}}-->
-  <div *ngFor="let message of messages()">
-    {{message.text}} {{message.id}}
+<div class="chat">
+  <div class="chat-title">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 1440 320"
+    >
+      <path
+        fill="midnightblue"
+        fill-opacity="1"
+        d="M0,224L40,186.7C80,149,160,75,240,80C320,85,400,171,480,192C560,213,640,171,720,154.7C800,139,880,149,960,170.7C1040,192,1120,224,1200,229.3C1280,235,1360,213,1400,202.7L1440,192L1440,0L1400,0C1360,0,1280,0,1200,0C1120,0,1040,0,960,0C880,0,800,0,720,0C640,0,560,0,480,0C400,0,320,0,240,0C160,0,80,0,40,0L0,0Z">
+      </path>
+    </svg>
   </div>
+  <div *ngIf="messages() === null">
+    <mat-spinner></mat-spinner>
+  </div>
+  <div *ngIf="messages() !== null" class="chat-box">
+    <div class="chat-message" *ngFor="let message of messages()">
+      {{message.text}} {{message.id}}
+    </div>
+  </div>
+  <form *ngIf="messages() !== null" class="chat-input" [formGroup]="form">
+    <mat-form-field appearance="outline" class="chat-input-box">
+      <mat-label>Kirjuta siia midagi</mat-label>
+      <input matInput formControlName="text" type="text">
+    </mat-form-field>
+    <button mat-mini-fab color="primary" class="chat-input-button">
+      <mat-icon>send</mat-icon>
+    </button>
+    <button mat-mini-fab color="primary" class="chat-input-button">
+      <mat-icon>add</mat-icon>
+    </button>
+  </form>
 </div>
 
 

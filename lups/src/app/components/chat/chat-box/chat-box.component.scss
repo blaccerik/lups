@@ -1,6 +1,55 @@
-.container {
-  background-color: yellow;
-  width: 100px;
-  height: 500px;
-  margin-top: 10px;
+.chat {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5%;
+  align-items: center;
+  justify-content: center;
+
+  &-title {
+    z-index: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:0;
+  }
+
+  &-box {
+    z-index: 1;
+    border: 1px solid grey;
+    border-radius: 5px;
+    background-color: ghostwhite;
+    width: 90%;
+    height: calc(85% - 55px);
+  }
+
+  &-message {
+    margin: 5%;
+    background-color: dodgerblue;
+  }
+
+  &-input {
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 90%;
+    height: 55px;
+
+    &-button {
+      background-color: midnightblue;
+      height: 40px;
+      width: 40px;
+      margin-left: 10px;
+      color: white;
+    }
+
+    &-box {
+      border-radius: 5px;
+      width: calc(100% - 100px);
+      height: 55px;
+    }
+  }
 }

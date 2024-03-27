@@ -7,89 +7,9 @@
 
 .toggle-button {
   position: absolute;
-  right: 2%;
+  right: 1%;
   top: calc(50% - 50px);
   z-index: 99;
 }
 
-/* Translate the button to the right when the drawer is opened */
-.mat-drawer-opened .toggle-button {
-  right: 50%;
-  //transform: translateX(400px); /* Adjust the value according to your drawer width */
-}
-
-.chat {
-  &-container {
-    background-color: white;
-    display: flex;
-    position: relative;
-    justify-content: center;
-  }
-
-  &-box {
-    width: 75%;
-    position: relative;
-    height: calc(100% - 100px);
-    overflow-y: auto;
-    border: 1px solid gray;
-    border-radius: 4px;
-    //padding-right: 10px;
-    padding: 0 10px;
-    margin-top: 10px;
-
-    /* width */
-    &::-webkit-scrollbar {
-      width: 10px;
-    }
-
-    /* Track */
-    &::-webkit-scrollbar-track {
-      background: #d3d3d3;
-    }
-
-    /* Handle */
-    &::-webkit-scrollbar-thumb {
-      background: #888;
-    }
-
-    /* Handle on hover */
-    &::-webkit-scrollbar-thumb:hover {
-      background: #555;
-    }
-  }
-  &-line {
-    margin-top: 10px;
-    margin-bottom: 10px; /* Add some spacing between messages */
-  }
-  &-owner {
-    margin-bottom: 10px;
-    text-transform: capitalize;
-  }
-  &-message {
-    //background-color: silver;
-    //box-shadow: rgba(0, 0, 0, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
-    border: 1px solid gray;
-    border-radius: 5px;
-    padding: 15px;
-    white-space: pre-wrap; /* Preserve white spaces and wrap lines */
-  }
-  &-input {
-    position: absolute;
-    bottom: 5px;
-    width: calc(75% + 22px);
-    display: flex;
-  }
-  &-input-box {
-    width: calc(100% - 0px);
-  }
-  &-input-button {
-    margin: 6px;
-  }
-}
-
-.spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
