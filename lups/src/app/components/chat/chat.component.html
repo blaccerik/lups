@@ -1,11 +1,11 @@
 <mat-drawer-container class="main-container" autosize>
   <mat-drawer-content class="chat-container">
-    <button mat-icon-button class="toggle-button" (click)="drawerOpen.set(!drawerOpen())">
-      <mat-icon>{{drawerOpen() ? "arrow_forward_ios" : "arrow_back_ios"}}</mat-icon>
+    <button mat-icon-button class="toggle-button" (click)="drawer.opened = !drawer.opened">
+      <mat-icon>{{drawer.opened ? "arrow_forward_ios" : "arrow_back_ios"}}</mat-icon>
     </button>
     <app-chat-box></app-chat-box>
   </mat-drawer-content>
-  <mat-drawer [opened]="drawerOpen()" mode="side" position="end">
+  <mat-drawer mode="over" position="end" #drawer>
     <app-chat-drawer></app-chat-drawer>
   </mat-drawer>
 </mat-drawer-container>

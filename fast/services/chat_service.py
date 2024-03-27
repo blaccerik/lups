@@ -9,7 +9,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from models.models import DBUser, DBChat, DBMessage
-from schemas.chat import Chat, ChatMessage, LanguageType
+from schemas.chat import Chat, ChatMessage, LanguageType, OwnerType
 from utils.schemas import User
 
 MAX_USER_NAME_SIZE = 50
@@ -72,18 +72,26 @@ def read_chats_by_user(user_id: int, session: Session) -> List[Chat]:
     return [Chat(title=c.title, chat_id=c.id) for c in chats]
 
 
-def read_messages(chat_id: int, user_id: int, session: Session) -> List[ChatMessage]:
-    user_has_chat(chat_id, user_id, session)
+async def read_messages(chat_id: int, user_id: int, session: Session) -> List[ChatMessage]:
+    await user_has_chat(chat_id, user_id, session)
     messages = session.query(DBMessage).filter(and_(
         DBMessage.chat_id == chat_id,
         DBMessage.deleted == False
     )).all()
-    return [ChatMessage(
-        id=dbm.id,
-        text=dbm.text,
-        owner=dbm.owner,
-        type=LanguageType(dbm.language)
-    ) for dbm in messages]
+    return [
+        ChatMessage(
+            id=1,
+            text="tetet heurewi rwoe",
+            owner=OwnerType("user"),
+            language=LanguageType("english")
+        )
+    ]
+    # return [ChatMessage(
+    #     id=dbm.id,
+    #     text=dbm.text,
+    #     owner=OwnerType(dbm.owner),
+    #     language=LanguageType(dbm.language)
+    # ) for dbm in messages]
 
 
 def delete_messages(chat_id: int, user_id: int, session: Session):

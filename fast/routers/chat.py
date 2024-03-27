@@ -48,7 +48,7 @@ async def get_chat_by_id(
         postgres_client: Session = Depends(get_db)
 ):
     user_id = read_user(current_user, postgres_client)
-    return read_messages(chat_id, user_id, postgres_client)
+    return await read_messages(chat_id, user_id, postgres_client)
 
 
 @router.put("/{chat_id}")

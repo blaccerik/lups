@@ -1,3 +1,11 @@
+<div class="container">
+<!--  {{messages()}}-->
+  <div *ngFor="let message of messages()">
+    {{message.text}} {{message.id}}
+  </div>
+</div>
+
+
 <!--<button mat-icon-button class="toggle-button" (click)="toggleSidenav()">-->
 <!--  <mat-icon>{{isSidenavOpen ? "arrow_forward_ios" : "arrow_back_ios"}}</mat-icon>-->
 <!--</button>-->

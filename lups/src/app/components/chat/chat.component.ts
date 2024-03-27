@@ -104,9 +104,9 @@ export class ChatComponent implements OnDestroy, OnInit, AfterViewChecked {
   }
 
   ngOnInit(): void {
-    this.chatService.getChats().subscribe(data => {
-
-    })
+    // this.chatService.getChats().subscribe(data => {
+    //
+    // })
   }
 
 

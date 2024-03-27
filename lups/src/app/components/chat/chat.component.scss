@@ -12,6 +12,12 @@
   z-index: 99;
 }
 
+/* Translate the button to the right when the drawer is opened */
+.mat-drawer-opened .toggle-button {
+  right: 50%;
+  //transform: translateX(400px); /* Adjust the value according to your drawer width */
+}
+
 .chat {
   &-container {
     background-color: white;

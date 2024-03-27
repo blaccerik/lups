@@ -31,6 +31,13 @@ export interface ChatData {
   editing: boolean
 }
 
+export interface ChatMessage {
+  id: number
+  text: string
+  owner: string
+  language: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -58,8 +65,8 @@ export class ChatService {
   // })
 
 
-  getMessages(id: number): Observable<Message[]> {
-    return this.http.get<Message[]>(this.url + "/" + id)
+  getChatMessages(id: number): Observable<ChatMessage[]> {
+    return this.http.get<ChatMessage[]>(this.url + "/" + id)
   }
 
   editChatTitle(id: number, title: string): Observable<any> {

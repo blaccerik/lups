@@ -37,10 +37,10 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
 export class ChatDrawerComponent {
   private activatedRoute = inject(ActivatedRoute)
   chatService = inject(ChatService)
-  chatId$ = this.activatedRoute.params.pipe(map(
-    data => Number(data["id"]) ?? 0
-  ))
-  chatId = toSignal(this.chatId$, {initialValue: 0} )
+  // chatId$ = this.activatedRoute.params.pipe(map(
+  //   data => Number(data["id"]) ?? 0
+  // ))
+  // chatId = toSignal(this.chatId$, {initialValue: 0} )
   router = inject(Router)
   fb = inject(FormBuilder)
   form = this.fb.group({
@@ -89,7 +89,8 @@ export class ChatDrawerComponent {
     }
   }
 
-  toggleEdit(chat: ChatData) {
+  toggleEdit(event: MouseEvent, chat: ChatData) {
+    event.stopPropagation();
     if (chat.title === "") {
       return
     }
@@ -98,5 +99,6 @@ export class ChatDrawerComponent {
       this.chatService.editChatTitle(chat.chat_id, chat.title).subscribe()
     }
     chat.editing = !chat.editing
+    this.chatService.chats.set([...this.chatService.chats()])
   }
 }

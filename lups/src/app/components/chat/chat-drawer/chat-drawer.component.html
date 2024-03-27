@@ -50,7 +50,7 @@
       <div *ngIf="!chat.editing" class="chats-title">
         {{chat.title}}
       </div>
-      <button *ngIf="!chat.editing" class="chats-button" mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
+      <button *ngIf="!chat.editing" class="chats-button" mat-icon-button (click)="toggleEdit($event, chat)">
         <mat-icon>edit</mat-icon>
       </button>
       <input
@@ -61,7 +61,7 @@
         (input)="onTitleChange($event, chat)"
         maxlength="50"
       />
-      <button *ngIf="chat.editing" class="chats-button" mat-icon-button matTooltip="Muuda" (click)="toggleEdit(chat)">
+      <button *ngIf="chat.editing" class="chats-button" mat-icon-button (click)="toggleEdit($event, chat)">
         <mat-icon>done</mat-icon>
       </button>
     </div>
