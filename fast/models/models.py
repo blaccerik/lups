@@ -107,7 +107,7 @@ def init_db():
 
     print("start")
     # Drop all tables
-    # Base.metadata.drop_all(engine)
+    Base.metadata.drop_all(engine)
 
     print("dropped")
     # Create all tables

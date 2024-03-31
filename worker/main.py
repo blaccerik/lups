@@ -35,6 +35,7 @@ def stream(self, chat_id, stream_id, language):
     t1 = time.time()
     try:
         for index, text_part in enumerate(self.cpp_model.stream(text)):
+            print(f"{index} {text_part}")
             if self.is_aborted():
                 print("aborted")
                 break

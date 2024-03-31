@@ -19,15 +19,15 @@
       {{message.text}} {{message.id}}
     </div>
   </div>
-  <form *ngIf="messages() !== null" class="chat-input" [formGroup]="form">
+  <form *ngIf="messages() !== null" class="chat-input" [formGroup]="form" (ngSubmit)="send()">
     <mat-form-field appearance="outline" class="chat-input-box">
       <mat-label>Kirjuta siia midagi</mat-label>
       <input matInput formControlName="text" type="text">
     </mat-form-field>
-    <button mat-mini-fab color="primary" class="chat-input-button">
+    <button mat-mini-fab color="primary" class="chat-input-button" type="submit">
       <mat-icon>send</mat-icon>
     </button>
-    <button mat-mini-fab color="primary" class="chat-input-button">
+    <button mat-mini-fab color="primary" class="chat-input-button" (click)="new()">
       <mat-icon>add</mat-icon>
     </button>
   </form>

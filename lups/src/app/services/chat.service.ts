@@ -76,27 +76,43 @@ export class ChatService {
     return this.http.put<any>(this.url + "/" + id, data)
   }
 
-  postMessage(id: number, chatSend: ChatSend): Observable<ChatSendRespond> {
+    postMessage(id: number, chatSend: ChatMessage): Observable<ChatSendRespond> {
     return this.http.post<ChatSendRespond>(this.url + "/" + id, chatSend)
   }
 
   getStreamMessages(streamId: string): Observable<ChatReceive> {
     const eventSource = new EventSource(this.url + "/stream/" + streamId)
     return new Observable<ChatReceive>((observer) => {
-      // need to use event listener or else zone js isn't triggered
-      eventSource.addEventListener("message", m => {
+
+      eventSource.onmessage = (m) => {
         const chatReceive = JSON.parse(m.data)
         observer.next(chatReceive)
         if (chatReceive.type === "end") {
           eventSource.close()
           observer.complete()
         }
-      })
-      eventSource.addEventListener("error", e => {
+      }
+
+      eventSource.onerror = (e) => {
         console.log(e)
         eventSource.close()
         observer.complete()
-      })
+      }
+
+      // // need to use event listener or else zone js isn't triggered
+      // eventSource.addEventListener("message", m => {
+      //   const chatReceive = JSON.parse(m.data)
+      //   observer.next(chatReceive)
+      //   if (chatReceive.type === "end") {
+      //     eventSource.close()
+      //     observer.complete()
+      //   }
+      // })
+      // eventSource.addEventListener("error", e => {
+      //   console.log(e)
+      //   eventSource.close()
+      //   observer.complete()
+      // })
     })
   }
 
