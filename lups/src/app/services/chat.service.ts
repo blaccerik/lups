@@ -1,10 +1,6 @@
-import {computed, effect, inject, Injectable, OnDestroy, Signal, signal} from '@angular/core';
-import {map, Observable, Subscription} from "rxjs";
+import {inject, Injectable, signal} from '@angular/core';
+import {map, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
-import {OAuthService} from "angular-oauth2-oidc";
-import {Message} from "../components/chat/chat.component";
-import {toSignal} from "@angular/core/rxjs-interop";
-import {ActivatedRoute, Params} from "@angular/router";
 
 export interface ChatReceive {
   type: string
@@ -76,7 +72,7 @@ export class ChatService {
     return this.http.put<any>(this.url + "/" + id, data)
   }
 
-    postMessage(id: number, chatSend: ChatMessage): Observable<ChatSendRespond> {
+  postMessage(id: number, chatSend: ChatMessage): Observable<ChatSendRespond> {
     return this.http.post<ChatSendRespond>(this.url + "/" + id, chatSend)
   }
 
@@ -120,16 +116,16 @@ export class ChatService {
     return this.http.delete<any>(this.url + "/stream/" + streamId)
   }
 
-  getChats(): Observable<ChatData[]> {
-    return this.http.get<ChatData[]>(this.url + "/")
-  }
+  // getChats(): Observable<ChatData[]> {
+  //   return this.http.get<ChatData[]>(this.url + "/")
+  // }
 
   newChat(): Observable<ChatData> {
     return this.http.get<ChatData>(this.url + "/new").pipe(
-        map(c => {
-          c.editing = false
-          return c
-        })
+      map(c => {
+        c.editing = false
+        return c
+      })
     )
   }
 }

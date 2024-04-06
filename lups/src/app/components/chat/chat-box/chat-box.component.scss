@@ -23,6 +23,19 @@
     background-color: ghostwhite;
     width: 90%;
     height: calc(85% - 55px);
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+    &::-webkit-scrollbar-track {
+      background: #d3d3d3;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
   }
 
   &-message {

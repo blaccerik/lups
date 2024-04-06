@@ -78,20 +78,21 @@ async def read_messages(chat_id: int, user_id: int, session: Session) -> List[Ch
         DBMessage.chat_id == chat_id,
         DBMessage.deleted == False
     )).all()
-    return [
-        ChatMessage(
-            id=1,
-            text="tetet heurewi rwoe",
-            owner=OwnerType("user"),
-            language=LanguageType("english")
-        )
-    ]
-    # return [ChatMessage(
-    #     id=dbm.id,
-    #     text=dbm.text,
-    #     owner=OwnerType(dbm.owner),
-    #     language=LanguageType(dbm.language)
-    # ) for dbm in messages]
+    # return [
+    #     ChatMessage(
+    #         id=1,
+    #         text="tetet heurewi rwoe",
+    #         owner=OwnerType("user"),
+    #         language=LanguageType("english")
+    #     )
+    # ]
+    print(messages)
+    return [ChatMessage(
+        id=dbm.id,
+        text=dbm.text,
+        owner=OwnerType(dbm.owner),
+        language=LanguageType(dbm.language)
+    ) for dbm in messages]
 
 
 def delete_messages(chat_id: int, user_id: int, session: Session):

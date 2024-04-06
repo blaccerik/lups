@@ -1,7 +1,17 @@
-import {Component, effect, inject, OnDestroy, signal} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {
+  AfterViewChecked,
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild
+} from '@angular/core';
+import {ActivatedRoute, Router} from "@angular/router";
 import {ChatMessage, ChatService} from "../../../services/chat.service";
-import {merge, of, Subscription, switchMap, throwIfEmpty} from "rxjs";
+import {merge, of, Subscription, switchMap} from "rxjs";
 import {NgForOf, NgIf} from "@angular/common";
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
@@ -9,8 +19,6 @@ import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
 import {MatIconButton, MatMiniFabButton} from "@angular/material/button";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
-import {toSignal} from "@angular/core/rxjs-interop";
-import {dateTimestampProvider} from "rxjs/internal/scheduler/dateTimestampProvider";
 
 @Component({
   selector: 'app-chat-box',
@@ -31,9 +39,10 @@ import {dateTimestampProvider} from "rxjs/internal/scheduler/dateTimestampProvid
   templateUrl: './chat-box.component.html',
   styleUrl: './chat-box.component.scss'
 })
-export class ChatBoxComponent implements OnDestroy {
+export class ChatBoxComponent implements OnDestroy, AfterViewChecked {
   private chatService = inject(ChatService)
   private activatedRoute = inject(ActivatedRoute)
+  private router = inject(Router)
   private fb = inject(FormBuilder)
   form = this.fb.group({
     text: ["", Validators.required],
@@ -49,11 +58,11 @@ export class ChatBoxComponent implements OnDestroy {
 
   constructor() {
 
+    // only purpose of the effect is to tell angular messages has been updated
+    // otherwise if chat stream parts come in then html wont be updated :/
     effect(() => {
-      const streamId = this.streamId()
-
-      // console.log(this.streamId())
-    })
+      this.messages()
+    });
 
     this.messages$ = this.activatedRoute.params.pipe(
       switchMap(params => {
@@ -70,6 +79,8 @@ export class ChatBoxComponent implements OnDestroy {
       })
     ).subscribe(data => {
       this.messages.set(data)
+      // use timeout so dom can update from signal
+      setTimeout(() => {this.scrollToBottom()}, 0)
     })
   }
 
@@ -87,95 +98,106 @@ export class ChatBoxComponent implements OnDestroy {
 
   send() {
     const text = this.form.value.text
-    if (text && !this.isWaiting()) {
-      this.isWaiting.set(true)
-      const userMessage: ChatMessage = {
-        text: text,
-        language: this.chatService.language(),
-        owner: "user",
-        id: -1
-      }
-      const modelMessage: ChatMessage = {
-        text: "loading...",
-        language: this.chatService.language(),
-        owner: this.chatService.model(),
-        id: -1
-      }
-      const messages = this.messages()
-      if (messages) {
-        this.messages.set([...messages, userMessage, modelMessage])
-      }
-      this.streamId$ = this.chatService.postMessage(this.chatId(), userMessage).subscribe(
-        data => {
-          this.streamId.set(data.stream_id)
-          const messages = this.messages()
-          if (!messages) {
-            return
-          }
-          const last = messages.find(m => m.owner === "user" && m.id === -1)
-          if (last) {
-            last.id = data.message_id
-          }
-          this.messages.set([...messages])
+    this.form.reset()
+    if (!text || this.isWaiting()) {
+      return
+    }
+    this.isWaiting.set(true)
+    const userMessage: ChatMessage = {
+      text: text,
+      language: this.chatService.language(),
+      owner: "user",
+      id: -1
+    }
+    const modelMessage: ChatMessage = {
+      text: "loading...",
+      language: this.chatService.language(),
+      owner: this.chatService.model(),
+      id: -1
+    }
 
-          // todo does not update on html
-          // when using effect + console log then it does :(
-          // use effect with streamid to update messages maybe?
-          this.stream$ = this.chatService.getStreamMessages(data.stream_id).subscribe(
-            textPart => {
-              // find last bot message
-              const messages = this.messages()
-              if (!messages) {
-                return
-              }
-              const m = messages.find(m => m.owner !== "user" && m.id === -1)
-              if (!m) {
-                return;
-              }
-              m.text = textPart.text
-              if (textPart.type === "end") {
-                m.id = textPart.id
-                this.isWaiting.set(false)
-              }
-              // this.messages.set([{
-              //   owner: "2",
-              //   text: "wewe",
-              //   language: "ee",
-              //   id: -1
-              // }])
-              // this.messages.update(
-              //   messages => {
-              //     if (!messages) {
-              //       return messages
-              //     }
-              //     const m = messages.find(m => m.owner !== "user" && m.id === -1)
-              //     if (!m) {
-              //       return messages
-              //     }
-              //     m.text = textPart.text
-              //     console.log(m)
-              //     // msgs?.find()
-              //     return [{
-              //       owner: "2",
-              //       text: "wewe",
-              //       language: "ee",
-              //       id: -1
-              //     }]
-              //   }
-              // )
-              this.messages.set([...messages])
-              // console.log(textPart)
-              // console.log(messages)
-            }
-          )
+    // update messages
+    const messages = this.messages()
+    if (messages) {
+      this.messages.set([...messages, userMessage, modelMessage])
+    }
+    setTimeout(() => {this.scrollToBottom()}, 0)
 
+    // send post request
+    this.streamId$ = this.chatService.postMessage(this.chatId(), userMessage).subscribe(
+      data => {
+        this.streamId.set(data.stream_id)
+        const messages = this.messages()
+        if (!messages) {
+          return
         }
-      )
+
+        const userMessage = messages.find(message => message.owner === "user" && message.id === -1)
+        if (userMessage) {
+          userMessage.id = data.message_id
+        }
+        this.messages.set([...messages])
+
+        // start listening for chat stream
+        this.stream$ = this.chatService.getStreamMessages(data.stream_id).subscribe(
+          textPart => {
+            const messages = this.messages()
+            if (!messages) {
+              return
+            }
+
+            // find last bot message
+            const botMessage = messages.find(message => message.owner !== "user" && message.id === -1)
+            if (botMessage) {
+              botMessage.text = textPart.text
+              if (textPart.type === "end") {
+                botMessage.id = textPart.id
+
+                // reset values
+                this.isWaiting.set(false)
+                this.streamId.set("")
+              }
+            }
+            this.messages.set([...messages])
+          }
+        )
+      }
+    )
+  }
+
+  cancel() {
+    const streamId = this.streamId()
+    if (!streamId) {
+      return
     }
     this.form.reset()
+    this.chatService.deleteStream(streamId).subscribe()
   }
 
   new() {
-    console.log("neew")
+    this.chatService.newChat().subscribe(
+      data => {
+        this.chatService.chats.set([...this.chatService.chats(), data])
+        this.router.navigate(["chat", data.chat_id])
+      }
+    )
+  }
+
+
+  ngAfterViewChecked() {
+    // this.scrollToBottom();
+  }
+
+  @ViewChild('scrollContainer') private scrollContainer: ElementRef | undefined;
+
+  scrollToBottom(): void {
+    const container = this.scrollContainer?.nativeElement
+    if (!container) {
+      return
+    }
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: 'smooth' // Add smooth scroll behavior
+    });
   }
 }

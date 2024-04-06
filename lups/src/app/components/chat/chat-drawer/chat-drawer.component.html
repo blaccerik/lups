@@ -46,7 +46,7 @@
     <div class="chats-loading" *ngIf="chatService.chats().length === 0">
       <mat-spinner></mat-spinner>
     </div>
-    <div class="chats-row-item" *ngFor="let chat of chatService.chats()" (click)="selectChat(chat)">
+    <div class="chats-row-item" [class.chats-selected]="chat.chat_id === Number(route()['id'])" *ngFor="let chat of chatService.chats()" (click)="selectChat(chat)">
       <div *ngIf="!chat.editing" class="chats-title">
         {{chat.title}}
       </div>

@@ -91,11 +91,12 @@ export class ChatComponent implements OnDestroy, OnInit, AfterViewChecked {
     //   model: ['small', Validators.required],
 
 
-    // navigate to chat with id
+    // navigate to chat with id if chat id is not given
     effect(() => {
       const chats = this.chatService.chats()
       const route = this.route()
       const chatId = route["id"]
+      console.log(chats)
       if (!chatId && chats.length > 0) {
         const lastChat = chats[chats.length - 1]
         this.router.navigate(['/chat', lastChat.chat_id]);

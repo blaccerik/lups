@@ -92,7 +92,8 @@ async def post_chat_by_id(
     task = celery_app.send_task("stream", args=[
         chat_id,
         stream_id,
-        chat_message.language.value
+        chat_message.language.value,
+        chat_message.owner.value
     ])
 
     # save stream

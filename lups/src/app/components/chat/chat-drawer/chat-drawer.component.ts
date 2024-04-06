@@ -1,5 +1,5 @@
-import {Component, effect, inject, Input, input, OnInit, signal} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {Component, inject} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatIcon} from "@angular/material/icon";
@@ -7,7 +7,6 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {MatIconButton} from "@angular/material/button";
 import {ChatData, ChatService} from "../../../services/chat.service";
-import {map, throwIfEmpty} from "rxjs";
 import {ActivatedRoute, Params, Router} from "@angular/router";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {MatDivider} from "@angular/material/divider";
@@ -37,10 +36,9 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
 export class ChatDrawerComponent {
   private activatedRoute = inject(ActivatedRoute)
   chatService = inject(ChatService)
-  // chatId$ = this.activatedRoute.params.pipe(map(
-  //   data => Number(data["id"]) ?? 0
-  // ))
-  // chatId = toSignal(this.chatId$, {initialValue: 0} )
+  route$ = this.activatedRoute.params
+  route = toSignal(this.route$, {initialValue: {} as Params})
+
   router = inject(Router)
   fb = inject(FormBuilder)
   form = this.fb.group({
@@ -56,16 +54,6 @@ export class ChatDrawerComponent {
     {display: 'Väike', value: 'small'},
     {display: 'Suur', value: 'large'},
   ];
-
-  // constructor() {
-  //   effect(() => {
-  //     console.log("chat id", this.chatId(), typeof this.chatId())
-  //     for (const chat of this.chatService.chats()) {
-  //       console.log("chat", chat.chat_id, typeof chat.chat_id )
-  //     }
-  //   })
-  // }
-
 
   onSubmit() {
     if (this.form.valid) {
@@ -101,4 +89,6 @@ export class ChatDrawerComponent {
     chat.editing = !chat.editing
     this.chatService.chats.set([...this.chatService.chats()])
   }
+
+  protected readonly Number = Number;
 }

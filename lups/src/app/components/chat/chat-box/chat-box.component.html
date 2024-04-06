@@ -14,17 +14,20 @@
   <div *ngIf="messages() === null">
     <mat-spinner></mat-spinner>
   </div>
-  <div *ngIf="messages() !== null" class="chat-box">
+  <div *ngIf="messages() !== null" class="chat-box" #scrollContainer>
     <div class="chat-message" *ngFor="let message of messages()">
       {{message.text}} {{message.id}}
     </div>
   </div>
-  <form *ngIf="messages() !== null" class="chat-input" [formGroup]="form" (ngSubmit)="send()">
+  <form *ngIf="messages() !== null" class="chat-input" [formGroup]="form">
     <mat-form-field appearance="outline" class="chat-input-box">
       <mat-label>Kirjuta siia midagi</mat-label>
       <input matInput formControlName="text" type="text">
     </mat-form-field>
-    <button mat-mini-fab color="primary" class="chat-input-button" type="submit">
+    <button *ngIf="isWaiting()" mat-mini-fab color="primary" class="chat-input-button" (click)="cancel()">
+      <mat-icon>cancel</mat-icon>
+    </button>
+    <button *ngIf="!isWaiting()" mat-mini-fab color="primary" class="chat-input-button" (click)="send()">
       <mat-icon>send</mat-icon>
     </button>
     <button mat-mini-fab color="primary" class="chat-input-button" (click)="new()">

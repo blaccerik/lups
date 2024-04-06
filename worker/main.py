@@ -21,7 +21,7 @@ MAX_TEXT_LEN = 512
 
 
 @celery_app.task(name="stream", soft_time_limit=60, base=PredictTask, bind=True)
-def stream(self, chat_id, stream_id, language):
+def stream(self, chat_id, stream_id, language, model):
     # get db
     redis_client = get_client()
     postgres_client = SessionLocal()
@@ -60,7 +60,7 @@ def stream(self, chat_id, stream_id, language):
 
     db_output = DBMessage(
         chat_id=chat_id,
-        owner="model",
+        owner=model,
         language=language,
         text=total_text,
     )

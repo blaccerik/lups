@@ -1,3 +1,4 @@
+import time
 from typing import List
 
 from llama_cpp import Llama
@@ -49,11 +50,14 @@ A conversation between a User and Vambola. Vambola is an AI chatbot for lyps.ee.
         return text
 
     def stream(self, text):
-        stream = self.llm(prompt=text,
-                          stream=True,
-                          stop=["<|im_end|>"],
-                          max_tokens=1000,
-                          **self.config)
-        for output in stream:
-            text_part = output['choices'][0]['text']
-            yield text_part
+        for i in range(15):
+            yield f"t{i} "
+            time.sleep(0.06)
+        # stream = self.llm(prompt=text,
+        #                   stream=True,
+        #                   stop=["<|im_end|>"],
+        #                   max_tokens=1000,
+        #                   **self.config)
+        # for output in stream:
+        #     text_part = output['choices'][0]['text']
+        #     yield text_part
