@@ -8,7 +8,7 @@ from redis import Redis
 from sqlalchemy.orm import Session
 from sse_starlette import EventSourceResponse
 
-from schemas.chat import ChatUpdate, ChatPostRespond, ChatMessage
+from schemas.chat import ChatUpdate, ChatPostRespond, ChatMessage, OwnerType
 from services.chat_service import read_user, read_chats_by_user, read_messages, user_has_chat, create_chat, task_stream, \
     create_message, update_chat_title
 from utils.auth import get_current_user
@@ -76,6 +76,10 @@ async def post_chat_by_id(
     # check if chat is not in queue
     if await redis_client.sismember("chats", str(chat_id)):
         raise HTTPException(status_code=403, detail="Chat is in queue")
+
+    # verify request
+    if chat_message.owner.value == OwnerType.user.value:
+        raise HTTPException(status_code=403, detail="Model is required")
 
     # check if user has chat
     user_id = read_user(current_user, postgres_client)

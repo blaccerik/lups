@@ -35,7 +35,8 @@ def stream(self, chat_id, stream_id, language, model):
     t1 = time.time()
     try:
         for index, text_part in enumerate(self.cpp_model.stream(text)):
-            print(f"{index} {text_part}")
+            if index % 10 == 0:
+                print(f"{index} {text_part}")
             if self.is_aborted():
                 print("aborted")
                 break
@@ -55,6 +56,9 @@ def stream(self, chat_id, stream_id, language, model):
     except SoftTimeLimitExceeded:
         print("time limit")
     t2 = time.time()
+    if total_text == "":
+        total_text = "."
+
     print(f"Total text:\n{total_text}")
     print(f"Time taken: {t2 - t1}")
 
@@ -85,61 +89,3 @@ def stream(self, chat_id, stream_id, language, model):
 
     redis_client.close()
     postgres_client.close()
-
-    # messages = get_chat(chat_id, postgres_client)
-    # updates_channel = f"stream:{stream_id}"
-    # total_text = ""
-    # print("start")
-    # try:
-    #     # for index, text_part in enumerate(loop()):
-    #     for index, text_part in enumerate(self.cpp_model.stream(self.cpp_model.format_chat(messages))):
-    #         if self.is_aborted():
-    #             print("aborted")
-    #             break
-    #         elif len(total_text) + len(text_part) >= MAX_TEXT_LEN:
-    #             print("too long")
-    #             break
-    #         total_text += text_part
-    #         redis_client.xadd(
-    #             updates_channel,
-    #             {
-    #                 "index": index,
-    #                 "text": total_text,
-    #                 "type": "part"
-    #             }
-    #         )
-    #
-    #         time.sleep(0.1)
-    # except SoftTimeLimitExceeded:
-    #     print("time limit")
-    # # save full message to database
-    # db_output = DBMessage(
-    #     chat_id=chat_id,
-    #     owner="model",
-    #     language=language,
-    #     text=total_text,
-    #     text_model=total_text
-    # )
-    # try:
-    #     postgres_client.add(db_output)
-    #     postgres_client.commit()
-    #     message_id = db_output.id
-    #     # send complete message to user
-    #     redis_client.xadd(
-    #         updates_channel,
-    #         {
-    #             "index": message_id,
-    #             "text": total_text,
-    #             "type": "end"
-    #         }
-    #     )
-    # except Exception as e:
-    #     print("DB ERROR")
-    #     print(e)
-    #     print("DB ERROR")
-    # finally:
-    #     # remove locks
-    #     redis_client.hdel("streams", stream_id)
-    #     redis_client.srem("chats", str(chat_id))
-    #     redis_client.close()
-    #     postgres_client.close()

@@ -1,5 +1,5 @@
 <div class="chat">
-  <div class="chat-title">
+  <div class="chat-svg">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 1440 320"
@@ -15,8 +15,9 @@
     <mat-spinner></mat-spinner>
   </div>
   <div *ngIf="messages() !== null" class="chat-box" #scrollContainer>
-    <div class="chat-message" *ngFor="let message of messages()">
-      {{message.text}} {{message.id}}
+    <div class="chat-message" [class.chat-user]="message.owner === 'user'" *ngFor="let message of messages()">
+      <div class="chat-message-owner">{{ message.owner === 'user' ? 'User' : 'Vambolai' }}</div>
+      <div class="chat-message-text">{{ message.text }}</div>
     </div>
   </div>
   <form *ngIf="messages() !== null" class="chat-input" [formGroup]="form">

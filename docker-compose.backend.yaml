@@ -43,31 +43,17 @@ services:
     volumes:
       - redis_data:/data
   postgres:
-      container_name: postgres
-      restart: unless-stopped
-      image: postgres:alpine
-      expose:
-        - 5432
-      environment:
-        POSTGRES_DB: postgres
-        POSTGRES_USER: erik
-        POSTGRES_PASSWORD: erik
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
-      networks:
-        - lups
-  pgadmin:
-    container_name: pgadmin
+    container_name: postgres
     restart: unless-stopped
-    image: dpage/pgadmin4
-    depends_on:
-      - postgres
-    ports:
-      - "5050:80"
+    image: postgres:alpine
+    expose:
+      - 5432
     environment:
-      PGADMIN_DEFAULT_EMAIL: "erik@erik.com"
-      PGADMIN_DEFAULT_PASSWORD: "erik"
-      PGADMIN_DEFAULT_USER: "erik"
+      POSTGRES_DB: postgres
+      POSTGRES_USER: erik
+      POSTGRES_PASSWORD: erik
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - lups
 

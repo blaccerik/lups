@@ -1,14 +1,4 @@
-import {
-  AfterViewChecked,
-  Component,
-  effect,
-  ElementRef,
-  inject,
-  OnDestroy,
-  OnInit,
-  signal,
-  ViewChild
-} from '@angular/core';
+import {AfterViewChecked, Component, effect, ElementRef, inject, OnDestroy, signal, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {ChatMessage, ChatService} from "../../../services/chat.service";
 import {merge, of, Subscription, switchMap} from "rxjs";
@@ -58,6 +48,8 @@ export class ChatBoxComponent implements OnDestroy, AfterViewChecked {
 
   constructor() {
 
+    console.log(this.messages(), this.isWaiting())
+
     // only purpose of the effect is to tell angular messages has been updated
     // otherwise if chat stream parts come in then html wont be updated :/
     effect(() => {
@@ -66,6 +58,11 @@ export class ChatBoxComponent implements OnDestroy, AfterViewChecked {
 
     this.messages$ = this.activatedRoute.params.pipe(
       switchMap(params => {
+        console.log(params)
+        this.messages.set(null)
+        this.chatId.set(-1)
+        this.streamId.set("")
+        this.isWaiting.set(false)
         const id = params["id"]
         if (!id) {
           return of(null)
@@ -80,20 +77,26 @@ export class ChatBoxComponent implements OnDestroy, AfterViewChecked {
     ).subscribe(data => {
       this.messages.set(data)
       // use timeout so dom can update from signal
-      setTimeout(() => {this.scrollToBottom()}, 0)
+      setTimeout(() => {
+        this.scrollToBottom()
+      }, 0)
     })
   }
 
-  ngOnDestroy(): void {
-    if (this.messages$) {
-      this.messages$.unsubscribe()
-    }
+  private unsub() {
     if (this.stream$) {
       this.stream$.unsubscribe()
     }
     if (this.streamId$) {
       this.streamId$.unsubscribe()
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.messages$) {
+      this.messages$.unsubscribe()
+    }
+    this.unsub()
   }
 
   send() {
@@ -121,10 +124,18 @@ export class ChatBoxComponent implements OnDestroy, AfterViewChecked {
     if (messages) {
       this.messages.set([...messages, userMessage, modelMessage])
     }
-    setTimeout(() => {this.scrollToBottom()}, 0)
+    setTimeout(() => {
+      this.scrollToBottom()
+    }, 0)
 
     // send post request
-    this.streamId$ = this.chatService.postMessage(this.chatId(), userMessage).subscribe(
+    const sendMessage: ChatMessage = {
+      text: userMessage.text,
+      id: -1,
+      owner: modelMessage.owner,
+      language: modelMessage.language
+    }
+    this.streamId$ = this.chatService.postMessage(this.chatId(), sendMessage).subscribe(
       data => {
         this.streamId.set(data.stream_id)
         const messages = this.messages()
@@ -178,6 +189,11 @@ export class ChatBoxComponent implements OnDestroy, AfterViewChecked {
     this.chatService.newChat().subscribe(
       data => {
         this.chatService.chats.set([...this.chatService.chats(), data])
+        this.messages.set(null)
+        this.streamId.set("")
+        this.isWaiting.set(true)
+        this.chatId.set(-1)
+        this.unsub()
         this.router.navigate(["chat", data.chat_id])
       }
     )

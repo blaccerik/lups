@@ -77,16 +77,7 @@ async def read_messages(chat_id: int, user_id: int, session: Session) -> List[Ch
     messages = session.query(DBMessage).filter(and_(
         DBMessage.chat_id == chat_id,
         DBMessage.deleted == False
-    )).all()
-    # return [
-    #     ChatMessage(
-    #         id=1,
-    #         text="tetet heurewi rwoe",
-    #         owner=OwnerType("user"),
-    #         language=LanguageType("english")
-    #     )
-    # ]
-    print(messages)
+    )).order_by(DBMessage.id).all()
     return [ChatMessage(
         id=dbm.id,
         text=dbm.text,
@@ -115,7 +106,6 @@ def delete_messages(chat_id: int, user_id: int, session: Session):
 
 
 def create_message(chat_id: int, chat_message: ChatMessage, postgres_client: Session) -> int:
-
     # todo translate step
 
     # write user input to database
@@ -161,7 +151,12 @@ async def task_stream(
         text_part = raw_data["text"]
         text_index = int(raw_data["index"])
         task_type = raw_data["type"]
-        logger.info(f"Data: {task_type} {text_index} size: {len(text_part)}")
+
+        # log
+        if task_type == "part" and text_index % 10 == 0:
+            logger.info(f"Data: {task_type} {text_index} size: {len(text_part)}")
+        elif task_type == "end":
+            logger.info(f"Data: {task_type} {text_index} size: {len(text_part)}")
         yield {
             "event": "message",
             "id": text_index,
@@ -180,9 +175,3 @@ async def task_stream(
     else:
         # end loop if it goes on for too long
         logger.error("Took to long to get messages")
-
-    logger.info("------------CLEAN UP------------")
-    s = await redis_client.hget("streams", stream_id)
-    c = await redis_client.smembers("chats")
-    logger.info(f"chats: {c} streams: {s}")
-    logger.info("------------CLEAN UP------------")
