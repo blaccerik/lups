@@ -47,9 +47,6 @@ export class ChatBoxComponent implements OnDestroy, AfterViewChecked {
   streamId = signal("")
 
   constructor() {
-
-    console.log(this.messages(), this.isWaiting())
-
     // only purpose of the effect is to tell angular messages has been updated
     // otherwise if chat stream parts come in then html wont be updated :/
     effect(() => {
@@ -58,7 +55,6 @@ export class ChatBoxComponent implements OnDestroy, AfterViewChecked {
 
     this.messages$ = this.activatedRoute.params.pipe(
       switchMap(params => {
-        console.log(params)
         this.messages.set(null)
         this.chatId.set(-1)
         this.streamId.set("")
