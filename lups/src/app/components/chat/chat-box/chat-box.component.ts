@@ -109,7 +109,7 @@ export class ChatBoxComponent implements OnDestroy, AfterViewChecked {
       id: -1
     }
     const modelMessage: ChatMessage = {
-      text: "loading...",
+      text: "Loading...",
       language: this.chatService.language(),
       owner: this.chatService.model(),
       id: -1

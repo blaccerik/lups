@@ -58,14 +58,14 @@
     flex-direction: column;
 
     &-owner {
-      margin: 10px;
+      margin: 10px 20px;
       color: white;
       font-weight: 500;
       font-size: 20px;
     }
 
     &-text {
-      margin: 20px;
+      margin: 0 20px 20px 20px;
       word-wrap: break-word;
     }
   }
