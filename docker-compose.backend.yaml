@@ -18,63 +18,20 @@ services:
       - POSTGRES_DATABASE=postgres
     volumes:
       - image_data:/usr/src/app/images
-
-#  worker:
-#    container_name: worker
-#    build:
-#      context: celeryr
-#    command: celery --app worker.tasks worker --concurrency=1 --pool prefork
-#    environment:
-#      - REDIS_BROKER_URL=redis
-#      - POSTGRES_USER=erik
-#      - POSTGRES_PASSWORD=erik
-#      - POSTGRES_BROKER_URL=postgres:5432
-#      - POSTGRES_DATABASE=postgres
-#    depends_on:
-#      - redis
-#      - postgres
-#    networks:
-#      - lups
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: '2'  # Adjust the CPU limit as needed
-#          memory: 4G  # Adjust the memory limit as needed
-#    volumes:
-#      - image_data:/usr/src/app/images
-#
-#  dashboard:
-#    container_name: dashboard
-#    build:
-#      context: celeryr
-#    command: celery --app worker.tasks flower --port=5555
-#    ports:
-#      - "5555:5555"
-#    environment:
-#      - REDIS_BROKER_URL=redis://redis:6379/0
-#      - POSTGRES_USER=erik
-#      - POSTGRES_PASSWORD=erik
-#      - POSTGRES_BROKER_URL=postgres:5432
-#      - POSTGRES_DATABASE=postgres
-#    depends_on:
-#      - redis
-#      - worker
-#    networks:
-#      - lups
-#
-#  beat:
-#    container_name: beat
-#    build:
-#      context: celeryr
-#    command: celery --app beat beat
-#    environment:
-#      - REDIS_BROKER_URL=redis://redis:6379/0
-#    depends_on:
-#      - redis
-#      - worker
-#    networks:
-#      - lups
-
+  worker:
+    container_name: worker
+    restart: unless-stopped
+    build:
+      context: worker
+    command: celery --app main worker --concurrency=1 --pool prefork
+    environment:
+      - POSTGRES_USER=erik
+      - POSTGRES_PASSWORD=erik
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - lups
   redis:
     container_name: redis
     restart: unless-stopped
@@ -85,33 +42,18 @@ services:
       - lups
     volumes:
       - redis_data:/data
-
   postgres:
-      container_name: postgres
-      image: postgres:alpine
-      restart: unless-stopped
-      expose:
-        - 5432
-      environment:
-        POSTGRES_DB: postgres
-        POSTGRES_USER: erik
-        POSTGRES_PASSWORD: erik
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
-      networks:
-        - lups
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    depends_on:
-      - postgres
-    ports:
-      - "5050:80"
+    container_name: postgres
+    restart: unless-stopped
+    image: postgres:alpine
+    expose:
+      - 5432
     environment:
-      PGADMIN_DEFAULT_EMAIL: "erik@erik.com"
-      PGADMIN_DEFAULT_PASSWORD: "erik"
-      PGADMIN_DEFAULT_USER: "erik"
+      POSTGRES_DB: postgres
+      POSTGRES_USER: erik
+      POSTGRES_PASSWORD: erik
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - lups
 

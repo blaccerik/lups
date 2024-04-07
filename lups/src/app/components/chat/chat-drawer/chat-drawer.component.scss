@@ -1,0 +1,132 @@
+@import 'variables';
+
+.drawer-container {
+  border: 0;
+  background-color: ghostwhite;
+
+  height: 100%;
+  min-width: 225px;
+  overflow-y: auto;
+
+
+  /* width */
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: #d3d3d3;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+.drawer-title {
+  text-transform: capitalize;
+  text-align: center;
+  //margin-bottom: 10px;
+  margin: 10px 0;
+  font-size: 25px;
+}
+
+.settings {
+  background-color: white;
+  border-radius: 15px;
+  margin: 10px;
+  padding: 10px;
+
+  &-row-item {
+    //margin: 15px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+  }
+
+  &-row {
+    border: 1px solid black;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 15px;
+  }
+
+  &-icon {
+    margin-left: 3%;
+    width: 10%;
+  }
+
+  &-title {
+    width: 40%;
+    font-size: 20px;
+  }
+
+  &-form {
+    width: 50%;
+  }
+}
+
+.chats {
+  background-color: white;
+  border-radius: 15px;
+  margin: 10px;
+  padding: 10px;
+
+  &-loading {
+    width: 290px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &-row-item {
+    //background-color: royalblue;
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    width: 290px;
+    align-items: center;
+    margin: 2px;
+    border: 2px solid white;
+    border-radius: 5px;
+
+    &:hover {
+      cursor: pointer;
+      border-color: black;
+    }
+  }
+
+  &-title {
+    font-size: 20px;
+    width: 230px;
+    margin-left: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &-button {
+    //background-color: greenyellow;
+  }
+
+  &-input {
+    margin-left: 10px;
+    border: 2px solid #ccc;
+    width: 220px;
+    border-radius: 2px;
+    font-size: 20px;
+  }
+
+  &-selected {
+    background-color: silver;
+  }
+}

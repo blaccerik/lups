@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, Date, Text, func
 from sqlalchemy.orm import relationship
 
-from utils.database import Base, engine, SessionLocal
+from database.postgres_database import Base
 
 
 class DBUser(Base):
@@ -100,64 +100,3 @@ class DBFamilyFeudAnswer(Base):
 
     def __repr__(self):
         return f'{self.round_id} {self.text} {self.points}'
-
-
-
-def init_db():
-
-    print("start")
-    # Drop all tables
-    Base.metadata.drop_all(engine)
-
-    print("dropped")
-    # Create all tables
-    Base.metadata.create_all(engine)
-    print("created")
-
-    postgres_client = SessionLocal()
-
-    translate = {
-        "top": "top",
-        "business": "äri",
-        "world": "maailm",
-        "sports": "sport",
-        "entertainment": "meelelahutus",
-        "health": "tervis",
-        "food": "toit",
-        "other": "muu",
-        "environment": "keskkond"
-    }
-    for i in translate.values():
-        cat = DBNewsCategory()
-        cat.name = i
-        postgres_client.add(cat)
-    postgres_client.commit()
-
-    # u = DBUser(google_id="erik", name="erik")
-    # postgres_client.add(u)
-    # postgres_client.commit()
-    #
-    # f = DBFamilyFeudGame(code="erik", auth="erik", user_id=u.id)
-    # postgres_client.add(f)
-    # f2 = DBFamilyFeudGame(code="eri2", auth="erik", user_id=u.id)
-    # postgres_client.add(f2)
-    # postgres_client.commit()
-    #
-    # r1 = DBFamilyFeudRound(code=f.code, round_number=1, text="tere", points=1)
-    # postgres_client.add(r1)
-    # postgres_client.commit()
-    #
-    # r2 = DBFamilyFeudRound(code=f.code, round_number=2, text="tere", points=1)
-    # postgres_client.add(r2)
-    # postgres_client.commit()
-    #
-    # r3 = DBFamilyFeudRound(code=f2.code, round_number=1, text="tere", points=1)
-    # postgres_client.add(r3)
-    # postgres_client.commit()
-    #
-    # r4 = DBFamilyFeudRound(code=f2.code, round_number=2, text="tere", points=1)
-    # postgres_client.add(r4)
-    # postgres_client.commit()
-
-    postgres_client.close()
-    print("done")

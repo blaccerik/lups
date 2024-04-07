@@ -1,0 +1,70 @@
+<div class="drawer-container">
+
+  <div class="drawer-title">
+    seaded
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <form [formGroup]="form">
+    <div class="settings">
+      <div class="settings-row">
+        <mat-icon class="settings-icon settings-row-item">memory</mat-icon>
+        <div class="settings-title settings-row-item">
+          Mudel
+        </div>
+        <mat-form-field class="settings-form settings-row-item" appearance="outline">
+          <mat-select formControlName="model" (selectionChange)="onSubmit()">
+            <mat-option *ngFor="let mdl of models" [value]="mdl.value">{{ mdl.display }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="settings-row" style="margin-bottom: 0">
+        <mat-icon class="settings-icon settings-row-item">language</mat-icon>
+        <div class="settings-title settings-row-item">
+          Keel
+        </div>
+        <mat-form-field class="settings-form settings-row-item" appearance="outline">
+          <mat-select formControlName="language" (selectionChange)="onSubmit()">
+            <mat-option *ngFor="let lang of languages"
+                        [value]="lang.value">{{ lang.display }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  </form>
+
+  <mat-divider></mat-divider>
+
+  <div class="drawer-title">
+    vestlused
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="chats">
+    <div class="chats-loading" *ngIf="chatService.chats().length === 0">
+      <mat-spinner></mat-spinner>
+    </div>
+    <div class="chats-row-item" [class.chats-selected]="chat.chat_id === Number(route()['id'])" *ngFor="let chat of chatService.chats()" (click)="selectChat(chat)">
+      <div *ngIf="!chat.editing" class="chats-title">
+        {{chat.title}}
+      </div>
+      <button *ngIf="!chat.editing" class="chats-button" mat-icon-button (click)="toggleEdit($event, chat)">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <input
+        *ngIf="chat.editing"
+        class="chats-input"
+        type="text"
+        [value]="chat.title"
+        (input)="onTitleChange($event, chat)"
+        maxlength="50"
+      />
+      <button *ngIf="chat.editing" class="chats-button" mat-icon-button (click)="toggleEdit($event, chat)">
+        <mat-icon>done</mat-icon>
+      </button>
+    </div>
+  </div>
+
+</div>
