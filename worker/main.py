@@ -7,12 +7,13 @@ from database.models import DBMessage
 from database.postgres_database import SessionLocal
 from database.redis_database import get_client
 from services.chat import get_chat_messages
+from task.news_task import get_news
 from task.predict_task import PredictTask
 
 # Python 3.11.8
 DATABASE_URI = "redis://redis:6379/0"
 celery_app = Celery(
-    'main',
+    'main_app',
     broker=DATABASE_URI,
     backend=DATABASE_URI,
     broker_connection_retry_on_startup=True
@@ -89,3 +90,12 @@ def stream(self, chat_id, stream_id, language, model):
 
     redis_client.close()
     postgres_client.close()
+
+
+@celery_app.task(name="news", time_limit=600)
+def news():
+    print("getting news")
+    s = time.time()
+    get_news()
+    e = time.time()
+    print(f"getting news: {e - s}")
