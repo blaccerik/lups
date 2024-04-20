@@ -20,6 +20,11 @@ from utils.schemas import User
 router = APIRouter(prefix="/api/chat")
 logger = logging.getLogger("Chat")
 
+@router.get("/test")
+async def test():
+    task = celery_app.send_task("news")
+    print(task)
+    return str(task)
 
 @router.get("/")
 async def get_chats(

@@ -6,25 +6,44 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 from newsdataapi import NewsDataApiClient
 from sqlalchemy.orm import Session
 
-from worker.database import get_session, DBNews, DBNewsCategory, DBNewsExtra
+from database.models import DBNewsExtra, DBNews, DBNewsCategory
+from database.postgres_database import SessionLocal
+
+NEWS_API_QUERY_NUMBER = 1
 
 if sys.platform == "win32":
     IMAGE_PATH = f"{Path(os.path.abspath(__file__)).parent.parent.parent}/images"
 else:
     IMAGE_PATH = "/usr/src/app/images"
+print(f"image path {IMAGE_PATH}")
 
-print(IMAGE_PATH)
+
+def load_key():
+    # Load environment variables from .env file
+    load_dotenv()
+    api_key = os.environ.get("NEWS_API_KEY")
+    return api_key
 
 
-def read_key():
-    some_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    some_dir = os.path.join(some_dir, "key.txt")
-    with open(some_dir, "r") as f:
-        key = f.readline()
-        return key
+def cat_to_est(string):
+    translate = {
+        "top": "top",
+        "business": "äri",
+        "world": "maailm",
+        "sports": "sport",
+        "entertainment": "meelelahutus",
+        "health": "tervis",
+        "food": "toit",
+        "environment": "keskkond"
+    }
+    if string in translate:
+        return translate[string]
+    print(f"missing translate {string}")
+    return "muu"
 
 
 SOURCES = ["ohtuleht", "postimees", "telegramet", "saartehaal", "onlinele"]
@@ -75,27 +94,9 @@ def fetch_image(url, news_id):
         file.write(res.content)
 
 
-def cat_to_est(string):
-    translate = {
-        "top": "top",
-        "business": "äri",
-        "world": "maailm",
-        "sports": "sport",
-        "entertainment": "meelelahutus",
-        "health": "tervis",
-        "food": "toit",
-        "environment": "keskkond"
-    }
-    if string in translate:
-        return translate[string]
-    print(f"missing translate {string}")
-    return "muu"
-
-
-def process_news(result, session: Session):
-    # dont add duplicates
+def process_news(result, postgres_client: Session):
     article_id = result["article_id"]
-    existing_news = session.query(DBNewsExtra).filter_by(article_id=article_id).first()
+    existing_news = postgres_client.query(DBNewsExtra).filter_by(article_id=article_id).first()
     if existing_news:
         print(f"exists {article_id}")
         return
@@ -125,7 +126,7 @@ def process_news(result, session: Session):
     category_name = cat_to_est(category)
 
     # get category
-    existing_category = session.query(DBNewsCategory).filter_by(name=category_name).first()
+    existing_category = postgres_client.query(DBNewsCategory).filter_by(name=category_name).first()
 
     if existing_category:
         cat_id = existing_category.id
@@ -134,8 +135,8 @@ def process_news(result, session: Session):
         return
 
     dbnews.category_id = cat_id
-    session.add(dbnews)
-    session.flush()
+    postgres_client.add(dbnews)
+    postgres_client.flush()
 
     dbextra = DBNewsExtra()
     dbextra.id = dbnews.id
@@ -156,25 +157,31 @@ def process_news(result, session: Session):
         image_url = fetch_image_url(link, source)
     if image_url:
         fetch_image(image_url, dbnews.id)
-    session.add(dbextra)
+    postgres_client.add(dbextra)
+    postgres_client.commit()
 
 
 def get_news():
-    key = read_key()
-
+    key = load_key()
+    print(key)
+    return
     api = NewsDataApiClient(apikey=key)
-    page = None
-    with get_session() as session:
-        while True:
-            response = api.news_api(page=page, language="et")
-            for res in response.get("results", []):
-                process_news(res, session)
-            session.commit()
 
-            page = response.get('nextPage', None)
-            s = response.get("status", None)
-            tr = response.get("totalResults", None)
-            print(f"{page} {s} {tr}")
-            if not page:
-                break
-            time.sleep(1)
+    page = None
+    postgres_client = SessionLocal()
+    for _ in range(NEWS_API_QUERY_NUMBER):
+        response = api.news_api(page=page, language="et")
+        for res in response.get("results", []):
+            process_news(res, postgres_client)
+        page = response.get('nextPage', None)
+        s = response.get("status", None)
+        tr = response.get("totalResults", None)
+        print(f"{page} {s} {tr}")
+        if not page:
+            break
+        time.sleep(1)
+    postgres_client.close()
+
+
+if __name__ == '__main__':
+    get_news()
