@@ -81,6 +81,7 @@ class DBFamilyFeudGame(Base):
     started = Column(Boolean, nullable=False, default=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
+
 class DBFamilyFeudRound(Base):
     __tablename__ = 'family_feud_round'
     id = Column(Integer, primary_key=True)
@@ -90,6 +91,7 @@ class DBFamilyFeudRound(Base):
 
     def __repr__(self):
         return f'{self.game_code} {self.id} {str(self.round_number)} {self.question}'
+
 
 class DBFamilyFeudAnswer(Base):
     __tablename__ = 'family_feud_answer'
@@ -102,9 +104,42 @@ class DBFamilyFeudAnswer(Base):
         return f'{self.round_id} {self.text} {self.points}'
 
 
+class DBArtist(Base):
+    __tablename__ = "artist"
+    # channel id is 24
+    id = Column(String(24))
+    name = Column(String(30), nullable=False)
+
+
+class DBSong(Base):
+    __tablename__ = 'song'
+    # video url seems to be 11 chars long
+    id = Column(String(11), primary_key=True)
+    title = Column(String(100), nullable=False)
+    length = Column(Integer, nullable=False)
+    artist_id = Column(String(24), ForeignKey('artist.id', ondelete="CASCADE"), nullable=False)
+    # OMV: Original Music Video - uploaded by original artist with actual video content
+    # UGC: User Generated Content - uploaded by regular YouTube user
+    # ATV: High quality song uploaded by original artist with cover image
+    # OFFICIAL_SOURCE_MUSIC: Official video content, but not for a single track
+    type = Column(Enum(
+        'MUSIC_VIDEO_TYPE_UGC',
+        'MUSIC_VIDEO_TYPE_ATV',
+        'MUSIC_VIDEO_TYPE_OMV',
+        'OFFICIAL_SOURCE_MUSIC',
+        name='song_type'), nullable=False)
+
+
+class DBReaction(Base):
+    __tablename__ = "reaction"
+    id = Column(Integer, primary_key=True)
+    song_id = Column(String(11), ForeignKey("song.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    # add more maybe?
+    type = Column(Enum('listened', 'skip', name='reaction_type'), nullable=False)
+
 
 def init_db():
-
     print("start")
     # Drop all tables
     Base.metadata.drop_all(engine)
