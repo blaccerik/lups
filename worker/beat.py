@@ -15,5 +15,6 @@ celery_app.conf.beat_schedule = {
 }
 
 from datetime import datetime
-
-print(datetime.now())
+import logging
+logging.error(datetime.now())
+# print(datetime.now())
