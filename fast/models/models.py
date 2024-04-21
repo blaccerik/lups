@@ -137,7 +137,17 @@ class DBReaction(Base):
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     # add more maybe?
     type = Column(Enum('listened', 'skip', name='reaction_type'), nullable=False)
+    date = Column(Date, nullable=False, default=func.current_date())
 
+
+class DBSongRelation(Base):
+    __tablename__ = "song_relation"
+    id = Column(Integer, primary_key=True)
+    parent_song_id = Column(String(11), ForeignKey("song.id"), nullable=False)
+    child_song_id = Column(String(11), ForeignKey("song.id"), nullable=False)
+    # artist - songs share artist
+    # genre - yt api said songs are similar
+    type = Column(Enum('artist', 'genre', name='relation_type'), nullable=False)
 
 def init_db():
     print("start")
