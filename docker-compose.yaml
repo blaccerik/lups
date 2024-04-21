@@ -55,6 +55,8 @@ services:
       POSTGRES_PASSWORD: erik
       NEWS_API_KEY: ${NEWS_API_KEY}
       TZ: "Europe/Tallinn"
+    volumes:
+      - image_data:/usr/src/app/images
     depends_on:
       - redis
       - postgres
