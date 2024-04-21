@@ -13,8 +13,3 @@ celery_app.conf.beat_schedule = {
         'schedule': crontab(minute='3', hour='17')
     },
 }
-
-from datetime import datetime
-import logging
-logging.error(datetime.now())
-# print(datetime.now())
