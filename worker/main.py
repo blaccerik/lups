@@ -96,6 +96,6 @@ def stream(self, chat_id, stream_id, language, model):
 def news():
     print("getting news")
     s = time.time()
-    # get_news()
+    get_news()
     e = time.time()
     print(f"getting news: {e - s}")
