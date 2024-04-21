@@ -2,3 +2,4 @@ data/
 ai_test/
 celeryr/t5-model/
 news_test/
+.env
