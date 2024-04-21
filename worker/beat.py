@@ -10,6 +10,6 @@ celery_app = Celery('main_app',
 celery_app.conf.beat_schedule = {
     'run-task': {
         'task': 'news',
-        'schedule': crontab(minute='*')
+        'schedule': crontab(minute='25', hour='19')
     },
 }
