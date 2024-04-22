@@ -163,8 +163,6 @@ def process_news(result, postgres_client: Session):
 
 def get_news():
     key = load_key()
-    print(key)
-    return
     api = NewsDataApiClient(apikey=key)
 
     page = None
