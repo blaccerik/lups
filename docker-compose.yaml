@@ -31,6 +31,7 @@ services:
     restart: unless-stopped
     build:
       context: fast
+    # todo expose 8000???
     ports:
       - "8000:8000"
     networks:
@@ -87,20 +88,20 @@ services:
     environment:
       TZ: "Europe/Tallinn"
   postgres:
-      container_name: postgres
-      restart: unless-stopped
-      image: postgres:alpine
-      expose:
-        - 5432
-      environment:
-        POSTGRES_DB: postgres
-        POSTGRES_USER: erik
-        POSTGRES_PASSWORD: erik
-        TZ: "Europe/Tallinn"
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
-      networks:
-        - lups
+    container_name: postgres
+    restart: unless-stopped
+    image: postgres:alpine
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: erik
+      POSTGRES_PASSWORD: erik
+      TZ: "Europe/Tallinn"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lups
 
 networks:
   lups:

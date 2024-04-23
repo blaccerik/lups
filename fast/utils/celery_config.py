@@ -6,12 +6,12 @@ print(DATABASE_URI)
 
 celery_app = Celery(
     'main',
-    broker=DATABASE_URI,  # Replace with your Redis server configuration
-    backend=DATABASE_URI,  # Replace with your Redis server configuration
+    broker=DATABASE_URI,
+    backend=DATABASE_URI,
+    result_expires=3600,
+    timezone='Europe/Tallinn',
 )
 
-# Optional Celery configuration settings
-celery_app.conf.update(
-    result_expires=3600,  # Result expiration time in seconds (adjust as needed)
-    timezone='UTC',       # Timezone for Celery tasks
-)
+celery_app.conf.task_routes = {
+    "stream": {'queue': "normal"}
+}

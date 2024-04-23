@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
-from utils.schemas import User
+from schemas.schemas import User
 
 oauth2_scheme = HTTPBearer()
 

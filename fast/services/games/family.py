@@ -8,7 +8,7 @@ from redis.client import Redis
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from models.models import DBFamilyFeudGame, DBFamilyFeudAnswer, DBFamilyFeudRound
+from database.models import DBFamilyFeudGame, DBFamilyFeudAnswer, DBFamilyFeudRound
 from schemas.familyfeud import Game, Answer, GameRound, GameData, GameStatus, LiveGame, LiveGameType, LiveGameAnswer
 
 logger = logging.getLogger("FamilyService")

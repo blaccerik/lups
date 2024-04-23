@@ -13,9 +13,9 @@ from services.chat_service import read_user, read_chats_by_user, read_messages, 
     create_message, update_chat_title
 from utils.auth import get_current_user
 from utils.celery_config import celery_app
-from utils.database import get_db
-from utils.redis_database import get_redis
-from utils.schemas import User
+from database.postgres_database import get_postgres_db
+from database.redis_database import get_redis_database
+from schemas.schemas import User
 
 router = APIRouter(prefix="/api/chat")
 logger = logging.getLogger("Chat")
@@ -24,7 +24,7 @@ logger = logging.getLogger("Chat")
 @router.get("/")
 async def get_chats(
         current_user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_postgres_db)
 ):
     user_id = read_user(current_user, db)
     chats = read_chats_by_user(user_id, db)
@@ -34,7 +34,7 @@ async def get_chats(
 @router.get("/new")
 async def get_chat(
         current_user: User = Depends(get_current_user),
-        postgres_client: Session = Depends(get_db)
+        postgres_client: Session = Depends(get_postgres_db)
 ):
     user_id = read_user(current_user, postgres_client)
     chat_response = create_chat(user_id, postgres_client)
@@ -45,7 +45,7 @@ async def get_chat(
 async def get_chat_by_id(
         chat_id: int,
         current_user: User = Depends(get_current_user),
-        postgres_client: Session = Depends(get_db)
+        postgres_client: Session = Depends(get_postgres_db)
 ):
     user_id = read_user(current_user, postgres_client)
     return await read_messages(chat_id, user_id, postgres_client)
@@ -56,7 +56,7 @@ async def update_chat(
         chat_id: int,
         chat_update: ChatUpdate,
         current_user: User = Depends(get_current_user),
-        postgres_client: Session = Depends(get_db)
+        postgres_client: Session = Depends(get_postgres_db)
 ):
     user_id = read_user(current_user, postgres_client)
 
@@ -70,8 +70,8 @@ async def post_chat_by_id(
         chat_id: int,
         chat_message: ChatMessage,
         current_user: User = Depends(get_current_user),
-        redis_client: Redis = Depends(get_redis),
-        postgres_client: Session = Depends(get_db)
+        redis_client: Redis = Depends(get_redis_database),
+        postgres_client: Session = Depends(get_postgres_db)
 ):
     # check if chat is not in queue
     if await redis_client.sismember("chats", str(chat_id)):
@@ -93,7 +93,7 @@ async def post_chat_by_id(
 
     # send task to worker
     stream_id = uuid.uuid4().hex
-    task = celery_app.send_task("stream", args=[
+    task = celery_app.send_task("stream", queue="normal", args=[
         chat_id,
         stream_id,
         chat_message.language.value,
@@ -110,7 +110,7 @@ async def post_chat_by_id(
 @router.delete("/stream/{stream_id}")
 async def delete_chat_stream(
         stream_id: str,
-        redis_client: Redis = Depends(get_redis)
+        redis_client: Redis = Depends(get_redis_database)
 ):
     # check if stream exists
     raw_data = await redis_client.hget("streams", stream_id)
@@ -127,7 +127,7 @@ async def delete_chat_stream(
 @router.get("/stream/{stream_id}")
 async def get_chat_stream(
         stream_id: str,
-        redis_client: Redis = Depends(get_redis)
+        redis_client: Redis = Depends(get_redis_database)
 ):
     # check if stream exists
     raw_data = await redis_client.hget("streams", stream_id)

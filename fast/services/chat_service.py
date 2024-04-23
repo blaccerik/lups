@@ -8,9 +8,9 @@ from redis import Redis
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from models.models import DBUser, DBChat, DBMessage
+from database.models import DBUser, DBChat, DBMessage
 from schemas.chat import Chat, ChatMessage, LanguageType, OwnerType
-from utils.schemas import User
+from schemas.schemas import User
 
 MAX_USER_NAME_SIZE = 50
 

@@ -163,6 +163,9 @@ def process_news(result, postgres_client: Session):
 
 def get_news():
     key = load_key()
+    if not key.startswith("pub"):
+        print("no key")
+        return
     api = NewsDataApiClient(apikey=key)
 
     page = None

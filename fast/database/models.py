@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, Date, Text, func
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, Date, Text, func, DateTime
 from sqlalchemy.orm import relationship
 
-from utils.database import Base, engine, SessionLocal
+from database.postgres_database import Base
 
 
 class DBUser(Base):
@@ -107,8 +107,8 @@ class DBFamilyFeudAnswer(Base):
 class DBArtist(Base):
     __tablename__ = "artist"
     # channel id is 24
-    id = Column(String(24))
-    name = Column(String(30), nullable=False)
+    id = Column(String(24), primary_key=True)
+    name = Column(String(100), nullable=False)
 
 
 class DBSong(Base):
@@ -117,7 +117,7 @@ class DBSong(Base):
     id = Column(String(11), primary_key=True)
     title = Column(String(100), nullable=False)
     length = Column(Integer, nullable=False)
-    artist_id = Column(String(24), ForeignKey('artist.id', ondelete="CASCADE"), nullable=False)
+    artist_id = Column(String(24), ForeignKey('artist.id'), nullable=True)
     # OMV: Original Music Video - uploaded by original artist with actual video content
     # UGC: User Generated Content - uploaded by regular YouTube user
     # ATV: High quality song uploaded by original artist with cover image
@@ -127,6 +127,7 @@ class DBSong(Base):
         'MUSIC_VIDEO_TYPE_ATV',
         'MUSIC_VIDEO_TYPE_OMV',
         'OFFICIAL_SOURCE_MUSIC',
+        'MUSIC_VIDEO_TYPE_PODCAST_EPISODE',
         name='song_type'), nullable=False)
 
 
@@ -134,10 +135,15 @@ class DBReaction(Base):
     __tablename__ = "reaction"
     id = Column(Integer, primary_key=True)
     song_id = Column(String(11), ForeignKey("song.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    # add more maybe?
-    type = Column(Enum('listened', 'skip', name='reaction_type'), nullable=False)
-    date = Column(Date, nullable=False, default=func.current_date())
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    # listened - user started listening the song
+    # skip - user had filter which skipped song
+    # like - user likes the song
+    type = Column(Enum('listened', 'skip', 'like', name='reaction_type'), nullable=False)
+
+    # how long user listened the song for
+    duration = Column(Integer, nullable=False)
+    date = Column(DateTime, nullable=False, default=func.now())
 
 
 class DBSongRelation(Base):
@@ -147,62 +153,13 @@ class DBSongRelation(Base):
     child_song_id = Column(String(11), ForeignKey("song.id"), nullable=False)
     # artist - songs share artist
     # genre - yt api said songs are similar
-    type = Column(Enum('artist', 'genre', name='relation_type'), nullable=False)
+    same_genre = Column(Boolean, nullable=False, default=False)
+    same_artist = Column(Boolean, nullable=False, default=False)
 
-def init_db():
-    print("start")
-    # Drop all tables
-    Base.metadata.drop_all(engine)
 
-    print("dropped")
-    # Create all tables
-    Base.metadata.create_all(engine)
-    print("created")
-
-    postgres_client = SessionLocal()
-
-    translate = {
-        "top": "top",
-        "business": "äri",
-        "world": "maailm",
-        "sports": "sport",
-        "entertainment": "meelelahutus",
-        "health": "tervis",
-        "food": "toit",
-        "other": "muu",
-        "environment": "keskkond"
-    }
-    for i in translate.values():
-        cat = DBNewsCategory()
-        cat.name = i
-        postgres_client.add(cat)
-    postgres_client.commit()
-
-    # u = DBUser(google_id="erik", name="erik")
-    # postgres_client.add(u)
-    # postgres_client.commit()
-    #
-    # f = DBFamilyFeudGame(code="erik", auth="erik", user_id=u.id)
-    # postgres_client.add(f)
-    # f2 = DBFamilyFeudGame(code="eri2", auth="erik", user_id=u.id)
-    # postgres_client.add(f2)
-    # postgres_client.commit()
-    #
-    # r1 = DBFamilyFeudRound(code=f.code, round_number=1, text="tere", points=1)
-    # postgres_client.add(r1)
-    # postgres_client.commit()
-    #
-    # r2 = DBFamilyFeudRound(code=f.code, round_number=2, text="tere", points=1)
-    # postgres_client.add(r2)
-    # postgres_client.commit()
-    #
-    # r3 = DBFamilyFeudRound(code=f2.code, round_number=1, text="tere", points=1)
-    # postgres_client.add(r3)
-    # postgres_client.commit()
-    #
-    # r4 = DBFamilyFeudRound(code=f2.code, round_number=2, text="tere", points=1)
-    # postgres_client.add(r4)
-    # postgres_client.commit()
-
-    postgres_client.close()
-    print("done")
+class DBFilter(Base):
+    __tablename__ = "filter"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    config = Column(Text, nullable=False)

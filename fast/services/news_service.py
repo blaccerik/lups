@@ -6,8 +6,8 @@ from PIL import Image
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
-from models.models import DBNews, DBNewsCategory, DBUser, DBNewsExtra
-from utils.schemas import News, NewsId
+from database.models import DBNews, DBNewsCategory, DBUser, DBNewsExtra
+from schemas.schemas import News, NewsId
 
 if sys.platform == "win32":
     IMAGE_PATH = f"{Path(os.path.abspath(__file__)).parent.parent.parent}/images"

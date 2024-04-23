@@ -16,8 +16,11 @@ celery_app = Celery(
     'main_app',
     broker=DATABASE_URI,
     backend=DATABASE_URI,
-    broker_connection_retry_on_startup=True
+    broker_connection_retry_on_startup=True,
+    result_expires=3600,
+    timezone='Europe/Tallinn',
 )
+
 MAX_TEXT_LEN = 512
 
 

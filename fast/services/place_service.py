@@ -3,7 +3,7 @@ from typing import List
 
 from redis.client import Redis
 
-from utils.schemas import PlaceInput, User, PlacePixel, PlaceOutput
+from schemas.schemas import PlaceInput, User, PlacePixel, PlaceOutput
 
 SIZE = 300
 COLORS = [

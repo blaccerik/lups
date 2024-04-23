@@ -5,9 +5,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers import news, place, chat, familyfeud, music
-from utils.database import SessionLocal
-from utils.redis_database import get_client
-from utils.schemas import PlacePixel, PlaceColor
+from database.postgres_database import SessionLocal
+from database.redis_database import get_client
+from schemas.schemas import PlacePixel, PlaceColor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ app.include_router(music.router)
 
 @app.get("/")
 async def main():
-    return "get works"
+    return "get works now"
 
 @app.on_event("startup")
 async def startup_event():
