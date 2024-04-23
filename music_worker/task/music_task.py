@@ -161,5 +161,5 @@ def get_next_seed_song_id(postgres_client: Session) -> str:
 
 
 @log_time
-def get_next_song_by_user(user_id: int ,postgres_client: Session) -> str:
+def get_next_song_by_user(user_id: int, postgres_client: Session) -> str:
     pass
