@@ -4,10 +4,10 @@ import time
 from functools import wraps
 from typing import List
 
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from sqlalchemy.orm import Session
 
-from database.models import DBArtist, DBSong, DBSongRelation
+from database.models import DBArtist, DBSong, DBSongRelation, DBReaction
 from schemas.main import Artist, Song
 from util.download import download_channel_image, download_song, download_song_image, download_watch
 
@@ -162,4 +162,10 @@ def get_next_seed_song_id(postgres_client: Session) -> str:
 
 @log_time
 def get_next_song_by_user(user_id: int, postgres_client: Session) -> str:
+    # Query song and its reaction
+    result = postgres_client.query(DBSong, DBReaction).filter(and_(
+        DBSong.id == DBReaction.song_id,
+        DBReaction.user_id == user_id
+    )).all()
+    print(result)
     pass
