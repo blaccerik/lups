@@ -1,14 +1,18 @@
 import logging
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
 
 from database.postgres_database import get_postgres_db
-from schemas.music import Song
-from services.music_service import read_song, read_song_image, read_artist_image
+from schemas.auth import UserExtra
+from schemas.music import Song, Filter
+from services.music_service import read_song, read_song_image, read_artist_image, read_filters_by_user, \
+    create_filters_by_user, update_filters_by_user
+from utils.auth import get_extra_user
 
-router = APIRouter(prefix="/api/music")
+router = APIRouter(prefix="/api/music", tags=["Music"])
 logger = logging.getLogger(__name__)
 
 
@@ -33,3 +37,40 @@ async def get_song_image(song_id: str):
 async def get_artist_image(artist_id: str):
     image_path = read_artist_image(artist_id)
     return FileResponse(image_path)
+
+
+@router.get("/filters", response_model=List[Filter])
+async def get_user_filters(
+        user: UserExtra = Depends(get_extra_user),
+        postgres_client: Session = Depends(get_postgres_db)
+):
+    return read_filters_by_user(user.user_id, postgres_client)
+
+
+@router.post("/filters")
+async def post_user_filter(
+        f: Filter,
+        user: UserExtra = Depends(get_extra_user),
+        postgres_client: Session = Depends(get_postgres_db)
+):
+    return create_filters_by_user(user.user_id, f, postgres_client)
+
+
+@router.put("/filters")
+async def put_user_filter(
+        f: Filter,
+        user: UserExtra = Depends(get_extra_user),
+        postgres_client: Session = Depends(get_postgres_db)
+):
+    return update_filters_by_user(user.user_id, f, postgres_client)
+
+
+@router.get("/queue/{song_id}")
+async def get_user_queue(
+        song_id: str,
+        filter_id: Optional[int] = Query(None, description="Filter ID"),
+        user: UserExtra = Depends(get_extra_user),
+        postgres_client: Session = Depends(get_postgres_db)
+):
+    print(filter_id, user)
+    pass

@@ -5,13 +5,14 @@ from fastapi.params import Depends
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from database.postgres_database import get_postgres_db
+from schemas.auth import User
+from schemas.schemas import News, NewsId
 from services.chat_service import read_user
 from services.news_service import read_all_news, read_news, find_image, create_news
 from utils.auth import get_current_user
-from database.postgres_database import get_postgres_db
-from schemas.schemas import News, NewsId, User
 
-router = APIRouter(prefix="/api/news")
+router = APIRouter(prefix="/api/news", tags=["News"])
 
 
 @router.get("/", response_model=List[News])

@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from database.models import DBUser, DBChat, DBMessage
 from schemas.chat import Chat, ChatMessage, LanguageType, OwnerType
-from schemas.schemas import User
+from schemas.auth import User
 
 MAX_USER_NAME_SIZE = 50
 

@@ -14,9 +14,9 @@ from services.games.family import read_games_by_user, create_game_by_user, read_
 from utils.auth import get_current_user
 from database.postgres_database import get_postgres_db
 from database.redis_database import get_redis_database
-from schemas.schemas import User
+from schemas.auth import User
 
-router = APIRouter(prefix="/api/familyfeud")
+router = APIRouter(prefix="/api/familyfeud", tags=["Games"])
 connected_clients = {}
 
 logger = logging.getLogger("Family")

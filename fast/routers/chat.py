@@ -15,9 +15,9 @@ from utils.auth import get_current_user
 from utils.celery_config import celery_app
 from database.postgres_database import get_postgres_db
 from database.redis_database import get_redis_database
-from schemas.schemas import User
+from schemas.auth import User
 
-router = APIRouter(prefix="/api/chat")
+router = APIRouter(prefix="/api/chat", tags=["Chat"])
 logger = logging.getLogger("Chat")
 
 

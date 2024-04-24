@@ -4,9 +4,7 @@ from typing import Union, List
 from pydantic import BaseModel, Field
 
 
-class User(BaseModel):
-    google_id: str
-    name: str
+
 
 
 class News(BaseModel):

@@ -11,7 +11,7 @@ from utils.auth import get_current_user_with_token
 from database.redis_database import get_redis_database
 from schemas.schemas import PlaceInput, PlaceOutput
 
-router = APIRouter(prefix="/api/place")
+router = APIRouter(prefix="/api/place", tags=["Place"])
 connected_clients = []
 
 logger = logging.getLogger("Place")

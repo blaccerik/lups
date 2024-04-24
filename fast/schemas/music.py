@@ -1,6 +1,7 @@
 from enum import Enum
+from typing import List, Optional
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, Field
 
 
 class Artist(BaseModel):
@@ -22,3 +23,17 @@ class Song(BaseModel):
     length: int
     artist: Artist | None
     type: SongType
+    has_audio: bool
+
+
+class FilterConfig(BaseModel):
+    include: bool  # keep or remove certain word
+    target_title: bool  # title or artist
+    word: str
+
+
+class Filter(BaseModel):
+    id: int
+    name: constr(min_length=1, max_length=100)
+    config: List[FilterConfig]
+    delete: Optional[bool] = None
