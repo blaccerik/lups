@@ -1,11 +1,11 @@
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel, constr, Field
+from pydantic import BaseModel, constr
 
 
 class Artist(BaseModel):
-    id: str
+    id: constr(min_length=24, max_length=24)
     name: constr(max_length=100)
 
 
@@ -18,12 +18,24 @@ class SongType(str, Enum):
 
 
 class Song(BaseModel):
-    id: str
+    id: constr(min_length=11, max_length=11)
     title: constr(max_length=100)
-    length: int
+    length: int  # in seconds
     artist: Artist | None
     type: SongType
     has_audio: bool
+
+
+class Similarity(BaseModel):
+    same_artist: bool
+    same_genre: bool
+    song: Song
+
+
+class SongQueue(BaseModel):
+    seed_song_id: constr(min_length=11, max_length=11)
+    scrape: bool
+    songs: List[Similarity]
 
 
 class FilterConfig(BaseModel):

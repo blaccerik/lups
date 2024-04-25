@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from database.models import DBNewsExtra, DBNews, DBNewsCategory
 from database.postgres_database import SessionLocal
 
-NEWS_API_QUERY_NUMBER = 1
+NEWS_API_QUERY_NUMBER = 10
 
 if sys.platform == "win32":
     IMAGE_PATH = f"{Path(os.path.abspath(__file__)).parent.parent.parent}/images"

@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from database.models import DBSong, DBArtist, DBFilter
 from schemas.music import Song, Artist, Filter, FilterConfig
+from utils.celery_config import celery_app
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -96,12 +97,42 @@ def update_filters_by_user(user_id: int, f: Filter, postgres_client: Session):
     )).first()
     if dbf is None:
         raise HTTPException(status_code=404, detail="User doesn't have this filter")
-    print(f.delete)
-    # dbf = DBFilter()
-    # dbf.name = f.name
-    # dbf.user_id = user_id
-    # # print(f.config)
-    # # print([c.model_dump() for c in f.config])
-    # dbf.config = json.dumps([c.model_dump() for c in f.config])
-    # postgres_client.add(dbf)
-    # postgres_client.commit()
+    if f.delete:
+        postgres_client.delete(dbf)
+        postgres_client.commit()
+        return
+    else:
+        dbf.name = f.name
+        dbf.user_id = user_id
+        dbf.config = json.dumps([c.model_dump() for c in f.config])
+        postgres_client.add(dbf)
+        postgres_client.commit()
+
+
+def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session):
+    # check if user has queue
+    if filter_id is None:
+        dbf = None
+    else:
+        dbf = postgres_client.query(DBFilter).filter(and_(
+            DBFilter.user_id == user_id,
+            DBFilter.id == filter_id
+        )).first()
+        if dbf is None:
+            raise HTTPException(status_code=404, detail="User doesn't have this filter")
+
+    # main query
+    # strategy 1:
+    # 1. find all related to seed song
+    # 2. filter
+    # 3. if not enough of songs then send task to celery, return error?
+    print(dbf)
+
+    # postgres_client.query()
+    # stream_id = uuid.uuid4().hex
+    # task = celery_app.send_task("stream", queue="normal", args=[
+    #     chat_id,
+    #     stream_id,
+    #     chat_message.language.value,
+    #     chat_message.owner.value
+    # ])
