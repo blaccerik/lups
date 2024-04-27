@@ -130,11 +130,16 @@ class DBSong(Base):
         'MUSIC_VIDEO_TYPE_PODCAST_EPISODE',
         name='song_type'), nullable=False)
 
+    def __repr__(self):
+        return f"Song({self.id})"
+
+
 
 class DBReaction(Base):
     __tablename__ = "reaction"
     id = Column(Integer, primary_key=True)
-    song_id = Column(String(11), ForeignKey("song.id"), nullable=False)
+    date = Column(DateTime, nullable=False, default=func.now())
+    song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     # listened - user started listening the song
     # skip - user had filter which skipped song
@@ -143,18 +148,29 @@ class DBReaction(Base):
 
     # how long user listened the song for
     duration = Column(Integer, nullable=False)
+
+    def __repr__(self):
+        return f"React({self.user_id})"
+
+
+class DBSongRelationV1(Base):
+    __tablename__ = "song_relation_v1"
+    id = Column(Integer, primary_key=True)
+    date = Column(DateTime, nullable=False, default=func.now())
+    parent_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), nullable=False)
+    child_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), nullable=False)
+
+    def __repr__(self):
+        return f"Repr({self.id}): {self.parent_song_id} | {self.child_song_id}"
+
+
+class DBScrapeV1(Base):
+    __tablename__ = "song_scrape_v1"
+    id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
     date = Column(DateTime, nullable=False, default=func.now())
 
-
-class DBSongRelation(Base):
-    __tablename__ = "song_relation"
-    id = Column(Integer, primary_key=True)
-    parent_song_id = Column(String(11), ForeignKey("song.id"), nullable=False)
-    child_song_id = Column(String(11), ForeignKey("song.id"), nullable=False)
-    # artist - songs share artist
-    # genre - yt api said songs are similar
-    same_genre = Column(Boolean, nullable=False, default=False)
-    same_artist = Column(Boolean, nullable=False, default=False)
+    def __repr__(self):
+        return f"{self.date}"
 
 
 class DBFilter(Base):

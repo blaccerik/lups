@@ -68,6 +68,20 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - lups
+  pgadmin:
+    restart: unless-stopped
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    depends_on:
+      - postgres
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "erik@erik.com"
+      PGADMIN_DEFAULT_PASSWORD: "erik"
+      PGADMIN_DEFAULT_USER: "erik"
+    networks:
+      - lups
 
 
 networks:

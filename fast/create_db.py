@@ -1,5 +1,7 @@
-from database.models import DBNewsCategory
+from sqlalchemy import MetaData
+
 from database.postgres_database import engine, Base, SessionLocal
+from database.models import DBNewsCategory
 
 if __name__ == '__main__':
     print("start")
