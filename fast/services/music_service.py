@@ -23,6 +23,7 @@ if operating_system == 'Windows':
 else:
     MUSIC_DATA = "/usr/src/app/music_data"
 logger.info(MUSIC_DATA)
+MIN_QUEUE_SONGS = 40
 
 
 def read_song(song_id: str, postgres_client: Session) -> Song:
@@ -123,8 +124,11 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
             raise HTTPException(status_code=404, detail="User doesn't have this filter")
 
     # check if song exists
-    seed_song = postgres_client.get(DBSong, song_id)
-    if seed_song is None:
+    # if not then start scrape
+    db_seed_song, db_sv1 = postgres_client.query(DBSong, DBScrapeV1).filter(
+        DBSong.id == song_id
+    ).join(DBScrapeV1, DBScrapeV1.id == DBSong.id, isouter=True).first()
+    if db_seed_song is None:
         celery_app.send_task("music", queue="music", args=[song_id])
         return SongQueue(
             seed_song_id=song_id,
@@ -139,19 +143,19 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
     """
 
     mq = MusicQuery(user_id, postgres_client)
-    # songs = []
-    # for dbs, dbr, dbd in r:
-    #
-    #     song = Song(
-    #         id= dbs.id,
-    #         title=dbs.title,
-    #         length=dbs.length,
-    #         artist=
-    #     )
-    #
-    #     sim = Similarity()
+    songs = mq.get_songs(db_seed_song.id)
+    if len(songs) >= MIN_QUEUE_SONGS:
+        return SongQueue(
+            seed_song_id=song_id,
+            scrape=db_sv1 is not None,
+            songs=songs
+        )
+
+    print(len(songs))
+
     return SongQueue(
         seed_song_id=song_id,
-        scrape=True,
-        songs=mq.get_songs(seed_song.id)
+        scrape=db_sv1 is not None,
+        songs=songs
     )
+
