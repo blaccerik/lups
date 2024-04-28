@@ -70,8 +70,7 @@ async def put_user_filter(
 async def get_user_queue(
         song_id: constr(min_length=11, max_length=11),
         filter_id: Optional[int] = Query(None, description="Filter ID"),
-        user: UserExtra = Depends(get_extra_user),
+        # user: UserExtra = Depends(get_extra_user),
         postgres_client: Session = Depends(get_postgres_db)
 ):
-    read_queue(user.user_id, song_id, filter_id, postgres_client)
-    pass
+    return read_queue(1, song_id, filter_id, postgres_client)

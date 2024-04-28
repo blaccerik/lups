@@ -9,9 +9,10 @@ from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from database.models import DBSong, DBArtist, DBFilter
-from schemas.music import Song, Artist, Filter, FilterConfig
+from database.models import DBSong, DBArtist, DBFilter, DBSongRelationV1, DBScrapeV1, DBReaction
+from schemas.music import Song, Artist, Filter, FilterConfig, SongQueue, Similarity
 from utils.celery_config import celery_app
+from utils.music_query import MusicQuery
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -121,18 +122,38 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
         if dbf is None:
             raise HTTPException(status_code=404, detail="User doesn't have this filter")
 
-    # main query
-    # strategy 1:
-    # 1. find all related to seed song
-    # 2. filter
-    # 3. if not enough of songs then send task to celery, return error?
-    print(dbf)
+    # check if song exists
+    # song actually doesnt exist or its not downloaded
+    seed_song = postgres_client.get(DBSong, song_id)
+    if seed_song is None:
+        celery_app.send_task("music", queue="music", args=[song_id])
+        return SongQueue(
+            seed_song_id=song_id,
+            scrape=False,
+            songs=[]
+        )
 
-    # postgres_client.query()
-    # stream_id = uuid.uuid4().hex
-    # task = celery_app.send_task("stream", queue="normal", args=[
-    #     chat_id,
-    #     stream_id,
-    #     chat_message.language.value,
-    #     chat_message.owner.value
-    # ])
+    """
+    Strat
+    get all songs
+    filter out where user doesnt have 
+    """
+
+    mq = MusicQuery(user_id, postgres_client)
+    # songs = []
+    # for dbs, dbr, dbd in r:
+    #
+    #     song = Song(
+    #         id= dbs.id,
+    #         title=dbs.title,
+    #         length=dbs.length,
+    #         artist=
+    #     )
+    #
+    #     sim = Similarity()
+
+    return SongQueue(
+        seed_song_id=song_id,
+        scrape=True,
+        songs=mq.get_songs(seed_song.id)
+    )

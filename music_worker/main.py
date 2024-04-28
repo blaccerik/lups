@@ -17,8 +17,6 @@ celery_app = Celery(
 
 
 @celery_app.task(name="music")
-def music():
-    print("test")
-    logger.info("erer")
-    logger.error("erewwrwerew")
+def music(song_id):
+    logger.info(song_id)
     return 3

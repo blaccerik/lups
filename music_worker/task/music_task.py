@@ -7,7 +7,7 @@ from typing import List
 from sqlalchemy import func, and_
 from sqlalchemy.orm import Session
 
-from database.models import DBArtist, DBSong, DBSongRelation, DBReaction
+from database.models import DBArtist, DBSong, DBSongRelationV1, DBReaction
 from schemas.main import Artist, Song
 from util.download import download_channel_image, download_song, download_song_image, download_watch
 
@@ -119,19 +119,19 @@ def add_songs_to_db(seed_song: Song, songs: List[Song], song_images: dict, postg
         # skip if same song
         if song.id == seed_song.id:
             continue
-        dbs = postgres_client.query(DBSongRelation).filter_by(
+        dbs = postgres_client.query(DBSongRelationV1).filter_by(
             child_song_id=song.id,
             parent_song_id=seed_song.id
         ).first()
         if dbs:
             continue
-        dbsr = DBSongRelation()
+        dbsr = DBSongRelationV1()
         dbsr.child_song_id = song.id
         dbsr.parent_song_id = seed_song.id
         dbsr.same_artist = db_seed_song.artist_id == db_song.artist_id
         dbsr.same_genre = True
         postgres_client.add(dbsr)
-        dbsr2 = DBSongRelation()
+        dbsr2 = DBSongRelationV1()
         dbsr2.parent_song_id = song.id
         dbsr2.child_song_id = seed_song.id
         dbsr2.same_artist = db_seed_song.artist_id == db_song.artist_id
@@ -145,9 +145,9 @@ def get_next_seed_song_id(postgres_client: Session) -> str:
     # Query to count the number of connections for each song and sort by the count
     song_connections = postgres_client.query(
         DBSong.id,
-        func.count(DBSongRelation.id).label('connection_count')
+        func.count(DBSongRelationV1.id).label('connection_count')
     ).outerjoin(
-        DBSongRelation, DBSong.id == DBSongRelation.parent_song_id
+        DBSongRelationV1, DBSong.id == DBSongRelationV1.parent_song_id
     ).group_by(
         DBSong.id
     ).order_by(

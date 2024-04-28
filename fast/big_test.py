@@ -22,7 +22,7 @@ def q(seed_id, user_id):
     return [i[0].id for i in r]
 
 def q2(seed_id, user_id):
-    r = postgres_client.query(DBSong, DBSongRelationV1).filter(
+    r = postgres_client.query(DBSong, DBSongRelationV1, DBScrapeV1).filter(
         DBSong.id == DBSongRelationV1.child_song_id,
         DBSongRelationV1.parent_song_id == seed_id
     ).outerjoin(
@@ -31,7 +31,10 @@ def q2(seed_id, user_id):
             DBReaction.song_id == DBSongRelationV1.child_song_id,
             DBReaction.user_id == user_id
         )
-    ).filter(DBReaction.id == None)
+    ).filter(DBReaction.id == None).outerjoin(
+        DBScrapeV1,
+        DBScrapeV1.id == DBSongRelationV1.child_song_id
+    )
     return [i[0].id for i in r]
 
 
