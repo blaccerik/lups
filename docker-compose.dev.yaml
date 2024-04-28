@@ -27,6 +27,8 @@ services:
       POSTGRES_USER: erik
       POSTGRES_PASSWORD: erik
       TZ: "Europe/Tallinn"
+    volumes:
+      - music_data:/usr/src/app/music_data
     depends_on:
       - redis
       - postgres
@@ -89,6 +91,7 @@ networks:
     driver: bridge
 
 volumes:
+  music_data:
   postgres_data:
   redis_data:
   image_data:

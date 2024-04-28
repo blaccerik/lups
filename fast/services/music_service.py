@@ -123,9 +123,8 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
             raise HTTPException(status_code=404, detail="User doesn't have this filter")
 
     # check if song exists
-    # song actually doesnt exist or its not downloaded
     seed_song = postgres_client.get(DBSong, song_id)
-    if seed_song is None:
+    if seed_song is None or True:
         celery_app.send_task("music", queue="music", args=[song_id])
         return SongQueue(
             seed_song_id=song_id,
