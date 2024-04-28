@@ -40,6 +40,8 @@ class MusicQuery:
                 DBSongRelationV1.parent_song_id == seed_song_id
         ).yield_per(32):
 
+            print(dbsr)
+
             child_song_id = dbsr.child_song_id
 
             dbr = self.postgres_client.query(DBReaction).filter(and_(
@@ -48,11 +50,6 @@ class MusicQuery:
             )).first()
             if dbr:
                 continue
-            # print(child_song_id)
-            # print(self.postgres_client.get(DBSong, child_song_id))
-            # print(self.postgres_client.query(DBSong).filter(
-            #     DBSong.id == child_song_id
-            # ).all())
             dbs, dba, dbsv1 = self.postgres_client.query(DBSong, DBArtist, DBScrapeV1).filter(and_(
                 DBSong.id == child_song_id,
                 DBSong.artist_id == DBArtist.id
@@ -81,4 +78,5 @@ class MusicQuery:
                 song=song
             )
             results.append(sim)
+        print(len(results))
         return results

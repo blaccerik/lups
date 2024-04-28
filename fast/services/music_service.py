@@ -124,7 +124,7 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
 
     # check if song exists
     seed_song = postgres_client.get(DBSong, song_id)
-    if seed_song is None or True:
+    if seed_song is None:
         celery_app.send_task("music", queue="music", args=[song_id])
         return SongQueue(
             seed_song_id=song_id,
@@ -150,7 +150,6 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
     #     )
     #
     #     sim = Similarity()
-
     return SongQueue(
         seed_song_id=song_id,
         scrape=True,

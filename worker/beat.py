@@ -19,10 +19,10 @@ celery_app.conf.beat_schedule = {
         # 'schedule': timedelta(seconds=5),
         'schedule': crontab(minute='19', hour='19')
     },
-    'get-music': {
-        'task': 'music',
-        'options': {'queue': 'music'},
-        'schedule': timedelta(seconds=999),
-        # 'schedule': crontab(minute='*', hour='*')
-    },
+    # 'get-music': {
+    #     'task': 'music',
+    #     'options': {'queue': 'music'},
+    #     'schedule': timedelta(seconds=999),
+    #     # 'schedule': crontab(minute='*', hour='*')
+    # },
 }

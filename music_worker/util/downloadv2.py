@@ -104,6 +104,10 @@ def add_song(seed_song_id, song_id, song_title, number, artist_id, song_type, im
     )
     postgres_client.add(dbs)
 
+    if seed_song_id == song_id:
+        postgres_client.commit()
+        return 1
+
     dbsr = DBSongRelationV1()
     dbsr.child_song_id = song_id
     dbsr.parent_song_id = seed_song_id
@@ -117,8 +121,8 @@ def add_song(seed_song_id, song_id, song_title, number, artist_id, song_type, im
     postgres_client.commit()
 
     # check if image exists
-    if os.path.exists(f"{MUSIC_DATA}/song_images/{id}.jpg"):
-        logger.error(f"image exists: {id}")
+    if os.path.exists(f"{MUSIC_DATA}/song_images/{song_id}.jpg"):
+        logger.error(f"image exists: {song_id}")
         return 1
 
     res = requests.get(image_link)
