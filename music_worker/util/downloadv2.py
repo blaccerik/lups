@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
 from ytmusicapi import YTMusic
 
-from database.models import DBSong, DBArtist, DBSongRelationV1
+from database.models import DBSong, DBArtist, DBSongRelationV1, DBScrapeV1
 
 operating_system = platform.system()
 if operating_system == 'Windows':
@@ -103,8 +103,12 @@ def add_song(seed_song_id, song_id, song_title, number, artist_id, song_type, im
         type=song_type
     )
     postgres_client.add(dbs)
+    postgres_client.flush()
 
     if seed_song_id == song_id:
+        postgres_client.add(DBScrapeV1(
+            id=song_id
+        ))
         postgres_client.commit()
         return 1
 
