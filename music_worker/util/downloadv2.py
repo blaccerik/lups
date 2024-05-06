@@ -7,11 +7,10 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
-from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from ytmusicapi import YTMusic
 
-from database.models import DBSong, DBArtist, DBSongData, DBSongRelationV1, DBSongRelationV2
+from database.models import DBSong, DBArtist, DBSongRelationV1, DBSongRelationV2
 from task.music_task import log_time
 
 operating_system = platform.system()
@@ -56,6 +55,7 @@ def add_all():
         name = f.split(".")[0]
         result.append(name)
     return result
+
 
 @log_time
 def get_result(song_id):
@@ -123,7 +123,6 @@ def add_artist(artist_id, artist_name, postgres_client: Session) -> int:
 
 
 def add_song(song_id, song_title, number, artist_id, song_type, image_link, postgres_client: Session):
-
     dbs = postgres_client.get(DBSong, song_id)
     if dbs:
         return 0
@@ -174,6 +173,7 @@ def add_connections(seed_song_id, song_id, postgres_client: Session):
     postgres_client.commit()
     return 2
 
+
 def add_connections2(seed_song_id, song_id, postgres_client: Session):
     if seed_song_id == song_id:
         return 0
@@ -191,3 +191,76 @@ def add_connections2(seed_song_id, song_id, postgres_client: Session):
     postgres_client.add(dbsr)
     postgres_client.commit()
     return 1
+
+
+class Adder:
+    def __init__(self, postgres_client: Session):
+        self.artists = {}
+        self.songs = {}
+        self.connections = {}
+        self.postgres_client = postgres_client
+
+
+    def add_to_db(self):
+        self.postgres_client.add_all(self.artists.values())
+        self.postgres_client.flush()
+        self.postgres_client.add_all(self.songs.values())
+        self.postgres_client.flush()
+        self.postgres_client.add_all(self.connections.values())
+        self.postgres_client.commit()
+
+    def add_artist(self, artist_id, artist_name):
+        if artist_id is None:
+            return
+        if self.postgres_client.get(DBArtist, artist_id):
+            return
+        if artist_id in self.artists:
+            return
+        dba = DBArtist(
+            name=artist_name,
+            id=artist_id
+        )
+        self.artists[artist_id] = dba
+
+        # todo image?
+
+    def add_song(self, song_id, song_title, number, artist_id, song_type, image_link):
+
+        if self.postgres_client.get(DBSong, song_id):
+            return
+        if song_id in self.songs:
+            return
+        dbs = DBSong(
+            id=song_id,
+            title=song_title,
+            length=number,
+            artist_id=artist_id,
+            type=song_type
+        )
+        self.songs[song_id] = dbs
+
+        # todo imgae=
+
+    def add_connection(self, seed_song_id, song_id):
+        if seed_song_id == song_id:
+            return
+        key1 = seed_song_id + song_id
+        key2 = song_id + seed_song_id
+        dbsr = self.postgres_client.get(DBSongRelationV2, key1)
+        if dbsr:
+            return 0
+        dbsr = self.postgres_client.get(DBSongRelationV2, key2)
+        if dbsr:
+            return 0
+        if key1 in self.connections:
+            return
+        if key2 in self.connections:
+            return
+
+        dbsr = DBSongRelationV2(
+            id=key1
+        )
+        self.connections[key1] = dbsr
+
+
+

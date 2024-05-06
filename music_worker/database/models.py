@@ -134,7 +134,6 @@ class DBSong(Base):
         return f"Song({self.id})"
 
 
-
 class DBReaction(Base):
     __tablename__ = "reaction"
     song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
