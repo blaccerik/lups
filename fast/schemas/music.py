@@ -26,8 +26,7 @@ class Song(BaseModel):
     has_audio: bool
 
 
-class Similarity(BaseModel):
-    same_artist: bool
+class SongWrapper(BaseModel):
     distance: float
     song: Song
 
@@ -35,7 +34,7 @@ class Similarity(BaseModel):
 class SongQueue(BaseModel):
     seed_song_id: constr(min_length=11, max_length=11)
     scrape: bool
-    songs: List[Similarity]
+    songs: List[SongWrapper]
 
 
 class FilterConfig(BaseModel):

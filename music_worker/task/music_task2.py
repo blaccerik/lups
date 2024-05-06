@@ -19,12 +19,12 @@ def download_by_song_id(song_id: str, postgres_client: Session):
     # check if needs to download
     db_song_data = postgres_client.get(DBSongData, song_id)
     if db_song_data is not None:
-        return 0, 0
+        return 0, 0, 0
 
     # download
     result = get_result(song_id)
     if result is None:
-        return -1, -1
+        return -1, -1, -1
 
     new_artists = 0
     new_songs = 0

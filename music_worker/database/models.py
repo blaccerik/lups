@@ -137,10 +137,10 @@ class DBSong(Base):
 
 class DBReaction(Base):
     __tablename__ = "reaction"
-    id = Column(Integer, primary_key=True)
+    # id = Column(Integer, primary_key=True)
     date = Column(DateTime, nullable=False, default=func.now())
-    song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     # listened - user started listening the song
     # skip - user had filter which skipped song
     # like - user likes the song

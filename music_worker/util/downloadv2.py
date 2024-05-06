@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from ytmusicapi import YTMusic
 
 from database.models import DBSong, DBArtist, DBSongData, DBSongRelationV1
+from task.music_task import log_time
 
 operating_system = platform.system()
 if operating_system == 'Windows':
@@ -48,11 +49,21 @@ if not os.path.exists(path4):
     logger.error(path4)
 
 
+@log_time
+def add_all():
+    result = []
+    for f in os.listdir(MUSIC_DATA + "/song_json"):
+        name = f.split(".")[0]
+        result.append(name)
+    return result
+
+@log_time
 def get_result(song_id):
     ytmusic = YTMusic("oauth.json")
     try:
         path = f"{MUSIC_DATA}/song_json/{song_id}.json"
         if os.path.exists(f"{MUSIC_DATA}/song_json/{song_id}.json"):
+            logger.info(f"cached: {song_id}")
             with open(path, "r") as json_file:
                 result = json.load(json_file)
         else:
@@ -60,13 +71,12 @@ def get_result(song_id):
                 videoId=song_id,
                 radio=True
             )
+            time.sleep(DOWNLOAD_TIMEOUT)
             with open(path, "w") as json_file:
                 json.dump(result, json_file)
-
     except Exception as e:
         logger.error(e)
         return None
-    time.sleep(DOWNLOAD_TIMEOUT)
     return result
 
 
