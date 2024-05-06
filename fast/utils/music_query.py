@@ -4,10 +4,10 @@ import time
 from collections import deque
 from functools import wraps
 
-from sqlalchemy import and_
+from sqlalchemy import and_, desc, asc
 from sqlalchemy.orm import Session
 
-from database.models import DBReaction, DBSong, DBArtist, DBSongData, DBSongRelationV1
+from database.models import DBReaction, DBSong, DBArtist, DBSongData, DBSongRelationV1, DBSongRelationV2
 from schemas.music import Song, Artist, SongQueue, SongWrapper
 
 logging.basicConfig()
@@ -29,26 +29,13 @@ def log_time(func):
 
 
 class MusicQuery:
-    MAX_RESULTS_SIZE = 3000
+    MAX_RESULTS_SIZE = 100
     YIELD_PER = 256
 
     def __init__(self, user_id, song_id, postgres_client: Session):
         self.postgres_client = postgres_client
         self.user_id = user_id
         self.song_id = song_id
-
-    @log_time
-    def test(self):
-        r = []
-        for dbrv1, dbr in self.postgres_client.query(DBSongRelationV1, DBReaction).join(
-                DBReaction,
-                and_(
-                    DBReaction.song_id == DBSongRelationV1.child_song_id,
-                    DBReaction.user_id == self.user_id
-                ), isouter=True
-        ).yield_per(self.YIELD_PER):
-            r.append(dbrv1)
-        print(len(r))
 
     @log_time
     def get_mapping(self):
@@ -92,6 +79,85 @@ class MusicQuery:
                     return result
         return result
 
+    @log_time
+    def get_mapping2(self):
+        result = {}
+        banned = set()
+        for dbrv1 in self.postgres_client.query(DBSongRelationV1).yield_per(self.YIELD_PER):
+            cid = dbrv1.child_song_id
+            pid = dbrv1.parent_song_id
+            if cid in result:
+                result[cid].append(pid)
+            else:
+                result[cid] = [pid]
+
+        for dbr in self.postgres_client.query(DBReaction).filter(DBReaction.user_id == self.user_id).all():
+            banned.add(dbr.song_id)
+        return result, banned
+
+    @log_time
+    def get_ids2(self) -> list:
+        result = []
+        song_map, banned = self.get_mapping2()
+        queue = deque()
+        queue.append(self.song_id)
+        searched = {self.song_id}
+        while queue:
+            song_id = queue.pop()
+            for connection in song_map[song_id]:
+                if connection in searched:
+                    continue
+                searched.add(connection)
+                queue.append(connection)
+                if connection in banned:
+                    continue
+                result.append(connection)
+                if len(result) >= self.MAX_RESULTS_SIZE:
+                    return result
+        return result
+
+    @log_time
+    def get_mapping3(self):
+        result = {}
+        banned = set()
+        for dbrv2 in self.postgres_client.query(DBSongRelationV2.id).yield_per(self.YIELD_PER):
+            # print(dbrv2)
+            key = dbrv2.id
+            id1 = key[:11]
+            id2 = key[11:]
+            if id1 in result:
+                result[id1].append(id2)
+            else:
+                result[id1] = [id2]
+            if id2 in result:
+                result[id2].append(id1)
+            else:
+                result[id2] = [id1]
+
+        for dbr in self.postgres_client.query(DBReaction.song_id).filter(DBReaction.user_id == self.user_id).all():
+            banned.add(dbr.song_id)
+        return result, banned
+
+    @log_time
+    def get_ids3(self) -> list:
+        result = []
+        song_map, banned = self.get_mapping3()
+        queue = deque()
+        queue.append(self.song_id)
+        searched = {self.song_id}
+        while queue:
+            song_id = queue.pop()
+            for connection in song_map[song_id]:
+                if connection in searched:
+                    continue
+                searched.add(connection)
+                queue.append(connection)
+                if connection in banned:
+                    continue
+                result.append(connection)
+                if len(result) >= self.MAX_RESULTS_SIZE:
+                    return result
+        return result
 
     @log_time
     def ids_to_songs(self, ids):
@@ -129,5 +195,3 @@ class MusicQuery:
             scrape=ssd is not None,
             songs=result
         )
-        # print(r[0])
-        # print("all relos", len(r), len(ids))

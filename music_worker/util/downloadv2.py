@@ -11,7 +11,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from ytmusicapi import YTMusic
 
-from database.models import DBSong, DBArtist, DBSongData, DBSongRelationV1
+from database.models import DBSong, DBArtist, DBSongData, DBSongRelationV1, DBSongRelationV2
 from task.music_task import log_time
 
 operating_system = platform.system()
@@ -173,3 +173,21 @@ def add_connections(seed_song_id, song_id, postgres_client: Session):
     postgres_client.add(dbsr2)
     postgres_client.commit()
     return 2
+
+def add_connections2(seed_song_id, song_id, postgres_client: Session):
+    if seed_song_id == song_id:
+        return 0
+    key1 = seed_song_id + song_id
+    key2 = song_id + seed_song_id
+    dbsr = postgres_client.get(DBSongRelationV2, key1)
+    if dbsr:
+        return 0
+    dbsr = postgres_client.get(DBSongRelationV2, key2)
+    if dbsr:
+        return 0
+    dbsr = DBSongRelationV2(
+        id=key1
+    )
+    postgres_client.add(dbsr)
+    postgres_client.commit()
+    return 1

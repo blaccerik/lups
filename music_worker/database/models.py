@@ -137,10 +137,9 @@ class DBSong(Base):
 
 class DBReaction(Base):
     __tablename__ = "reaction"
-    # id = Column(Integer, primary_key=True)
-    date = Column(DateTime, nullable=False, default=func.now())
     song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    date = Column(DateTime, nullable=False, default=func.now())
     # listened - user started listening the song
     # skip - user had filter which skipped song
     # like - user likes the song
@@ -157,6 +156,16 @@ class DBSongRelationV1(Base):
     __tablename__ = "song_relation_v1"
     parent_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
     child_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
+    date = Column(DateTime, nullable=False, default=func.now())
+    distance = Column(Float, nullable=False, default=1.0)
+
+    def __repr__(self):
+        return f"Repr({self.parent_song_id} | {self.child_song_id})"
+
+
+class DBSongRelationV2(Base):
+    __tablename__ = "song_relation_v2"
+    id = Column(String(22), primary_key=True)
     date = Column(DateTime, nullable=False, default=func.now())
     distance = Column(Float, nullable=False, default=1.0)
 

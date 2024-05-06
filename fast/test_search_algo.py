@@ -1,30 +1,50 @@
-from database.models import DBUser, DBReaction, DBSong, DBSongRelationV1
+import time
+
+from database.models import DBUser, DBReaction, DBSong, DBSongRelationV1, DBSongRelationV2
 from database.postgres_database import SessionLocal
 from utils.music_query import MusicQuery
 
 
 def test1(postgres_client):
-
-    print("all songs", len(postgres_client.query(DBSong).all()))
-    print("all relations", len(postgres_client.query(DBSongRelationV1).all()))
+    print("all songs", postgres_client.query(DBSong).count())
+    print("all relations", postgres_client.query(DBSongRelationV1).count())
+    print("all relations2", postgres_client.query(DBSongRelationV2).count())
+    print("banned", postgres_client.query(DBReaction).count())
 
     song_id = "jRqhGC5vgC0"
     mq = MusicQuery(1, song_id, postgres_client)
-    ids = mq.get_ids()
-    songs = mq.ids_to_songs(ids)
-    print("song", songs.songs[0])
-    print("song nr", len(songs.songs))
-    for s in ids:
-        postgres_client.add(DBReaction(
-            song_id=s,
-            user_id=1,
-            type="listened",
-            duration=1
-        ))
-    postgres_client.commit()
+    # ids = mq.get_ids()
+    # print("ids", len(ids))
+    # ids2 = mq.get_ids2()
+    # print("ids2", len(ids2))
+    # ids3 = mq.get_ids3()
+    # print("ids3", len(ids3))
+    # print(len(set(ids).intersection(set(ids2))))
+    # print(len(set(ids).intersection(set(ids3))))
 
-    # test if are similar
-    #
+
+    # songs = mq.ids_to_songs(ids)
+    # print("song", songs.songs[0])
+    # print("song nr", len(songs.songs))
+    # for s in ids:
+    #     postgres_client.add(DBReaction(
+    #         song_id=s,
+    #         user_id=1,
+    #         type="listened",
+    #         duration=1
+    #     ))
+    # postgres_client.commit()
+
+    song_id = "jRqhGC5vgC0"
+    mq = MusicQuery(0, song_id, postgres_client)
+    ids = mq.get_ids()
+    print("ids", len(ids))
+    ids2 = mq.get_ids2()
+    print("ids2", len(ids2))
+    ids3 = mq.get_ids3()
+    print("ids3", len(ids3))
+    print(len(set(ids).intersection(set(ids2))))
+    print(len(set(ids).intersection(set(ids3))))
     return
 
 
