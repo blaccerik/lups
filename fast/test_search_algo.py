@@ -45,6 +45,15 @@ def test1(postgres_client):
     print("ids3", len(ids3))
     print(len(set(ids).intersection(set(ids2))))
     print(len(set(ids).intersection(set(ids3))))
+
+    """
+    INFO:utils.music_query:Function              get_mapping Took 0.7968 seconds
+    INFO:utils.music_query:Function                  get_ids Took 0.7988 seconds
+    INFO:utils.music_query:Function             get_mapping2 Took 0.6833 seconds
+    INFO:utils.music_query:Function                 get_ids2 Took 0.6843 seconds
+    INFO:utils.music_query:Function             get_mapping3 Took 0.1551 seconds
+    INFO:utils.music_query:Function                 get_ids3 Took 0.1572 seconds
+    """
     return
 
 
