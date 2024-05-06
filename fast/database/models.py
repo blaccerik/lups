@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, Date, Text, func, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Boolean, Date, Text, func, DateTime, Float
 from sqlalchemy.orm import relationship
 
 from database.postgres_database import Base
@@ -155,18 +155,19 @@ class DBReaction(Base):
 
 class DBSongRelationV1(Base):
     __tablename__ = "song_relation_v1"
-    id = Column(Integer, primary_key=True)
+    parent_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
+    child_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
     date = Column(DateTime, nullable=False, default=func.now())
-    parent_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), nullable=False)
-    child_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), nullable=False)
+    distance = Column(Float, nullable=False, default=1.0)
 
     def __repr__(self):
-        return f"Repr({self.id}): {self.parent_song_id} | {self.child_song_id}"
+        return f"Repr({self.parent_song_id} | {self.child_song_id})"
 
 
-class DBScrapeV1(Base):
-    __tablename__ = "song_scrape_v1"
+class DBSongData(Base):
+    __tablename__ = "song_data"
     id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
+    type = Column(Enum('scrapping', 'ready', name='scrape_type'), nullable=False)
     date = Column(DateTime, nullable=False, default=func.now())
 
     def __repr__(self):

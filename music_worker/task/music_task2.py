@@ -1,15 +1,24 @@
+import random
+
 from sqlalchemy.orm import Session
 
-from database.models import DBSong
-from util.downloadv2 import add_artist, get_result, add_song
+from database.models import DBSong, DBSongData
+from util.downloadv2 import add_artist, get_result, add_song, add_connections
 from util.log_time import log_time
 
 
 @log_time
-def download_by_song_id(song_id: str, postgres_client: Session):
+def select_random_song(postgres_client: Session):
+    dbsongs = postgres_client.query(DBSong).all()
+    dbsong = random.choice(dbsongs)
+    return dbsong.id
 
+
+@log_time
+def download_by_song_id(song_id: str, postgres_client: Session):
     # check if needs to download
-    if postgres_client.get(DBSong, song_id):
+    db_song_data = postgres_client.get(DBSongData, song_id)
+    if db_song_data is not None:
         return 0, 0
 
     # download
@@ -19,6 +28,7 @@ def download_by_song_id(song_id: str, postgres_client: Session):
 
     new_artists = 0
     new_songs = 0
+    new_connections = 0
     for track in result["tracks"]:
         # parse artist
         artist_dict = track["artists"][0]
@@ -33,7 +43,6 @@ def download_by_song_id(song_id: str, postgres_client: Session):
 
         # parse song
         new_songs += add_song(
-            song_id,
             track["videoId"],
             track["title"][:100],
             number,
@@ -43,4 +52,13 @@ def download_by_song_id(song_id: str, postgres_client: Session):
             postgres_client
         )
 
-    return new_artists, new_songs
+        new_connections += add_connections(song_id, track["videoId"], postgres_client)
+
+    # update song state database
+    postgres_client.add(DBSongData(
+        id=song_id,
+        type="ready"
+    ))
+    postgres_client.commit()
+
+    return new_artists, new_songs, new_connections

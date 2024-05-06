@@ -9,7 +9,7 @@ from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from database.models import DBSong, DBArtist, DBFilter, DBSongRelationV1, DBScrapeV1, DBReaction
+from database.models import DBSong, DBArtist, DBFilter, DBReaction, DBSongData
 from schemas.music import Song, Artist, Filter, FilterConfig, SongQueue, Similarity
 from utils.celery_config import celery_app
 from utils.music_query import MusicQuery
@@ -125,9 +125,9 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
 
     # check if song exists
     # if not then start scrape
-    db_seed_song, db_sv1 = postgres_client.query(DBSong, DBScrapeV1).filter(
-        DBSong.id == song_id
-    ).join(DBScrapeV1, DBScrapeV1.id == DBSong.id, isouter=True).first()
+    db_seed_song = postgres_client.get(DBSong, song_id)
+    db_song_data = postgres_client.get(DBSongData, song_id)
+    print(db_seed_song, db_song_data)
     if db_seed_song is None:
         celery_app.send_task("music", queue="music", args=[song_id])
         return SongQueue(
@@ -135,27 +135,36 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
             scrape=False,
             songs=[]
         )
-
     """
     Strat
     get all songs
     filter out where user doesnt have 
     """
-
     mq = MusicQuery(user_id, postgres_client)
     songs = mq.get_songs(db_seed_song.id)
+    has_scraped = db_song_data and db_song_data.type == "ready"
+    # if enough songs then return them
+    print(len(songs))
     if len(songs) >= MIN_QUEUE_SONGS:
         return SongQueue(
             seed_song_id=song_id,
-            scrape=db_sv1 is not None,
+            scrape=has_scraped,
+            songs=songs
+        )
+    # songs hasnt been scrapped yet
+    elif db_song_data is None:
+        celery_app.send_task("music", queue="music", args=[song_id])
+        return SongQueue(
+            seed_song_id=song_id,
+            scrape=False,
             songs=songs
         )
 
-    print(len(songs))
+    # if still no enough songs then look at
 
     return SongQueue(
         seed_song_id=song_id,
-        scrape=db_sv1 is not None,
+        scrape=True,
         songs=songs
     )
 

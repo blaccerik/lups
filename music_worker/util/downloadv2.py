@@ -7,10 +7,11 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from ytmusicapi import YTMusic
 
-from database.models import DBSong, DBArtist, DBSongRelationV1, DBScrapeV1
+from database.models import DBSong, DBArtist, DBSongData, DBSongRelationV1
 
 operating_system = platform.system()
 if operating_system == 'Windows':
@@ -111,7 +112,8 @@ def add_artist(artist_id, artist_name, postgres_client: Session) -> int:
     return 1
 
 
-def add_song(seed_song_id, song_id, song_title, number, artist_id, song_type, image_link, postgres_client: Session):
+def add_song(song_id, song_title, number, artist_id, song_type, image_link, postgres_client: Session):
+
     dbs = postgres_client.get(DBSong, song_id)
     if dbs:
         return 0
@@ -124,25 +126,6 @@ def add_song(seed_song_id, song_id, song_title, number, artist_id, song_type, im
         type=song_type
     )
     postgres_client.add(dbs)
-    postgres_client.flush()
-
-    if seed_song_id == song_id:
-        postgres_client.add(DBScrapeV1(
-            id=song_id
-        ))
-        postgres_client.commit()
-        return 1
-
-    dbsr = DBSongRelationV1()
-    dbsr.child_song_id = song_id
-    dbsr.parent_song_id = seed_song_id
-    postgres_client.add(dbsr)
-
-    dbsr2 = DBSongRelationV1()
-    dbsr2.parent_song_id = song_id
-    dbsr2.child_song_id = seed_song_id
-    postgres_client.add(dbsr2)
-
     postgres_client.commit()
 
     if not DOWNLOAD_IMAGES:
@@ -161,3 +144,22 @@ def add_song(seed_song_id, song_id, song_title, number, artist_id, song_type, im
         file.write(res.content)
     time.sleep(DOWNLOAD_TIMEOUT)
     return 1
+
+
+def add_connections(seed_song_id, song_id, postgres_client: Session):
+    if seed_song_id == song_id:
+        return 0
+    dbsr = postgres_client.get(DBSongRelationV1, (seed_song_id, song_id))
+    if dbsr:
+        return 0
+    dbsr1 = DBSongRelationV1()
+    dbsr1.child_song_id = song_id
+    dbsr1.parent_song_id = seed_song_id
+    postgres_client.add(dbsr1)
+
+    dbsr2 = DBSongRelationV1()
+    dbsr2.parent_song_id = song_id
+    dbsr2.child_song_id = seed_song_id
+    postgres_client.add(dbsr2)
+    postgres_client.commit()
+    return 2

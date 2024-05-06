@@ -28,7 +28,7 @@ class Song(BaseModel):
 
 class Similarity(BaseModel):
     same_artist: bool
-    same_genre: bool
+    distance: float
     song: Song
 
 
