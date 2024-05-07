@@ -1,14 +1,13 @@
 import logging
-import queue
 import time
 from collections import deque
 from functools import wraps
+from typing import List
 
-from sqlalchemy import and_, desc, asc
 from sqlalchemy.orm import Session
 
-from database.models import DBReaction, DBSong, DBArtist, DBSongData, DBSongRelationV1, DBSongRelationV2
-from schemas.music import Song, Artist, SongQueue, SongWrapper
+from database.models import DBReaction, DBSong, DBArtist, DBSongData, DBSongRelationV2
+from schemas.music import Song, Artist, SongQueue, SongWrapper, Filter
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -29,99 +28,20 @@ def log_time(func):
 
 
 class MusicQuery:
-    MAX_RESULTS_SIZE = 100
+    MIN_RESULTS_SIZE = 100
     YIELD_PER = 256
 
-    def __init__(self, user_id, song_id, postgres_client: Session):
+    def __init__(self, user_id: int, song_id: str, f: Filter, postgres_client: Session):
         self.postgres_client = postgres_client
         self.user_id = user_id
         self.song_id = song_id
+        self.filter = f
 
     @log_time
-    def get_mapping(self):
-        result = {}
-        banned = set()
-        for dbrv1, dbr in self.postgres_client.query(DBSongRelationV1, DBReaction).join(
-                DBReaction,
-                and_(
-                    DBReaction.song_id == DBSongRelationV1.child_song_id,
-                    DBReaction.user_id == self.user_id
-                ), isouter=True
-        ).yield_per(self.YIELD_PER):
-            cid = dbrv1.child_song_id
-            pid = dbrv1.parent_song_id
-            if cid in result:
-                result[cid].append(pid)
-            else:
-                result[cid] = [pid]
-            if dbr:
-                banned.add(cid)
-        return result, banned
-
-    @log_time
-    def get_ids(self) -> list:
-        result = []
-        song_map, banned = self.get_mapping()
-        queue = deque()
-        queue.append(self.song_id)
-        searched = {self.song_id}
-        while queue:
-            song_id = queue.pop()
-            for connection in song_map[song_id]:
-                if connection in searched:
-                    continue
-                searched.add(connection)
-                queue.append(connection)
-                if connection in banned:
-                    continue
-                result.append(connection)
-                if len(result) >= self.MAX_RESULTS_SIZE:
-                    return result
-        return result
-
-    @log_time
-    def get_mapping2(self):
-        result = {}
-        banned = set()
-        for dbrv1 in self.postgres_client.query(DBSongRelationV1).yield_per(self.YIELD_PER):
-            cid = dbrv1.child_song_id
-            pid = dbrv1.parent_song_id
-            if cid in result:
-                result[cid].append(pid)
-            else:
-                result[cid] = [pid]
-
-        for dbr in self.postgres_client.query(DBReaction).filter(DBReaction.user_id == self.user_id).all():
-            banned.add(dbr.song_id)
-        return result, banned
-
-    @log_time
-    def get_ids2(self) -> list:
-        result = []
-        song_map, banned = self.get_mapping2()
-        queue = deque()
-        queue.append(self.song_id)
-        searched = {self.song_id}
-        while queue:
-            song_id = queue.pop()
-            for connection in song_map[song_id]:
-                if connection in searched:
-                    continue
-                searched.add(connection)
-                queue.append(connection)
-                if connection in banned:
-                    continue
-                result.append(connection)
-                if len(result) >= self.MAX_RESULTS_SIZE:
-                    return result
-        return result
-
-    @log_time
-    def get_mapping3(self):
+    def _get_mapping3(self):
         result = {}
         banned = set()
         for dbrv2 in self.postgres_client.query(DBSongRelationV2.id).yield_per(self.YIELD_PER):
-            # print(dbrv2)
             key = dbrv2.id
             id1 = key[:11]
             id2 = key[11:]
@@ -139,9 +59,9 @@ class MusicQuery:
         return result, banned
 
     @log_time
-    def get_ids3(self) -> list:
+    def _get_ids3(self):
         result = []
-        song_map, banned = self.get_mapping3()
+        song_map, banned = self._get_mapping3()
         queue = deque()
         queue.append(self.song_id)
         searched = {self.song_id}
@@ -155,15 +75,15 @@ class MusicQuery:
                 if connection in banned:
                     continue
                 result.append(connection)
-                if len(result) >= self.MAX_RESULTS_SIZE:
-                    return result
-        return result
+                if len(result) >= self.MIN_RESULTS_SIZE:
+                    yield result
+                    result = []
+        yield result
 
-    @log_time
-    def ids_to_songs(self, ids):
+    def _ids_to_song_songs(self, ids) -> List[SongWrapper]:
         result = []
         for dbs, dba, dbsd in self.postgres_client.query(
-            DBSong, DBArtist, DBSongData
+                DBSong, DBArtist, DBSongData
         ).join(
             DBArtist, DBArtist.id == DBSong.artist_id, isouter=True
         ).join(
@@ -171,7 +91,6 @@ class MusicQuery:
         ).filter(
             DBSong.id.in_(ids)
         ).all():
-
             has_audio = False
             artist = None if dba is None else Artist(
                 id=dba.id,
@@ -188,10 +107,50 @@ class MusicQuery:
                     artist=artist
                 )
             ))
+        return result
+        # ssd = self.postgres_client.get(DBSongData, self.song_id)
+        # return SongQueue(
+        #     seed_song_id=self.song_id,
+        #     scrape=ssd is not None,
+        #     songs=result
+        # )
 
-        ssd = self.postgres_client.get(DBSongData, self.song_id)
+    def _normalize_text(self, text: str):
+        remove = ["(", ")", "[", "]", "'", '"', ".", ","]
+        text = text.lower()
+        for r in remove:
+            text = text.replace(r, "")
+        return text
+
+    def _filter_songs(self, songs: List[SongWrapper]) -> List[SongWrapper]:
+        result = []
+        for song_wrapper in songs:
+            song = song_wrapper.song
+
+            for fc in self.filter.config:
+                text: str = song.title if fc.target_title else song.artist.name
+                text = self._normalize_text(text)
+                word = fc.word
+                if fc.include and word not in text:
+                    break
+                elif not fc.include and word in text:
+                    break
+            else:
+                result.append(song_wrapper)
+        return result
+
+    @log_time
+    def get_filtered_songs(self) -> SongQueue:
+        result = []
+        for song_ids in self._get_ids3():
+            # todo id to song takes 80% of the time
+            songs = self._ids_to_song_songs(song_ids)
+            filtered_songs = self._filter_songs(songs)
+            result.extend(filtered_songs)
+            if len(result) >= self.MIN_RESULTS_SIZE:
+                break
         return SongQueue(
             seed_song_id=self.song_id,
-            scrape=ssd is not None,
-            songs=result
+            scrape=False,
+            songs=result[:self.MIN_RESULTS_SIZE]
         )

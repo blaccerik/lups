@@ -1,7 +1,9 @@
-import time
+import json
 
-from database.models import DBUser, DBReaction, DBSong, DBSongRelationV1, DBSongRelationV2
+from database.models import DBUser, DBReaction, DBSong, DBSongRelationV1, DBSongRelationV2, DBFilter
 from database.postgres_database import SessionLocal
+from schemas.music import Filter, FilterConfig
+from utils.helper_functions import dbfilter_to_filter
 from utils.music_query import MusicQuery
 
 
@@ -10,51 +12,33 @@ def test1(postgres_client):
     print("all relations", postgres_client.query(DBSongRelationV1).count())
     print("all relations2", postgres_client.query(DBSongRelationV2).count())
     print("banned", postgres_client.query(DBReaction).count())
+    f = Filter(
+        id=1,
+        name="test",
+        config=[
+            FilterConfig(
+                include=False,
+                target_title=True,
+                word="e"
+            )
+        ]
+    )
 
     song_id = "jRqhGC5vgC0"
-    mq = MusicQuery(1, song_id, postgres_client)
-    # ids = mq.get_ids()
-    # print("ids", len(ids))
-    # ids2 = mq.get_ids2()
-    # print("ids2", len(ids2))
-    # ids3 = mq.get_ids3()
-    # print("ids3", len(ids3))
-    # print(len(set(ids).intersection(set(ids2))))
-    # print(len(set(ids).intersection(set(ids3))))
-
-
-    # songs = mq.ids_to_songs(ids)
-    # print("song", songs.songs[0])
-    # print("song nr", len(songs.songs))
-    # for s in ids:
-    #     postgres_client.add(DBReaction(
-    #         song_id=s,
-    #         user_id=1,
-    #         type="listened",
-    #         duration=1
-    #     ))
-    # postgres_client.commit()
-
-    song_id = "jRqhGC5vgC0"
-    mq = MusicQuery(0, song_id, postgres_client)
-    ids = mq.get_ids()
-    print("ids", len(ids))
-    ids2 = mq.get_ids2()
-    print("ids2", len(ids2))
-    ids3 = mq.get_ids3()
-    print("ids3", len(ids3))
-    print(len(set(ids).intersection(set(ids2))))
-    print(len(set(ids).intersection(set(ids3))))
-
-    """
-    INFO:utils.music_query:Function              get_mapping Took 0.7968 seconds
-    INFO:utils.music_query:Function                  get_ids Took 0.7988 seconds
-    INFO:utils.music_query:Function             get_mapping2 Took 0.6833 seconds
-    INFO:utils.music_query:Function                 get_ids2 Took 0.6843 seconds
-    INFO:utils.music_query:Function             get_mapping3 Took 0.1551 seconds
-    INFO:utils.music_query:Function                 get_ids3 Took 0.1572 seconds
-    """
-    return
+    mq = MusicQuery(1, song_id, f, postgres_client)
+    sq = mq.get_filtered_songs()
+    # for s in sq.songs:
+    #     print(s.song)
+    print(len(sq.songs))
+    print(sq.songs[0])
+    for s in sq.songs:
+        postgres_client.add(DBReaction(
+            song_id=s.song.id,
+            user_id=1,
+            type="listened",
+            duration=1
+        ))
+    postgres_client.commit()
 
 
 if __name__ == '__main__':
@@ -72,4 +56,3 @@ if __name__ == '__main__':
         test1(postgres_client)
     finally:
         postgres_client.close()
-
