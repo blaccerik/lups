@@ -2,10 +2,10 @@
 
 .router-container {
   position: absolute;
-  top: calc($menuHeight + 5px);
+  top: $menuHeight;
   left: 0;
   width: 100%;
-  height: calc(100% - calc($menuHeight + 5px)); /* Adjust the height as needed */
+  height: calc(100% - calc($menuHeight)); /* Adjust the height as needed */
   overflow-y: auto;
   box-sizing: border-box;
 }
