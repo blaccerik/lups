@@ -5,9 +5,8 @@
   top: $menuHeight;
   left: 0;
   width: 100%;
-  height: calc(100% - calc($menuHeight)); /* Adjust the height as needed */
+  height: calc(100% - calc($menuHeight));
   overflow-y: auto;
-  box-sizing: border-box;
 }
 
 .router-container::-webkit-scrollbar {
