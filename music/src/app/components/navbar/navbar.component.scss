@@ -1,0 +1,13 @@
+@import 'variables';
+
+.container {
+  background-color: midnightblue;
+  width: 100%;
+  z-index: 100;
+  position: fixed;
+  height: $menuHeight;
+  display: flex;
+  top: 0;
+  left: 0;
+  border-bottom: 5px solid orange;
+}
