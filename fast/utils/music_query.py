@@ -36,6 +36,11 @@ class MusicQuery:
         self.user_id = user_id
         self.song_id = song_id
         self.filter = f
+        dbsd = self.postgres_client.get(DBSongData, song_id)
+        if dbsd is None:
+            self.scrape = False
+        else:
+            self.scrape = dbsd.type == "ready"
 
     @log_time
     def _get_mapping3(self):
@@ -151,6 +156,6 @@ class MusicQuery:
                 break
         return SongQueue(
             seed_song_id=self.song_id,
-            scrape=False,
+            scrape=self.scrape,
             songs=result[:self.MIN_RESULTS_SIZE]
         )

@@ -5,7 +5,7 @@ from google.oauth2 import id_token
 from sqlalchemy.orm import Session
 
 from database.postgres_database import get_postgres_db
-from schemas.auth import User, UserExtra
+from schemas.auth import User, Userv2
 from services.chat_service import read_user
 
 oauth2_scheme = HTTPBearer()
@@ -13,9 +13,9 @@ oauth2_scheme = HTTPBearer()
 YOUR_CLIENT_ID = '437646142767-evt2pt3tn4pbrjcea6pd71quq07h82j7.apps.googleusercontent.com'
 
 
-async def get_extra_user(
+async def get_user_v2(
         credentials: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
-        postgres_client: Session = Depends(get_postgres_db)) -> UserExtra:
+        postgres_client: Session = Depends(get_postgres_db)) -> Userv2:
     try:
         id_info = id_token.verify_oauth2_token(credentials.credentials, requests.Request(), YOUR_CLIENT_ID)
         google_id = id_info.get('sub')
@@ -24,7 +24,7 @@ async def get_extra_user(
         print(f"auth.py {e}")
         raise HTTPException(status_code=401, detail="Could not validate credentials")
     user_id = read_user(User(google_id=google_id, name=name), postgres_client)
-    return UserExtra(google_id=google_id, name=name, user_id=user_id)
+    return Userv2(google_id=google_id, name=name, user_id=user_id)
 
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(oauth2_scheme)):

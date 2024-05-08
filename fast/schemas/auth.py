@@ -6,7 +6,7 @@ class User(BaseModel):
     name: str
 
 
-class UserExtra(BaseModel):
+class Userv2(BaseModel):
     google_id: str
     name: str
     user_id: int

@@ -4,9 +4,6 @@ from typing import Union, List
 from pydantic import BaseModel, Field
 
 
-
-
-
 class News(BaseModel):
     creator_id: str | None
     creator: str

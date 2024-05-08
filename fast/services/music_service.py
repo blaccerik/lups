@@ -9,9 +9,10 @@ from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from database.models import DBSong, DBArtist, DBFilter, DBReaction, DBSongData
-from schemas.music import Song, Artist, Filter, FilterConfig, SongQueue, Similarity
+from database.models import DBSong, DBArtist, DBFilter
+from schemas.music import Song, Artist, Filter, FilterConfig, SongQueue
 from utils.celery_config import celery_app
+from utils.helper_functions import dbfilter_to_filter
 from utils.music_query import MusicQuery
 
 logging.basicConfig()
@@ -111,8 +112,8 @@ def update_filters_by_user(user_id: int, f: Filter, postgres_client: Session):
         postgres_client.commit()
 
 
-def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session):
-    # check if user has queue
+def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> SongQueue:
+    # check if user has filter
     if filter_id is None:
         dbf = None
     else:
@@ -126,45 +127,12 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
     # check if song exists
     # if not then start scrape
     db_seed_song = postgres_client.get(DBSong, song_id)
-    db_song_data = postgres_client.get(DBSongData, song_id)
-    print(db_seed_song, db_song_data)
     if db_seed_song is None:
         celery_app.send_task("music", queue="music", args=[song_id])
-        return SongQueue(
-            seed_song_id=song_id,
-            scrape=False,
-            songs=[]
-        )
-    """
-    Strat
-    get all songs
-    filter out where user doesnt have 
-    """
-    mq = MusicQuery(user_id, postgres_client)
-    songs = mq.get_songs(db_seed_song.id)
-    has_scraped = db_song_data and db_song_data.type == "ready"
-    # if enough songs then return them
-    print(len(songs))
-    if len(songs) >= MIN_QUEUE_SONGS:
-        return SongQueue(
-            seed_song_id=song_id,
-            scrape=has_scraped,
-            songs=songs
-        )
-    # songs hasnt been scrapped yet
-    elif db_song_data is None:
-        celery_app.send_task("music", queue="music", args=[song_id])
-        return SongQueue(
-            seed_song_id=song_id,
-            scrape=False,
-            songs=songs
-        )
+        return SongQueue(seed_song_id=song_id, scrape=False, songs=[])
 
-    # if still no enough songs then look at
-
-    return SongQueue(
-        seed_song_id=song_id,
-        scrape=True,
-        songs=songs
-    )
-
+    # init queue
+    filter_ = dbfilter_to_filter(dbf)
+    mq = MusicQuery(user_id, song_id, filter_, postgres_client)
+    sq = mq.get_filtered_songs()
+    return sq
