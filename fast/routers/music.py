@@ -8,9 +8,9 @@ from starlette.responses import FileResponse
 
 from database.postgres_database import get_postgres_db
 from schemas.auth import Userv2
-from schemas.music import Song, Filter, SongQueue
+from schemas.music import Song, Filter, SongQueue, SongReaction
 from services.music_service import read_song, read_song_image, read_artist_image, read_filters_by_user, \
-    create_filters_by_user, update_filters_by_user, read_queue
+    create_filters_by_user, update_filters_by_user, read_queue, update_song_reaction
 from utils.auth import get_user_v2
 
 router = APIRouter(prefix="/api/music", tags=["Music"])
@@ -26,6 +26,16 @@ async def get_music(
 @router.get("/song/{song_id}", response_model=Song)
 async def get_song(song_id: str, postgres_client: Session = Depends(get_postgres_db)):
     return read_song(song_id, postgres_client)
+
+
+@router.post("/song/{song_id}")
+async def post_song_reaction(
+        song_id: str,
+        song_reaction: SongReaction,
+        user: Userv2 = Depends(get_user_v2),
+        postgres_client: Session = Depends(get_postgres_db)
+):
+    return update_song_reaction(user.user_id, song_id, song_reaction, postgres_client)
 
 
 @router.get("/song/{song_id}/image", response_class=FileResponse)

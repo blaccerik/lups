@@ -9,8 +9,8 @@ from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from database.models import DBSong, DBArtist, DBFilter
-from schemas.music import Song, Artist, Filter, FilterConfig, SongQueue
+from database.models import DBSong, DBArtist, DBFilter, DBReaction
+from schemas.music import Song, Artist, Filter, FilterConfig, SongQueue, SongReaction, ReactionType
 from utils.celery_config import celery_app
 from utils.helper_functions import dbfilter_to_filter
 from utils.music_query import MusicQuery
@@ -136,3 +136,23 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
     mq = MusicQuery(user_id, song_id, filter_, postgres_client)
     sq = mq.get_filtered_songs()
     return sq
+
+
+def update_song_reaction(user_id: int, song_id: str, song_reaction: SongReaction, postgres_client: Session):
+    # check if user has feedback
+    dbr = postgres_client.get(DBReaction, (song_id, user_id))
+    if dbr is None:
+        dbr = DBReaction(
+            song_id=song_id,
+            user_id=user_id,
+            duration=song_reaction.duration,
+            type=song_reaction.type
+        )
+    else:
+        dbr.duration = dbr.duration + song_reaction.duration
+
+    if song_reaction.type == ReactionType.like:
+        dbr.type = song_reaction.type
+
+    postgres_client.add(dbr)
+    postgres_client.commit()

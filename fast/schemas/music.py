@@ -37,6 +37,17 @@ class SongQueue(BaseModel):
     songs: List[SongWrapper]
 
 
+class ReactionType(str, Enum):
+    listened = 'listened'
+    skip = 'skip'
+    like = 'like'
+
+
+class SongReaction(BaseModel):
+    duration: int
+    type: ReactionType
+
+
 class FilterConfig(BaseModel):
     include: bool  # keep or remove certain word
     target_title: bool  # title or artist
