@@ -1,0 +1,25 @@
+@import 'variables';
+
+.container {
+  display: flex;
+  width: 100%;
+  height: calc(100% - $footerHeight);
+}
+
+app-playlist {
+  flex: 30%;
+}
+
+app-song {
+  flex: 70%;
+}
+
+@media (max-width: $menuBreakpoint) {
+  .container {
+    flex-direction: column;
+  }
+  app-song, app-playlist {
+    flex: 100%;
+  }
+}
+

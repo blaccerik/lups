@@ -1,0 +1,6 @@
+<div class="container">
+  <p>display works!</p>
+  <div *ngFor="let song of songs" (click)="clickSong(song)">
+    {{song.title}}
+  </div>
+</div>
