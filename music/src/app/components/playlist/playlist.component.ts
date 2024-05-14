@@ -2,7 +2,7 @@ import {Component, inject, OnDestroy, signal} from '@angular/core';
 import {Router, RouterLink} from "@angular/router";
 import {MusicService, Song} from "../../services/music.service";
 import {toObservable} from "@angular/core/rxjs-interop";
-import {combineLatest, EMPTY, filter, mergeMap, retry, Subscription, throwIfEmpty} from "rxjs";
+import {combineLatest, EMPTY, filter, mergeMap, retry, Subscription} from "rxjs";
 import {NgForOf, NgIf} from "@angular/common";
 
 @Component({
@@ -29,6 +29,8 @@ export class PlaylistComponent implements OnDestroy {
 
   constructor() {
 
+    // check if selected song is in the end of query
+    // update state if true
     this.currentSong$ = toObservable(this.currentSong).subscribe(
       song => {
         if (!song) return
@@ -43,12 +45,15 @@ export class PlaylistComponent implements OnDestroy {
       }
     )
 
+    // check if is in 'query' state
+    // and if so then start querying using seed song
+    // retries if error from backend
     this.musicQueue$ = combineLatest([
       toObservable(this.query),
       toObservable(this.seedSong)
     ]).pipe(
       filter(([q, s]) => q && !!s),
-      mergeMap(([q, s]) => {
+      mergeMap(([_, s]) => {
         if (s) {
           return this.musicService.getQueue(s.id);
         } else {

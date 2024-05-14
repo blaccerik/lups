@@ -25,6 +25,8 @@ export class DisplayComponent implements OnInit, OnDestroy {
   private activatedRoute$: Subscription | undefined
 
   ngOnInit(): void {
+
+    // listen for route changes and update signals if needed
     this.activatedRoute$ = this.activatedRoute.params.pipe(
       filter(params => params["song_id"] != null),
       switchMap(params => this.musicService.getSong(params["song_id"]))
