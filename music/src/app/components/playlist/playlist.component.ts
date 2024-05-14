@@ -1,23 +1,84 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnDestroy, signal} from '@angular/core';
 import {Router, RouterLink} from "@angular/router";
-import {routes} from "../../app.routes";
+import {MusicService, Song} from "../../services/music.service";
+import {toObservable} from "@angular/core/rxjs-interop";
+import {combineLatest, EMPTY, filter, mergeMap, retry, Subscription, throwIfEmpty} from "rxjs";
+import {NgForOf, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-playlist',
   standalone: true,
   imports: [
-    RouterLink
+    RouterLink,
+    NgForOf,
+    NgIf
   ],
   templateUrl: './playlist.component.html',
   styleUrl: './playlist.component.scss'
 })
-export class PlaylistComponent {
+export class PlaylistComponent implements OnDestroy {
+  private musicService = inject(MusicService)
   router = inject(Router)
 
-  go() {
-    this.router.navigate(["song", "erik"])
+  currentSong = this.musicService.currentSong;
+  playlist = this.musicService.playlist;
+  seedSong = this.musicService.seedSong
+  query = signal(true);
+  private musicQueue$: Subscription | undefined
+  private currentSong$: Subscription | undefined
+
+  constructor() {
+
+    this.currentSong$ = toObservable(this.currentSong).subscribe(
+      song => {
+        if (!song) return
+        const songs = this.musicService.playlist()
+        const index = songs.findIndex(s => s.id === song.id)
+        if (index === -1) {
+          this.query.set(true)
+        }
+        if (songs.length - index <= 2) {
+          this.query.set(true)
+        }
+      }
+    )
+
+    this.musicQueue$ = combineLatest([
+      toObservable(this.query),
+      toObservable(this.seedSong)
+    ]).pipe(
+      filter(([q, s]) => q && !!s),
+      mergeMap(([q, s]) => {
+        if (s) {
+          return this.musicService.getQueue(s.id);
+        } else {
+          return EMPTY;
+        }
+      })).pipe(retry({delay: 1000})).subscribe(
+      songs => {
+        const playlist = this.playlist()
+        this.playlist.set([...playlist, ...songs])
+        this.query.set(false)
+      }
+    )
   }
+
+  ngOnDestroy(): void {
+    this.musicQueue$?.unsubscribe()
+    this.currentSong$?.unsubscribe()
+  }
+
+  clickOnSong(song: Song) {
+    this.currentSong.set(song)
+  }
+
+  go() {
+    this.router.navigate(["song", "erik1"])
+  }
+
   go2() {
     this.router.navigate(["song", "erik2"])
   }
+
+
 }

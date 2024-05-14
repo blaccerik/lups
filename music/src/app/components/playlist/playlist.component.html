@@ -3,4 +3,8 @@
   <button (click)="go()">ewew</button>
   <button (click)="go2()">ewewrrr</button>
   <button routerLink="">hime</button>
+
+  <div *ngFor="let song of playlist()" (click)="clickOnSong(song)">
+    {{song.title}}
+  </div>
 </div>

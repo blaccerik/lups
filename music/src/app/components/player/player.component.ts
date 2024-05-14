@@ -34,7 +34,7 @@ export class PlayerComponent {
 
   constructor() {
     effect(() => {
-      const song = this.musicService.song();
+      const song = this.musicService.currentSong();
       if (!song) return;
       this.audio.src = song.src
       this.audio.volume = this.volume

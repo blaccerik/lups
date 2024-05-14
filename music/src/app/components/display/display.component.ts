@@ -30,7 +30,9 @@ export class DisplayComponent implements OnInit, OnDestroy {
       switchMap(params => this.musicService.getSong(params["song_id"]))
     ).subscribe(
       song => {
-        this.musicService.song.set(song)
+        this.musicService.currentSong.set(song);
+        this.musicService.addSongToPlaylist(song);
+        this.musicService.setSeedSong(song);
       }
     )
   }
