@@ -108,5 +108,6 @@ def download_by_song_id2(song_id: str, postgres_client: Session):
         type="ready"
     ))
     postgres_client.commit()
-    return len(a.artists), len(a.songs), len(a.connections)
-    # return new_artists, new_songs, new_connections, new_connections2
+
+    # get db objects ids
+    return [x.id for x in a.artists.values()], [x.id for x in a.songs.values()], len(a.connections.values())

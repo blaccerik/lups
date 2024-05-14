@@ -1,4 +1,4 @@
-celery==5.3.6
+celery==5.4.0
 flower==2.0.1
 redis==5.0.3
 psycopg2==2.9.9

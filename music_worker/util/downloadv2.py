@@ -200,7 +200,6 @@ class Adder:
         self.connections = {}
         self.postgres_client = postgres_client
 
-
     def add_to_db(self):
         self.postgres_client.add_all(self.artists.values())
         self.postgres_client.flush()
@@ -261,6 +260,3 @@ class Adder:
             id=key1
         )
         self.connections[key1] = dbsr
-
-
-

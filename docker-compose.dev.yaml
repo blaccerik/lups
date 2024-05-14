@@ -1,28 +1,28 @@
 version: '3.8'
 
 services:
-  worker:
-    container_name: worker
-    restart: unless-stopped
-    build:
-      context: worker
-    command: celery --app main worker --concurrency=1 --pool prefork --queues=normal
-    environment:
-      POSTGRES_USER: erik
-      POSTGRES_PASSWORD: erik
-      NEWS_API_KEY: "test_key"
-      TZ: "Europe/Tallinn"
-    depends_on:
-      - redis
-      - postgres
-    networks:
-      - lups
+#  worker:
+#    container_name: worker
+#    restart: unless-stopped
+#    build:
+#      context: worker
+#    command: celery --app main worker --concurrency=1 --pool prefork --queues=normal
+#    environment:
+#      POSTGRES_USER: erik
+#      POSTGRES_PASSWORD: erik
+#      NEWS_API_KEY: "test_key"
+#      TZ: "Europe/Tallinn"
+#    depends_on:
+#      - redis
+#      - postgres
+#    networks:
+#      - lups
   music:
     container_name: music
     restart: unless-stopped
     build:
       context: music_worker
-    command: celery --app=main worker --concurrency=1 --pool=prefork --queues=music --loglevel=INFO
+    command: celery --app=main worker --concurrency=1 --pool=prefork --loglevel=INFO
     environment:
       POSTGRES_USER: erik
       POSTGRES_PASSWORD: erik
@@ -34,18 +34,18 @@ services:
       - postgres
     networks:
       - lups
-  beat:
-    container_name: beat
-    build:
-      context: worker
-    command: celery --app beat beat --loglevel=debug
-    depends_on:
-      - redis
-      - worker
-    networks:
-      - lups
-    environment:
-      TZ: "Europe/Tallinn"
+#  beat:
+#    container_name: beat
+#    build:
+#      context: worker
+#    command: celery --app beat beat --loglevel=debug
+#    depends_on:
+#      - redis
+#      - worker
+#    networks:
+#      - lups
+#    environment:
+#      TZ: "Europe/Tallinn"
   redis:
     container_name: redis
     restart: unless-stopped
