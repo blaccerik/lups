@@ -44,6 +44,6 @@ export class SongComponent {
   ]
 
   clickSong(song: Song) {
-    this.audioService.setSong(song)
+    this.audioService.song.set(song)
   }
 }

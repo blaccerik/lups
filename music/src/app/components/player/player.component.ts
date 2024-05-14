@@ -1,4 +1,4 @@
-import {Component, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, computed, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {MatToolbar} from "@angular/material/toolbar";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 import {FormsModule} from "@angular/forms";
@@ -7,6 +7,8 @@ import {MatIconButton} from "@angular/material/button";
 import {NgIf} from "@angular/common";
 import {AudioService} from "../../services/audio.service";
 import {Subscription} from "rxjs";
+import {toObservable} from "@angular/core/rxjs-interop";
+import {MusicService} from "../../services/music.service";
 
 
 @Component({
@@ -26,55 +28,50 @@ import {Subscription} from "rxjs";
 })
 export class PlayerComponent implements OnInit, OnDestroy {
 
-  private audioService = inject(AudioService)
+  // private audioService = inject(AudioService)
+  private musicService = inject(MusicService)
   isShowing = signal(false);
-  audio = new Audio();
+  audio = computed(() => {
+    const song = this.musicService.song();
+    if (!song) return;
+    const audio = new Audio(song.src);
+    this.duration = 0
+    this.currentTime = 0
+    audio.ondurationchange = () => {
+      this.duration = Math.floor(audio.duration);
+    }
+    audio.ontimeupdate = () => {
+      this.currentTime = Math.floor(audio.currentTime);
+    }
+    return audio;
+  })
+  // they are not know when audio object is created :(
   duration = 0;
   currentTime = 0;
-  volume = 0.5;
-
-  url = "https://download.samplelib.com/mp3/sample-9s.mp3"
+  volume = signal(0.5)
+  prevVolume = signal(0.5)
 
   constructor() {}
 
-  song$: Subscription | undefined
-
   ngOnInit(): void {
-    this.song$ = this.audioService.getSong().subscribe(
-      song => {
-        if (!song) return
-        this.audio.src = song.src
 
-        // Listen to the progress event to track the download progress
-        this.audio.addEventListener('progress', () => {
-          // Calculate the percentage of the audio file downloaded
-          const bufferedTime = this.audio.buffered.end(0); // Time buffered
-          const totalTime = this.audio.duration; // Total time of the audio
-          const percentage = (bufferedTime / totalTime) * 100;
-
-          console.log(`Downloaded: ${percentage}%`);
-        });
-
-        this.audio.ondurationchange = () => {
-          this.duration = Math.floor(this.audio.duration);
-        }
-        this.audio.ontimeupdate = () => {
-          this.currentTime = Math.floor(this.audio.currentTime);
-        }
-      }
-    )
   }
 
   ngOnDestroy() {
-    if (this.song$) this.song$.unsubscribe();
   }
 
 
   toggleMute() {
-    if (this.audio.volume === 0) {
-      this.audio.volume = this.volume
+    const audio = this.audio()
+    if (!audio) return
+
+    if (audio.volume === 0) {
+      const vol = this.prevVolume()
+      this.volume.set(vol)
+      audio.volume = vol
     } else {
-      this.audio.volume = 0
+      this.volume.set(0)
+      audio.volume = 0
     }
   }
 
@@ -87,19 +84,28 @@ export class PlayerComponent implements OnInit, OnDestroy {
   }
 
   play(): void {
-    if (this.audio.readyState < 2) return
-    if (this.audio.paused) {
-      this.audio.play();
+    const audio = this.audio()
+    if (!audio) return
+    if (audio.readyState < 2) return;
+    if (audio.paused) {
+      audio.play();
     } else {
-      this.audio.pause();
+      audio.pause();
     }
   }
 
   onTimeChange(value: number) {
-    this.audio.currentTime = value
+    const audio = this.audio()
+    if (!audio) return
+    audio.currentTime = value
   }
 
   onVolumeChange(value: number) {
-    this.volume = value;
+    const audio = this.audio()
+    if (!audio) return
+    audio.volume = value
+    this.volume.set(value);
+    this.prevVolume.set(value)
+
   }
 }

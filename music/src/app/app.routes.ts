@@ -6,4 +6,5 @@ import {DisplayComponent} from "./components/display/display.component";
 export const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'song', component: DisplayComponent},
+  {path: 'song/:song_id', component: DisplayComponent},
 ];
