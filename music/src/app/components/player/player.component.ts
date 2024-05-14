@@ -1,13 +1,10 @@
-import {Component, computed, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, effect, inject, signal} from '@angular/core';
 import {MatToolbar} from "@angular/material/toolbar";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 import {FormsModule} from "@angular/forms";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {NgIf} from "@angular/common";
-import {AudioService} from "../../services/audio.service";
-import {Subscription} from "rxjs";
-import {toObservable} from "@angular/core/rxjs-interop";
 import {MusicService} from "../../services/music.service";
 
 
@@ -26,52 +23,37 @@ import {MusicService} from "../../services/music.service";
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss'
 })
-export class PlayerComponent implements OnInit, OnDestroy {
+export class PlayerComponent {
 
-  // private audioService = inject(AudioService)
   private musicService = inject(MusicService)
   isShowing = signal(false);
-  audio = computed(() => {
-    const song = this.musicService.song();
-    if (!song) return;
-    const audio = new Audio(song.src);
-    this.duration = 0
-    this.currentTime = 0
-    audio.ondurationchange = () => {
-      this.duration = Math.floor(audio.duration);
-    }
-    audio.ontimeupdate = () => {
-      this.currentTime = Math.floor(audio.currentTime);
-    }
-    return audio;
-  })
-  // they are not know when audio object is created :(
+  volume = 0.5
+  audio = new Audio();
   duration = 0;
   currentTime = 0;
-  volume = signal(0.5)
-  prevVolume = signal(0.5)
 
-  constructor() {}
-
-  ngOnInit(): void {
-
-  }
-
-  ngOnDestroy() {
+  constructor() {
+    effect(() => {
+      const song = this.musicService.song();
+      if (!song) return;
+      this.audio.src = song.src
+      this.audio.volume = this.volume
+      this.audio.ondurationchange = () => {
+        this.duration = Math.floor(this.audio.duration);
+      }
+      this.audio.ontimeupdate = () => {
+        this.currentTime = Math.floor(this.audio.currentTime);
+      }
+    });
   }
 
 
   toggleMute() {
-    const audio = this.audio()
-    if (!audio) return
-
-    if (audio.volume === 0) {
-      const vol = this.prevVolume()
-      this.volume.set(vol)
-      audio.volume = vol
+    console.log(this.volume, this.audio.volume)
+    if (this.audio.volume === 0) {
+      this.audio.volume = this.volume
     } else {
-      this.volume.set(0)
-      audio.volume = 0
+      this.audio.volume = 0
     }
   }
 
@@ -84,28 +66,20 @@ export class PlayerComponent implements OnInit, OnDestroy {
   }
 
   play(): void {
-    const audio = this.audio()
-    if (!audio) return
-    if (audio.readyState < 2) return;
-    if (audio.paused) {
-      audio.play();
+    if (this.audio.readyState < 2) return;
+    if (this.audio.paused) {
+      this.audio.play();
     } else {
-      audio.pause();
+      this.audio.pause();
     }
   }
 
   onTimeChange(value: number) {
-    const audio = this.audio()
-    if (!audio) return
-    audio.currentTime = value
+    this.audio.currentTime = value
   }
 
   onVolumeChange(value: number) {
-    const audio = this.audio()
-    if (!audio) return
-    audio.volume = value
-    this.volume.set(value);
-    this.prevVolume.set(value)
-
+    this.audio.volume = value
+    this.volume = value
   }
 }

@@ -4,8 +4,7 @@ import {PlayerComponent} from "../player/player.component";
 import {PlaylistComponent} from "../playlist/playlist.component";
 import {SongComponent} from "../song/song.component";
 import {ActivatedRoute} from "@angular/router";
-import {AudioService} from "../../services/audio.service";
-import {filter, Subject, Subscription, switchMap, takeUntil} from "rxjs";
+import {filter, Subscription, switchMap} from "rxjs";
 import {MusicService} from "../../services/music.service";
 
 @Component({

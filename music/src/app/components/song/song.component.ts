@@ -3,7 +3,8 @@ import {MatDrawer, MatDrawerContainer, MatDrawerContent} from "@angular/material
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {NgForOf} from "@angular/common";
-import {AudioService, Song} from "../../services/audio.service";
+import {Song} from "../../services/audio.service";
+import {MusicService} from "../../services/music.service";
 
 @Component({
   selector: 'app-song',
@@ -20,7 +21,8 @@ import {AudioService, Song} from "../../services/audio.service";
   styleUrl: './song.component.scss'
 })
 export class SongComponent {
-  private audioService = inject(AudioService)
+  private musicService = inject(MusicService)
+  song = this.musicService.song.asReadonly()
 
   songs: Song[] = [
     {
@@ -44,6 +46,6 @@ export class SongComponent {
   ]
 
   clickSong(song: Song) {
-    this.audioService.song.set(song)
+    this.musicService.song.set(song)
   }
 }
