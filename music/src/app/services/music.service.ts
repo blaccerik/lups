@@ -35,7 +35,7 @@ export class MusicService {
     }
   }
 
-  generateRandomWord(s: string): Song {
+  private generateRandomWord(s: string): Song {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz';
     let word = '';
     for (let i = 0; i < 4; i++) {
@@ -50,7 +50,6 @@ export class MusicService {
     }
   }
 
-
   getQueue(s: string) {
     const songs: Song[] = [
       this.generateRandomWord(s),
@@ -59,7 +58,6 @@ export class MusicService {
       this.generateRandomWord(s)
     ]
     const shouldFail = Math.random() > 0.5;
-    console.log("shouldfail", s, shouldFail)
     if (shouldFail) {
       return throwError(() => new Error("Simulated error"));
     } else {
