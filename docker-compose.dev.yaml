@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
     build:
       context: music_worker
-    command: celery --app=main worker --concurrency=1 --pool=prefork --loglevel=INFO
+    command: celery --app=main worker --concurrency=1 --pool=prefork --queues=music --loglevel=INFO
     environment:
       POSTGRES_USER: erik
       POSTGRES_PASSWORD: erik

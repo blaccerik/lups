@@ -17,8 +17,14 @@ celery_app.conf.task_routes = {
     "stream": {'queue': "normal"}
 }
 
-celery_app.conf.broker_transport_options = {
-    'priority_steps': list(range(10)),
-    'sep': ':',
-    'queue_order_strategy': 'priority',
-}
+# celery_app.conf.broker_transport_options = {
+#     'priority_steps': list(range(10)),
+#     'sep': ':',
+#     'queue_order_strategy': 'priority',
+# }
+
+# celery_app.conf.broker_transport_options = {
+#     'priority_steps': list(range(10)),
+#     'sep': ':',
+#     'queue_order_strategy': 'priority',
+# }

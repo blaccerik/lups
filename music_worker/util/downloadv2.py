@@ -7,6 +7,7 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+from pytube import YouTube
 from sqlalchemy.orm import Session
 from ytmusicapi import YTMusic
 
@@ -19,6 +20,7 @@ if operating_system == 'Windows':
 else:
     MUSIC_DATA = "/usr/src/app/music_data"
 DOWNLOAD_IMAGES = False
+DOWNLOAD_SONGS = False
 DOWNLOAD_TIMEOUT = 0.5
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -260,3 +262,20 @@ class Adder:
             id=key1
         )
         self.connections[key1] = dbsr
+
+
+@log_time
+def download_song_by_id(song_id: str):
+    # check if saved
+    if os.path.exists(f"{MUSIC_DATA}/songs/{song_id}.mp3"):
+        logger.info(f"cached: {song_id}")
+        return
+
+    if not DOWNLOAD_SONGS:
+        return
+
+    yt = YouTube(f"https://music.youtube.com/watch?v={song_id}")
+    yt.streams.filter(only_audio=True).first().download(
+        output_path=f"{MUSIC_DATA}/songs",
+        filename=f"{song_id}.mp3"
+    )
