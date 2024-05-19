@@ -10,7 +10,6 @@ export interface Song {
   id: string;
   title: string;
   artist: Artist | null;
-  src: string
 }
 
 @Injectable({
@@ -19,19 +18,12 @@ export interface Song {
 export class MusicService {
 
   currentSong = signal<Song | null>(null);
-  seedSong = signal<Song | null>(null);
   playlist = signal<Song[]>([])
 
   addSongToPlaylist(song: Song) {
     const songs = this.playlist()
     if (!songs.find(s => s.id === song.id)) {
       this.playlist.set([...songs, song])
-    }
-  }
-
-  setSeedSong(song: Song) {
-    if (!this.seedSong()) {
-      this.seedSong.set(song)
     }
   }
 
@@ -45,7 +37,6 @@ export class MusicService {
     return {
       title: s + word,
       artist: null,
-      src: "https://filesamples.com/samples/audio/mp3/sample2.mp3",
       id: word
     }
   }
@@ -58,21 +49,32 @@ export class MusicService {
       this.generateRandomWord(s)
     ]
     const shouldFail = Math.random() > 0.5;
+    console.log("queue", s, shouldFail)
     if (shouldFail) {
-      return throwError(() => new Error("Simulated error"));
+      return throwError(() => new Error("Simulated error")).pipe(delay(100));
     } else {
-      return of(songs); // Return the songs with a delay
+      return of(songs).pipe(delay(100)); // Return the songs with a delay
     }
   }
 
-  // replace with backend call
   getSong(s: string) {
     const song: Song = {
       title: s,
       artist: null,
-      src: "https://filesamples.com/samples/audio/mp3/sample2.mp3",
       id: s
     }
     return of(song).pipe(delay(100));
+  }
+
+  getAudio(s: string) {
+    console.log("audio", s)
+    const url = "https://filesamples.com/samples/audio/mp3/sample2.mp3";
+    return of(url).pipe(delay(1000));
+  }
+
+  getSongImage(s: string) {
+    const image = "img" + s
+    console.log("img", s)
+    return of(image).pipe(delay(100));
   }
 }

@@ -1,4 +1,4 @@
-import {Component, effect, inject, signal} from '@angular/core';
+import {Component, effect, inject, OnDestroy, signal} from '@angular/core';
 import {MatToolbar} from "@angular/material/toolbar";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 import {FormsModule} from "@angular/forms";
@@ -6,6 +6,8 @@ import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {NgIf} from "@angular/common";
 import {MusicService} from "../../services/music.service";
+import {toObservable} from "@angular/core/rxjs-interop";
+import {EMPTY, Subscription, switchMap} from "rxjs";
 
 
 @Component({
@@ -23,21 +25,26 @@ import {MusicService} from "../../services/music.service";
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss'
 })
-export class PlayerComponent {
+export class PlayerComponent implements OnDestroy {
 
   private musicService = inject(MusicService)
+  song = this.musicService.currentSong.asReadonly()
   isShowing = signal(false);
   volume = 0.5
   audio = new Audio();
   duration = 0;
   currentTime = 0;
 
+  private songSrc$: Subscription | undefined
+
   constructor() {
     effect(() => {
       const song = this.musicService.currentSong();
       if (!song) return;
-      this.audio.src = song.src
+      this.audio.src = ""
       this.audio.volume = this.volume
+      this.duration = 0
+      this.currentTime = 0
       this.audio.ondurationchange = () => {
         this.duration = Math.floor(this.audio.duration);
       }
@@ -45,11 +52,19 @@ export class PlayerComponent {
         this.currentTime = Math.floor(this.audio.currentTime);
       }
     });
+
+    // get song new src
+    this.songSrc$ = toObservable(this.song)
+      .pipe(switchMap(s => s ? this.musicService.getAudio(s.id) : EMPTY))
+      .subscribe(url => this.audio.src = url)
+  }
+
+  ngOnDestroy(): void {
+    this.songSrc$?.unsubscribe()
   }
 
 
   toggleMute() {
-    console.log(this.volume, this.audio.volume)
     if (this.audio.volume === 0) {
       this.audio.volume = this.volume
     } else {
@@ -68,7 +83,7 @@ export class PlayerComponent {
   play(): void {
     if (this.audio.readyState < 2) return;
     if (this.audio.paused) {
-      this.audio.play();
+      this.audio.play().then();
     } else {
       this.audio.pause();
     }
