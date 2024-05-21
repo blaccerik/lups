@@ -13,6 +13,12 @@ export interface Song {
   artist: Artist | null;
 }
 
+export interface SongWrapper {
+  song: Song
+  liked: boolean,
+  listened: boolean
+}
+
 
 @Injectable({
   providedIn: 'root'
