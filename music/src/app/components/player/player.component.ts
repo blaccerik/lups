@@ -1,4 +1,4 @@
-import {Component, effect, inject, OnDestroy, signal} from '@angular/core';
+import {Component, inject, OnDestroy, signal} from '@angular/core';
 import {MatToolbar} from "@angular/material/toolbar";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 import {FormsModule} from "@angular/forms";
@@ -7,7 +7,7 @@ import {MatIconButton} from "@angular/material/button";
 import {NgIf} from "@angular/common";
 import {MusicService} from "../../services/music.service";
 import {toObservable} from "@angular/core/rxjs-interop";
-import {EMPTY, Subscription, switchMap} from "rxjs";
+import {EMPTY, Subscription, switchMap, tap} from "rxjs";
 
 
 @Component({
@@ -32,35 +32,55 @@ export class PlayerComponent implements OnDestroy {
   isShowing = signal(false);
   volume = 0.5
   audio = new Audio();
-  duration = 0;
+  duration = signal(0);
   currentTime = 0;
+
+  listenTime = this.musicService.listenTime
+  timer: any
 
   private songSrc$: Subscription | undefined
 
   constructor() {
-    effect(() => {
-      const song = this.musicService.currentSong();
-      if (!song) return;
-      this.audio.src = ""
-      this.audio.volume = this.volume
-      this.duration = 0
-      this.currentTime = 0
-      this.audio.ondurationchange = () => {
-        this.duration = Math.floor(this.audio.duration);
-      }
-      this.audio.ontimeupdate = () => {
-        this.currentTime = Math.floor(this.audio.currentTime);
-      }
-    });
+    this.audio.ondurationchange = () => {
+      this.duration.set(Math.floor(this.audio.duration));
+    }
 
-    // get song new src
-    this.songSrc$ = toObservable(this.song)
-      .pipe(switchMap(s => s ? this.musicService.getAudio(s.id) : EMPTY))
-      .subscribe(url => this.audio.src = url)
+    this.audio.ontimeupdate = () => {
+      this.currentTime = Math.floor(this.audio.currentTime);
+    }
+
+    this.songSrc$ = toObservable(this.song).pipe(
+      // reset states
+      tap(() => {
+        this.audio.src = "";
+        this.audio.volume = this.volume;
+        this.duration.set(0)
+        this.currentTime = 0;
+      }),
+      // query audio
+      switchMap(s => s ? this.musicService.getAudio(s.id) : EMPTY)
+    ).subscribe(url => {
+        this.audio.src = url
+        // if user hasn't interacted with site then audio cant play
+        this.audio.play().then(() => {
+          this.startTimer()
+        }).catch(error => {
+          this.audio.pause()
+        });
+      }
+    )
+  }
+
+  private startTimer() {
+    clearInterval(this.timer)
+    this.timer = setInterval(() => {
+      this.listenTime.update(v => v + 1)
+    }, 1000);
   }
 
   ngOnDestroy(): void {
     this.songSrc$?.unsubscribe()
+    clearInterval(this.timer)
   }
 
 
@@ -84,8 +104,10 @@ export class PlayerComponent implements OnDestroy {
     if (this.audio.readyState < 2) return;
     if (this.audio.paused) {
       this.audio.play().then();
+      this.startTimer()
     } else {
       this.audio.pause();
+      clearInterval(this.timer);
     }
   }
 

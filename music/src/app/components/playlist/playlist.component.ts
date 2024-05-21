@@ -16,24 +16,65 @@ import {NgForOf, NgIf} from "@angular/common";
   templateUrl: './playlist.component.html',
   styleUrl: './playlist.component.scss'
 })
-export class PlaylistComponent {
+export class PlaylistComponent implements OnDestroy {
   private musicService = inject(MusicService)
   router = inject(Router)
 
+
   currentSong = this.musicService.currentSong;
   playlist = this.musicService.playlist;
+  seedSong = signal<null | Song>(null)
+  query = signal(true);
+
+  private currentSong$: Subscription | undefined
+  private musicQueue$: Subscription | undefined
+
+  constructor() {
+
+    // check if selected song is in the end of query
+    // update state if true
+    this.currentSong$ = toObservable(this.currentSong).subscribe(
+      song => {
+        if (!song) return
+        if (this.seedSong() === null) {
+          this.seedSong.set(song);
+        }
+        const songs = this.musicService.playlist()
+        const index = songs.findIndex(s => s.id === song.id)
+        if (index === -1) {
+          this.query.set(true)
+        }
+        if (songs.length - index <= 2) {
+          this.query.set(true)
+        }
+      }
+    )
+
+    // check if is in 'query' state
+    // and if so then start querying using seed song
+    // retries if error from backend
+    this.musicQueue$ = combineLatest([
+      toObservable(this.query),
+      toObservable(this.seedSong)
+    ]).pipe(
+      filter(([q, s]) => q && !!s),
+      mergeMap(([q, s]) => q && s ? this.musicService.getQueue(s.id) : EMPTY)
+    ).subscribe(
+      songs => {
+        const playlist = this.playlist()
+        this.playlist.set([...playlist, ...songs])
+        this.query.set(false)
+      }
+    )
+  }
 
   clickOnSong(song: Song) {
-    this.currentSong.set(song)
-  }
-
-  go() {
-    this.router.navigate(["song", "erik1"])
-  }
-
-  go2() {
-    this.router.navigate(["song", "erik2"])
+    this.router.navigate(["song", song.id])
   }
 
 
+  ngOnDestroy(): void {
+    this.currentSong$?.unsubscribe()
+    this.musicQueue$?.unsubscribe()
+  }
 }

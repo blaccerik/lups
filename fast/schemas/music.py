@@ -23,7 +23,6 @@ class Song(BaseModel):
     length: int  # in seconds
     artist: Artist | None
     type: SongType
-    has_audio: bool
 
 
 class SongWrapper(BaseModel):

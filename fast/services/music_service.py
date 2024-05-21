@@ -2,10 +2,12 @@ import json
 import logging
 import os
 import platform
+import time
 from pathlib import Path
 from typing import List
 
 from fastapi import HTTPException
+from pytube import YouTube
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
@@ -25,6 +27,7 @@ else:
     MUSIC_DATA = "/usr/src/app/music_data"
 logger.info(MUSIC_DATA)
 MIN_QUEUE_SONGS = 40
+DEFAULT_SONG_IMAGE_PATH = "assets/default_song_image.png"
 
 
 def read_song(song_id: str, postgres_client: Session) -> Song:
@@ -40,15 +43,38 @@ def read_song(song_id: str, postgres_client: Session) -> Song:
             name=dbartist.name,
             id=dbartist.id
         )
-    path = f"{MUSIC_DATA}/songs/{song_id}.mp3"
     return Song(
-        id=dbsong.id,
+        id=song_id,
         title=dbsong.title,
         length=dbsong.length,
         type=dbsong.type,
         artist=artist,
-        has_audio=os.path.exists(path)
     )
+
+
+def read_song_audio(song_id: str) -> str:
+    yt = YouTube(f"https://www.youtube.com/watch?v={song_id}")
+    best = 999999999
+    link = None
+    bads = [
+        "avc1", "vp9"
+    ]
+    try:
+        streams = yt.streaming_data["adaptiveFormats"]
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=404, detail="Song audio not found")
+    for i in streams:
+        br = i['bitrate']
+        mt = i['mimeType']
+        if any(bad in mt for bad in bads):
+            continue
+        if br < best:
+            link = i['url']
+            best = br
+    if link is None:
+        raise HTTPException(status_code=404, detail="Song audio not found")
+    return link
 
 
 def read_song_image(song_id: str) -> str:
@@ -56,7 +82,7 @@ def read_song_image(song_id: str) -> str:
     path = f"{MUSIC_DATA}/song_images/{song_id}.jpg"
     if os.path.exists(path):
         return path
-    raise HTTPException(status_code=404, detail="Song image not found")
+    return DEFAULT_SONG_IMAGE_PATH
 
 
 def read_artist_image(artist_id: str) -> str:
@@ -112,7 +138,7 @@ def update_filters_by_user(user_id: int, f: Filter, postgres_client: Session):
         postgres_client.commit()
 
 
-def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> SongQueue:
+def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> List[Song]:
     # check if user has filter
     if filter_id is None:
         dbf = None
@@ -129,13 +155,12 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
     db_seed_song = postgres_client.get(DBSong, song_id)
     if db_seed_song is None:
         celery_app.send_task("find_new_songs", args=[song_id], queue="music:1")
-        return SongQueue(seed_song_id=song_id, scrape=False, songs=[])
+        raise HTTPException(status_code=404, detail="Song not found")
 
     # init queue
     filter_ = dbfilter_to_filter(dbf)
     mq = MusicQuery(user_id, song_id, filter_, postgres_client)
-    sq = mq.get_filtered_songs()
-    return sq
+    return mq.get_filtered_songs()
 
 
 def update_song_reaction(user_id: int, song_id: str, song_reaction: SongReaction, postgres_client: Session):

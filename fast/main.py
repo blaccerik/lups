@@ -43,7 +43,7 @@ async def startup_event():
     # clear redis jobs
     print(await redis_client.hgetall("streams"))
     print(await redis_client.smembers("chats"))
-    print(await redis_client.hgetall("games"))
+    # print(await redis_client.hgetall("games"))
     await redis_client.delete("streams")
     await redis_client.delete("chats")
     print(await redis_client.hgetall("streams"))

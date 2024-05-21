@@ -7,7 +7,7 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from database.models import DBReaction, DBSong, DBArtist, DBSongData, DBSongRelationV2
-from schemas.music import Song, Artist, SongQueue, SongWrapper, Filter
+from schemas.music import Song, Artist, SongWrapper, Filter
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -85,7 +85,7 @@ class MusicQuery:
                     result = []
         yield result
 
-    def _ids_to_song_songs(self, ids) -> List[SongWrapper]:
+    def _ids_to_song_songs(self, ids) -> List[Song]:
         result = []
         for dbs, dba, dbsd in self.postgres_client.query(
                 DBSong, DBArtist, DBSongData
@@ -96,21 +96,16 @@ class MusicQuery:
         ).filter(
             DBSong.id.in_(ids)
         ).all():
-            has_audio = False
             artist = None if dba is None else Artist(
                 id=dba.id,
                 name=dba.name
             )
-            result.append(SongWrapper(
-                distance=1,
-                song=Song(
-                    id=dbs.id,
-                    title=dbs.title,
-                    length=dbs.length,
-                    type=dbs.type,
-                    has_audio=has_audio,
-                    artist=artist
-                )
+            result.append(Song(
+                id=dbs.id,
+                title=dbs.title,
+                length=dbs.length,
+                type=dbs.type,
+                artist=artist
             ))
         return result
         # ssd = self.postgres_client.get(DBSongData, self.song_id)
@@ -127,10 +122,17 @@ class MusicQuery:
             text = text.replace(r, "")
         return text
 
-    def _filter_songs(self, songs: List[SongWrapper]) -> List[SongWrapper]:
+    def _filter_songs(self, songs: List[Song]) -> List[Song]:
         result = []
-        for song_wrapper in songs:
-            song = song_wrapper.song
+        bad_types = ["MUSIC_VIDEO_TYPE_UGC"]
+        for song in songs:
+
+            # todo ugc include normal videos and music
+            # NEXUS - Nii Kuum OtFAdJmUzZ8
+            # Fix - Jaanipäev + sõnad mX97wSdyQH4
+            # Has Generative AI Already Peaked? - Computerphile dDUC-LqVrPU
+            if song.type in bad_types:
+                continue
 
             for fc in self.filter.config:
                 text: str = song.title if fc.target_title else song.artist.name
@@ -141,11 +143,11 @@ class MusicQuery:
                 elif not fc.include and word in text:
                     break
             else:
-                result.append(song_wrapper)
+                result.append(song)
         return result
 
     @log_time
-    def get_filtered_songs(self) -> SongQueue:
+    def get_filtered_songs(self) -> List[Song]:
         result = []
         for song_ids in self._get_ids3():
             # todo id to song takes 80% of the time
@@ -154,8 +156,4 @@ class MusicQuery:
             result.extend(filtered_songs)
             if len(result) >= self.MIN_RESULTS_SIZE:
                 break
-        return SongQueue(
-            seed_song_id=self.song_id,
-            scrape=self.scrape,
-            songs=result[:self.MIN_RESULTS_SIZE]
-        )
+        return result[:self.MIN_RESULTS_SIZE]

@@ -1,5 +1,6 @@
-import {Injectable, signal} from '@angular/core';
-import {delay, of, throwError} from "rxjs";
+import {inject, Injectable, signal} from '@angular/core';
+import {of, retry} from "rxjs";
+import {HttpClient} from "@angular/common/http";
 
 export interface Artist {
   name: string;
@@ -12,13 +13,17 @@ export interface Song {
   artist: Artist | null;
 }
 
+
 @Injectable({
   providedIn: 'root'
 })
 export class MusicService {
-
+  private url = "api/music"
+  private delay = 3000
+  http = inject(HttpClient)
   currentSong = signal<Song | null>(null);
-  playlist = signal<Song[]>([])
+  playlist = signal<Song[]>([]);
+  listenTime = signal(0);
 
   addSongToPlaylist(song: Song) {
     const songs = this.playlist()
@@ -27,54 +32,31 @@ export class MusicService {
     }
   }
 
-  private generateRandomWord(s: string): Song {
-    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-    let word = '';
-    for (let i = 0; i < 4; i++) {
-      const randomIndex = Math.floor(Math.random() * alphabet.length);
-      word += alphabet[randomIndex];
-    }
-    return {
-      title: s + word,
-      artist: null,
-      id: word
-    }
-  }
-
   getQueue(s: string) {
-    const songs: Song[] = [
-      this.generateRandomWord(s),
-      this.generateRandomWord(s),
-      this.generateRandomWord(s),
-      this.generateRandomWord(s)
-    ]
-    const shouldFail = Math.random() > 0.5;
-    console.log("queue", s, shouldFail)
-    if (shouldFail) {
-      return throwError(() => new Error("Simulated error")).pipe(delay(100));
-    } else {
-      return of(songs).pipe(delay(100)); // Return the songs with a delay
-    }
+    return this.http.get<Song[]>(this.url + "/queue/" + s).pipe(retry({delay: this.delay}))
   }
 
-  getSong(s: string) {
-    const song: Song = {
-      title: s,
-      artist: null,
-      id: s
+  getSong(sid: string) {
+    // check playlist for song data
+    const songs = this.playlist()
+    const song = songs.find(s => s.id === sid)
+    if (song) return of(song)
+    return this.http.get<Song>(this.url + "/song/" + sid)
+  }
+
+  postSong(sid: string, time: number) {
+    const body = {
+      duration: time,
+      type: 'listened'
     }
-    return of(song).pipe(delay(100));
+    return this.http.post(this.url + "/song/" + sid, body)
   }
 
   getAudio(s: string) {
-    console.log("audio", s)
-    const url = "https://filesamples.com/samples/audio/mp3/sample2.mp3";
-    return of(url).pipe(delay(1000));
+    return this.http.get<string>(this.url + "/song/" + s + "/audio")
   }
 
   getSongImage(s: string) {
-    const image = "img" + s
-    console.log("img", s)
-    return of(image).pipe(delay(100));
+    return this.http.get(this.url + "/song/" + s + "/image", {responseType: 'blob'})
   }
 }
