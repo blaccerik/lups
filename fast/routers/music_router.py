@@ -37,10 +37,10 @@ async def get_song(
 async def post_song_reaction(
         song_id: constr(min_length=11, max_length=11),
         song_reaction: SongReaction,
-        # user: Userv2 = Depends(get_user_v2),
+        user: Userv2 = Depends(get_user_v2),
         postgres_client: Session = Depends(get_postgres_db)
 ):
-    return update_song_reaction(1, song_id, song_reaction, postgres_client)
+    return update_song_reaction(user.user_id, song_id, song_reaction, postgres_client)
 
 
 @router.get("/song/{song_id}/image", response_class=FileResponse)
