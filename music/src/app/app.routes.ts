@@ -8,5 +8,5 @@ export const routes: Routes = [
   {path: '', component: HomeComponent, canActivate: [authGuard]},
   {path: 'song/:song_id', component: DisplayComponent, canActivate: [authGuard]},
   {path: 'redirect', component: RedirectComponent},
-  {path: '**', component: HomeComponent, canActivate: [authGuard]},
+  {path: '**', redirectTo: '', pathMatch: 'full' },
 ];
