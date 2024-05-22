@@ -4,7 +4,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import news, place, chat, familyfeud, music
+from routers import news, place, chat, familyfeud, music_router
 from database.postgres_database import SessionLocal
 from database.redis_database import get_client
 from schemas.schemas import PlacePixel, PlaceColor
@@ -27,7 +27,7 @@ app.include_router(chat.router)
 app.include_router(place.router)
 app.include_router(news.router)
 app.include_router(familyfeud.router)
-app.include_router(music.router)
+app.include_router(music_router.router)
 
 @app.get("/")
 async def main():

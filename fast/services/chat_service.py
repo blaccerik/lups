@@ -18,9 +18,7 @@ logger = logging.getLogger("ChatService")
 
 
 def read_user(user: User, session: Session):
-    print(user)
     dbuser = session.query(DBUser).filter_by(google_id=user.google_id).first()
-    print(dbuser)
     if dbuser is None:
         if len(user.name) >= MAX_USER_NAME_SIZE:
             name = user.name[:MAX_USER_NAME_SIZE]

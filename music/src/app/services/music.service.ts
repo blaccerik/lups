@@ -19,6 +19,11 @@ export interface SongWrapper {
   listened: boolean
 }
 
+export interface PreviousSongQueue {
+  count: number,
+  song_id: string
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -64,5 +69,9 @@ export class MusicService {
 
   getSongImage(s: string) {
     return this.http.get(this.url + "/song/" + s + "/image", {responseType: 'blob'})
+  }
+
+  getQueuePrev() {
+    return this.http.get<PreviousSongQueue[]>(this.url + "/queue/previous")
   }
 }

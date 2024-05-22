@@ -1,17 +1,18 @@
 import logging
-import random
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Query, HTTPException, Response
+from fastapi import APIRouter, Depends, Query, Response
 from pydantic import constr
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
 
 from database.postgres_database import get_postgres_db
 from schemas.auth import Userv2
-from schemas.music import Song, Filter, SongQueue, SongReaction
-from services.music_service import read_song, read_song_image, read_artist_image, read_filters_by_user, \
-    create_filters_by_user, update_filters_by_user, read_queue, update_song_reaction, read_song_audio
+from schemas.music import Song, Filter, SongReaction, PreviousSongQueue
+from services.music.filter_service import read_filters_by_user, create_filters_by_user, update_filters_by_user
+from services.music.queue_service import read_queue, read_previous
+from services.music.song_service import read_song, update_song_reaction, read_song_image, read_song_audio, \
+    read_artist_image
 from utils.auth import get_user_v2
 
 router = APIRouter(prefix="/api/music", tags=["Music"])
@@ -44,7 +45,7 @@ async def post_song_reaction(
 
 @router.get("/song/{song_id}/image", response_class=FileResponse)
 async def get_song_image(
-    song_id: constr(min_length=11, max_length=11)
+        song_id: constr(min_length=11, max_length=11)
 ):
     image_path = read_song_image(song_id)
     response = FileResponse(image_path)
@@ -54,8 +55,8 @@ async def get_song_image(
 
 @router.get("/song/{song_id}/audio", response_model=str)
 async def get_song_audio(
-    song_id: constr(min_length=11, max_length=11),
-    response: Response
+        song_id: constr(min_length=11, max_length=11),
+        response: Response
 ):
     response.headers["Cache-Control"] = "public, max-age=3600"
     return read_song_audio(song_id)
@@ -95,11 +96,19 @@ async def put_user_filter(
     return update_filters_by_user(user.user_id, f, postgres_client)
 
 
+@router.get("/queue/previous", response_model=List[PreviousSongQueue])
+async def get_user_previous(
+        user: Userv2 = Depends(get_user_v2),
+        postgres_client: Session = Depends(get_postgres_db)
+):
+    return read_previous(user.user_id, postgres_client)
+
+
 @router.get("/queue/{song_id}", response_model=List[Song])
 async def get_user_queue(
         song_id: constr(min_length=11, max_length=11),
         filter_id: Optional[int] = Query(None, description="Filter ID"),
-        # user: Userv2 = Depends(get_user_v2),
+        user: Userv2 = Depends(get_user_v2),
         postgres_client: Session = Depends(get_postgres_db)
 ):
-    return read_queue(1, song_id, filter_id, postgres_client)
+    return read_queue(user.user_id, song_id, filter_id, postgres_client)

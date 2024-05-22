@@ -58,3 +58,8 @@ class Filter(BaseModel):
     name: constr(min_length=1, max_length=100)
     config: List[FilterConfig]
     delete: Optional[bool] = None
+
+
+class PreviousSongQueue(BaseModel):
+    count: int
+    song_id: str

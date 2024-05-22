@@ -28,7 +28,7 @@ export class DisplayComponent implements OnDestroy {
   constructor() {
     // listen for route changes and update current song
     this.activatedRoute$ = this.activatedRoute.params.pipe(
-      filter(params => params["song_id"] != null),
+      filter(params => params["song_id"] !== null),
       tap(() => {
           const prevSong = this.currentSong();
           if (prevSong) this.sendData(prevSong.id);

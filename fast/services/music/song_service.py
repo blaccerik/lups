@@ -1,21 +1,14 @@
-import json
 import logging
 import os
 import platform
-import time
 from pathlib import Path
-from typing import List
 
 from fastapi import HTTPException
 from pytube import YouTube
-from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from database.models import DBSong, DBArtist, DBFilter, DBReaction
-from schemas.music import Song, Artist, Filter, FilterConfig, SongQueue, SongReaction, ReactionType
-from utils.celery_config import celery_app
-from utils.helper_functions import dbfilter_to_filter
-from utils.music_query import MusicQuery
+from database.models import DBSong, DBArtist, DBReaction
+from schemas.music import Song, Artist, SongReaction, ReactionType
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -91,76 +84,6 @@ def read_artist_image(artist_id: str) -> str:
     if os.path.exists(path):
         return path
     raise HTTPException(status_code=404, detail="Artist image not found")
-
-
-def read_filters_by_user(user_id: int, postgres_client: Session) -> List[Filter]:
-    dbfs = postgres_client.query(DBFilter).filter(
-        DBFilter.user_id == user_id
-    ).all()
-
-    result = []
-    for dbf in dbfs:
-        config_list = json.loads(dbf.config)
-        f = Filter(
-            id=dbf.id,
-            name=dbf.name,
-            config=[FilterConfig(**c) for c in config_list]
-        )
-        result.append(f)
-    return result
-
-
-def create_filters_by_user(user_id: int, f: Filter, postgres_client: Session):
-    dbf = DBFilter()
-    dbf.name = f.name
-    dbf.user_id = user_id
-    dbf.config = json.dumps([c.model_dump() for c in f.config])
-    postgres_client.add(dbf)
-    postgres_client.commit()
-
-
-def update_filters_by_user(user_id: int, f: Filter, postgres_client: Session):
-    dbf = postgres_client.query(DBFilter).filter(and_(
-        DBFilter.user_id == user_id,
-        DBFilter.id == f.id
-    )).first()
-    if dbf is None:
-        raise HTTPException(status_code=404, detail="User doesn't have this filter")
-    if f.delete:
-        postgres_client.delete(dbf)
-        postgres_client.commit()
-        return
-    else:
-        dbf.name = f.name
-        dbf.user_id = user_id
-        dbf.config = json.dumps([c.model_dump() for c in f.config])
-        postgres_client.add(dbf)
-        postgres_client.commit()
-
-
-def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> List[Song]:
-    # check if user has filter
-    if filter_id is None:
-        dbf = None
-    else:
-        dbf = postgres_client.query(DBFilter).filter(and_(
-            DBFilter.user_id == user_id,
-            DBFilter.id == filter_id
-        )).first()
-        if dbf is None:
-            raise HTTPException(status_code=404, detail="User doesn't have this filter")
-
-    # check if song exists
-    # if not then start scrape
-    db_seed_song = postgres_client.get(DBSong, song_id)
-    if db_seed_song is None:
-        celery_app.send_task("find_new_songs", args=[song_id], queue="music:1")
-        raise HTTPException(status_code=404, detail="Song not found")
-
-    # init queue
-    filter_ = dbfilter_to_filter(dbf)
-    mq = MusicQuery(user_id, song_id, filter_, postgres_client)
-    return mq.get_filtered_songs()
 
 
 def update_song_reaction(user_id: int, song_id: str, song_reaction: SongReaction, postgres_client: Session):

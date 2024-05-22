@@ -22,6 +22,7 @@ export class GoogleApiService {
       picture: ""
     }
   })
+  loggedIn = signal<null | boolean>(null)
 
   constructor(private oAuthService: OAuthService) {
     oAuthService.configure({
@@ -33,7 +34,8 @@ export class GoogleApiService {
       showDebugInformation: true,
     });
     oAuthService.loadDiscoveryDocument().then((e) => {
-      oAuthService.tryLoginImplicitFlow().then(() => {
+      oAuthService.tryLoginImplicitFlow().then((t) => {
+        this.loggedIn.set(oAuthService.hasValidAccessToken())
         if (!oAuthService.hasValidAccessToken()) {
           oAuthService.initLoginFlow()
         } else {
@@ -43,10 +45,6 @@ export class GoogleApiService {
         }
       })
     })
-  }
-
-  isLoggedIn(): boolean {
-    return this.oAuthService.hasValidAccessToken();
   }
 
   signOut() {
