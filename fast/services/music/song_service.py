@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from database.models import DBSong, DBArtist, DBReaction
 from schemas.music import Song, Artist, SongReaction, ReactionType
+from utils.celery_config import celery_app
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -28,6 +29,7 @@ def read_song(song_id: str, postgres_client: Session) -> Song:
         DBArtist, DBSong.artist_id == DBArtist.id
     ).filter(DBSong.id == song_id).first()
     if dbsa is None:
+        celery_app.send_task("find_new_songs", args=[song_id], queue="music:1")
         raise HTTPException(status_code=404, detail="Song not found")
     dbsong, dbartist = dbsa
     artist = None

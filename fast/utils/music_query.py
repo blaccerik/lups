@@ -108,12 +108,6 @@ class MusicQuery:
                 artist=artist
             ))
         return result
-        # ssd = self.postgres_client.get(DBSongData, self.song_id)
-        # return SongQueue(
-        #     seed_song_id=self.song_id,
-        #     scrape=ssd is not None,
-        #     songs=result
-        # )
 
     def _normalize_text(self, text: str):
         remove = ["(", ")", "[", "]", "'", '"', ".", ","]

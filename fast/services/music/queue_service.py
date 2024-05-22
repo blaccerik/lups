@@ -46,8 +46,8 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
         raise HTTPException(status_code=404, detail="Song not found")
 
     # init queue
-    filter_ = dbfilter_to_filter(dbf)
-    mq = MusicQuery(user_id, song_id, filter_, postgres_client)
+    _filter = dbfilter_to_filter(dbf)
+    mq = MusicQuery(user_id, song_id, _filter, postgres_client)
     songs = mq.get_filtered_songs()
     _update_song_queue(user_id, song_id, len(songs), postgres_client)
     return songs
