@@ -7,19 +7,16 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
-from sqlalchemy.orm import Session
 from ytmusicapi import YTMusic
 
-from database.models import DBSong, DBArtist, DBSongRelationV2
-from schemas.main import Result
-from task.music_task import log_time
+from util.log_time import log_time
 
 operating_system = platform.system()
 if operating_system == 'Windows':
     MUSIC_DATA = f"{Path(os.path.abspath(__file__)).parent.parent.parent}/music_data"
 else:
     MUSIC_DATA = "/usr/src/app/music_data"
-DOWNLOAD_IMAGES = True
+DOWNLOAD_IMAGES = False
 DOWNLOAD_TIMEOUT = 0.5
 logger = logging.getLogger(__name__)
 logger.info(MUSIC_DATA)
@@ -48,7 +45,7 @@ if not os.path.exists(path4):
 
 
 @log_time
-def get_result(song_id):
+def download_scrape(song_id):
     ytmusic = YTMusic("oauth.json")
     try:
         path = f"{MUSIC_DATA}/song_json/{song_id}.json"
@@ -117,74 +114,3 @@ def download_song_image_by_link(song_id, image_link):
         file.write(res.content)
     time.sleep(DOWNLOAD_TIMEOUT)
     return
-
-
-class Adder:
-    def __init__(self, postgres_client: Session):
-        self.artists = {}
-        self.song_images = {}
-        self.songs = {}
-        self.connections = {}
-        self.postgres_client = postgres_client
-
-    def add_to_db(self):
-        self.postgres_client.add_all(self.artists.values())
-        self.postgres_client.flush()
-        self.postgres_client.add_all(self.songs.values())
-        self.postgres_client.flush()
-        self.postgres_client.add_all(self.connections.values())
-        self.postgres_client.commit()
-
-    def add_artist(self, artist_id, artist_name):
-        if artist_id is None:
-            return
-        if self.postgres_client.get(DBArtist, artist_id):
-            return
-        if artist_id in self.artists:
-            return
-        dba = DBArtist(
-            name=artist_name,
-            id=artist_id
-        )
-        self.artists[artist_id] = dba
-
-    def add_song(self, song_id, song_title, number, artist_id, song_type, image_link):
-
-        if self.postgres_client.get(DBSong, song_id):
-            return
-        if song_id in self.songs:
-            return
-        dbs = DBSong(
-            id=song_id,
-            title=song_title,
-            length=number,
-            artist_id=artist_id,
-            type=song_type
-        )
-        self.songs[song_id] = dbs
-        self.song_images[song_id] = image_link
-
-    def add_connection(self, seed_song_id, song_id):
-        if seed_song_id == song_id:
-            return
-        key1 = seed_song_id + song_id
-        key2 = song_id + seed_song_id
-        dbsr = self.postgres_client.get(DBSongRelationV2, key1)
-        if dbsr:
-            return 0
-        dbsr = self.postgres_client.get(DBSongRelationV2, key2)
-        if dbsr:
-            return 0
-        if key1 in self.connections:
-            return
-        if key2 in self.connections:
-            return
-
-        dbsr = DBSongRelationV2(
-            id=key1
-        )
-        self.connections[key1] = dbsr
-
-    def get_results(self) -> Result:
-        artists = [a.id for a in self.artists.values()]
-        return Result(artist_image_ids=artists, songs=self.song_images)

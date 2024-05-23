@@ -5,12 +5,13 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from database.models import DBFilter, DBSong, DBSongQueue
-from schemas.music import Song, PreviousSongQueue
-from utils.celery_config import celery_app
+from schemas.music_schema import SongQueueResult, SongQueue, SongStatusType
 from utils.helper_functions import dbfilter_to_filter
 from utils.music_query import MusicQuery
+from utils.scrapping import start_scrape_for_song
 
 PREVIOUS_QUEUE_LIMIT = 5
+
 
 def _update_song_queue(user_id: int, song_id: str, count: int, postgres_client: Session):
     dbsq = postgres_client.get(DBSongQueue, (song_id, user_id))
@@ -26,7 +27,7 @@ def _update_song_queue(user_id: int, song_id: str, count: int, postgres_client: 
     postgres_client.commit()
 
 
-def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> List[Song]:
+def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> SongQueue:
     # check if user has filter
     if filter_id is None:
         dbf = None
@@ -42,19 +43,26 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
     # if not then start scrape
     db_seed_song = postgres_client.get(DBSong, song_id)
     if db_seed_song is None:
-        celery_app.send_task("find_new_songs", args=[song_id], queue="music:1")
-        raise HTTPException(status_code=404, detail="Song not found")
+        start_scrape_for_song(song_id, postgres_client)
+        return SongQueue(songs=[], type=SongStatusType.scrapping)
+    elif db_seed_song.status == "scrapping":
+        return SongQueue(songs=[], type=SongStatusType.scrapping)
 
     # init queue
     _filter = dbfilter_to_filter(dbf)
     mq = MusicQuery(user_id, song_id, _filter, postgres_client)
     songs = mq.get_filtered_songs()
     _update_song_queue(user_id, song_id, len(songs), postgres_client)
-    return songs
+    return SongQueue(songs=songs, type=SongStatusType.ready)
 
 
-def read_previous(user_id: int, postgres_client: Session) -> List[PreviousSongQueue]:
+def read_previous(user_id: int, postgres_client: Session) -> List[SongQueueResult]:
     dbsq_list = postgres_client.query(DBSongQueue).filter(
         DBSongQueue.user_id == user_id
     ).all()
-    return [PreviousSongQueue(song_id=dbsq.song_id, count=dbsq.count) for dbsq in dbsq_list]
+    return [SongQueueResult(
+        song_nr=dbsq.song_nr,
+        artist_nr=dbsq.artist_nr,
+        hidden=dbsq.hidden,
+        song_id=dbsq.song_id
+    ) for dbsq in dbsq_list]

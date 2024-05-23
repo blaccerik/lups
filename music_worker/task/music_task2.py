@@ -2,9 +2,10 @@ import random
 
 from sqlalchemy.orm import Session
 
-from database.models import DBSong, DBSongData
+from database.models import DBSong
 from schemas.main import Result
-from util.downloadv2 import get_result, Adder
+from util.adder import Adder
+from util.downloadv2 import download_scrape
 from util.log_time import log_time
 
 
@@ -21,15 +22,18 @@ def select_random_song(postgres_client: Session) -> str:
 
 @log_time
 def find_new_songs_by_song_id(song_id: str, postgres_client: Session) -> Result:
-    # check if needs to download
-    db_song_data = postgres_client.get(DBSongData, song_id)
-    if db_song_data is not None:
+    """
+    Doesn't care if song has been scrapped before
+    """
+    result = download_scrape(song_id)
+    if result is None:
+        # reset state for scrape
+        dbs = postgres_client.get(DBSong, song_id)
+        dbs.status = "idle"
+        postgres_client.add(dbs)
+        postgres_client.commit()
         return Result(artist_image_ids=[], songs={})
 
-    # download
-    result = get_result(song_id)
-    if result is None:
-        return Result(artist_image_ids=[], songs={})
     a = Adder(postgres_client)
     for track in result["tracks"]:
         # parse artist
@@ -56,9 +60,8 @@ def find_new_songs_by_song_id(song_id: str, postgres_client: Session) -> Result:
         a.add_connection(song_id, track["videoId"])
     a.add_to_db()
     # update song state database
-    postgres_client.add(DBSongData(
-        id=song_id,
-        type="ready"
-    ))
+    dbs = postgres_client.get(DBSong, song_id)
+    dbs.status = "ready"
+    postgres_client.add(dbs)
     postgres_client.commit()
     return a.get_results()

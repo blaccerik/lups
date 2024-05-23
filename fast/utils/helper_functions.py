@@ -1,7 +1,7 @@
 import json
 
 from database.models import DBFilter
-from schemas.music import Filter, FilterConfig
+from schemas.music_schema import Filter, FilterConfig
 
 
 def dbfilter_to_filter(dbf: DBFilter | None) -> Filter:

@@ -6,8 +6,8 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from database.models import DBReaction, DBSong, DBArtist, DBSongData, DBSongRelationV2
-from schemas.music import Song, Artist, SongWrapper, Filter
+from database.models import DBReaction, DBSong, DBArtist, DBSongRelationV2
+from schemas.music_schema import Song, Artist, Filter
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -36,11 +36,6 @@ class MusicQuery:
         self.user_id = user_id
         self.song_id = song_id
         self.filter = f
-        dbsd = self.postgres_client.get(DBSongData, song_id)
-        if dbsd is None:
-            self.scrape = False
-        else:
-            self.scrape = dbsd.type == "ready"
 
     @log_time
     def _get_mapping3(self):
@@ -88,11 +83,9 @@ class MusicQuery:
     def _ids_to_song_songs(self, ids) -> List[Song]:
         result = []
         for dbs, dba, dbsd in self.postgres_client.query(
-                DBSong, DBArtist, DBSongData
+                DBSong, DBArtist
         ).join(
             DBArtist, DBArtist.id == DBSong.artist_id, isouter=True
-        ).join(
-            DBSongData, DBSongData.id == DBSong.id, isouter=True
         ).filter(
             DBSong.id.in_(ids)
         ).all():

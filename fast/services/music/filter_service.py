@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from database.models import DBFilter
-from schemas.music import Filter, FilterConfig
+from schemas.music_schema import Filter, FilterConfig
 
 
 def read_filters_by_user(user_id: int, postgres_client: Session) -> List[Filter]:

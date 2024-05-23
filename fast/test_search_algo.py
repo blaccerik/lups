@@ -2,7 +2,7 @@ import json
 
 from database.models import DBUser, DBReaction, DBSong, DBSongRelationV1, DBSongRelationV2, DBFilter
 from database.postgres_database import SessionLocal
-from schemas.music import Filter, FilterConfig
+from schemas.music_schema import Filter, FilterConfig
 from utils.helper_functions import dbfilter_to_filter
 from utils.music_query import MusicQuery
 

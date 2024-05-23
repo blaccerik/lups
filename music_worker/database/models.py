@@ -115,8 +115,9 @@ class DBSong(Base):
     __tablename__ = 'song'
     # video url seems to be 11 chars long
     id = Column(String(11), primary_key=True)
-    title = Column(String(100), nullable=False)
-    length = Column(Integer, nullable=False)
+    status = Column(Enum("ready", "scrapping", "idle", name="status"), nullable=False)
+    title = Column(String(100), nullable=True)
+    length = Column(Integer, nullable=True)
     artist_id = Column(String(24), ForeignKey('artist.id'), nullable=True)
     # OMV: Original Music Video - uploaded by original artist with actual video content
     # UGC: User Generated Content - uploaded by regular YouTube user
@@ -128,7 +129,7 @@ class DBSong(Base):
         'MUSIC_VIDEO_TYPE_OMV',
         'OFFICIAL_SOURCE_MUSIC',
         'MUSIC_VIDEO_TYPE_PODCAST_EPISODE',
-        name='song_type'), nullable=False)
+        name='song_type'), nullable=True)
 
     def __repr__(self):
         return f"Song({self.id})"
@@ -139,27 +140,12 @@ class DBReaction(Base):
     song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     date = Column(DateTime, nullable=False, default=func.now())
-    # listened - user started listening the song
-    # skip - user had filter which skipped song
-    # like - user likes the song
-    type = Column(Enum('listened', 'skip', 'like', name='reaction_type'), nullable=False)
-
+    liked = Column(Boolean, nullable=False)
     # how long user listened the song for
     duration = Column(Integer, nullable=False)
 
     def __repr__(self):
         return f"React({self.user_id})"
-
-
-class DBSongRelationV1(Base):
-    __tablename__ = "song_relation_v1"
-    parent_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
-    child_song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
-    date = Column(DateTime, nullable=False, default=func.now())
-    distance = Column(Float, nullable=False, default=1.0)
-
-    def __repr__(self):
-        return f"Repr({self.parent_song_id} | {self.child_song_id})"
 
 
 class DBSongRelationV2(Base):
@@ -170,16 +156,6 @@ class DBSongRelationV2(Base):
 
     def __repr__(self):
         return f"Repr({self.parent_song_id} | {self.child_song_id})"
-
-
-class DBSongData(Base):
-    __tablename__ = "song_data"
-    id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
-    type = Column(Enum('scrapping', 'ready', name='scrape_type'), nullable=False)
-    date = Column(DateTime, nullable=False, default=func.now())
-
-    def __repr__(self):
-        return f"{self.date}"
 
 
 class DBFilter(Base):
@@ -194,5 +170,6 @@ class DBSongQueue(Base):
     __tablename__ = "song_queue"
     song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    count = Column(Integer, nullable=False)
-    hide = Column(Boolean, nullable=False, default=False)
+    song_nr = Column(Integer, nullable=False)
+    artist_nr = Column(Integer, nullable=False)
+    hidden = Column(Boolean, nullable=False, default=False)

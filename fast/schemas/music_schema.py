@@ -17,6 +17,11 @@ class SongType(str, Enum):
     mvtpe = 'MUSIC_VIDEO_TYPE_PODCAST_EPISODE'
 
 
+class SongStatusType(str, Enum):
+    scrapping = 'scrapping'
+    ready = 'ready'
+
+
 class Song(BaseModel):
     id: constr(min_length=11, max_length=11)
     title: constr(max_length=100)
@@ -25,26 +30,14 @@ class Song(BaseModel):
     type: SongType
 
 
-class SongWrapper(BaseModel):
-    distance: float
-    song: Song
-
-
-class SongQueue(BaseModel):
-    seed_song_id: constr(min_length=11, max_length=11)
-    scrape: bool
-    songs: List[SongWrapper]
-
-
-class ReactionType(str, Enum):
-    listened = 'listened'
-    skip = 'skip'
-    like = 'like'
+class SongStatus(BaseModel):
+    type: SongStatusType
+    song: Song | None
 
 
 class SongReaction(BaseModel):
     duration: int
-    type: ReactionType
+    liked: bool
 
 
 class FilterConfig(BaseModel):
@@ -60,6 +53,13 @@ class Filter(BaseModel):
     delete: Optional[bool] = None
 
 
-class PreviousSongQueue(BaseModel):
-    count: int
+class SongQueueResult(BaseModel):
+    song_nr: int
+    artist_nr: int
+    hidden: bool
     song_id: str
+
+
+class SongQueue(BaseModel):
+    songs: List[Song]
+    type: SongStatusType
