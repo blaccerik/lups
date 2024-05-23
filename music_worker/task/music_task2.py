@@ -3,28 +3,33 @@ import random
 from sqlalchemy.orm import Session
 
 from database.models import DBSong, DBSongData
+from schemas.main import Result
 from util.downloadv2 import get_result, Adder
 from util.log_time import log_time
 
 
 @log_time
-def select_random_song(postgres_client: Session):
-    dbsongs = postgres_client.query(DBSong).all()
-    dbsong = random.choice(dbsongs)
-    return dbsong.id
+def select_random_song(postgres_client: Session) -> str:
+    dbs_list = (postgres_client.query(DBSong.id).filter(
+        DBSong.type != "MUSIC_VIDEO_TYPE_UGC"
+    ).all())
+    if len(dbs_list) == 0:
+        return "dQw4w9WgXcQ"
+    dbs = random.choice(dbs_list)
+    return dbs.id
 
 
 @log_time
-def find_new_songs_by_song_id(song_id: str, postgres_client: Session) -> list:
+def find_new_songs_by_song_id(song_id: str, postgres_client: Session) -> Result:
     # check if needs to download
     db_song_data = postgres_client.get(DBSongData, song_id)
     if db_song_data is not None:
-        return []
+        return Result(artist_image_ids=[], songs={})
 
     # download
     result = get_result(song_id)
     if result is None:
-        return []
+        return Result(artist_image_ids=[], songs={})
     a = Adder(postgres_client)
     for track in result["tracks"]:
         # parse artist
@@ -56,6 +61,4 @@ def find_new_songs_by_song_id(song_id: str, postgres_client: Session) -> list:
         type="ready"
     ))
     postgres_client.commit()
-
-    # get db objects ids
-    return [x.id for x in a.songs.values()]
+    return a.get_results()

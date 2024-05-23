@@ -7,11 +7,11 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
-from pytube import YouTube
 from sqlalchemy.orm import Session
 from ytmusicapi import YTMusic
 
-from database.models import DBSong, DBArtist, DBSongRelationV1, DBSongRelationV2
+from database.models import DBSong, DBArtist, DBSongRelationV2
+from schemas.main import Result
 from task.music_task import log_time
 
 operating_system = platform.system()
@@ -19,11 +19,8 @@ if operating_system == 'Windows':
     MUSIC_DATA = f"{Path(os.path.abspath(__file__)).parent.parent.parent}/music_data"
 else:
     MUSIC_DATA = "/usr/src/app/music_data"
-DOWNLOAD_IMAGES = False
-DOWNLOAD_SONGS = False
+DOWNLOAD_IMAGES = True
 DOWNLOAD_TIMEOUT = 0.5
-logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 logger.info(MUSIC_DATA)
 logger.info(DOWNLOAD_IMAGES)
@@ -51,15 +48,6 @@ if not os.path.exists(path4):
 
 
 @log_time
-def add_all():
-    result = []
-    for f in os.listdir(MUSIC_DATA + "/song_json"):
-        name = f.split(".")[0]
-        result.append(name)
-    return result
-
-
-@log_time
 def get_result(song_id):
     ytmusic = YTMusic("oauth.json")
     try:
@@ -82,122 +70,59 @@ def get_result(song_id):
     return result
 
 
-def add_artist(artist_id, artist_name, postgres_client: Session) -> int:
-    if artist_id is None:
-        return 0
-
-    dba = postgres_client.get(DBArtist, artist_id)
-    if dba:
-        return 0
-
-    dba = DBArtist(
-        name=artist_name,
-        id=artist_id
-    )
-    postgres_client.add(dba)
-    postgres_client.commit()
-
+@log_time
+def download_artist_image_by_id(artist_id):
     if not DOWNLOAD_IMAGES:
-        return 1
+        return
 
     # check if image exists
     if os.path.exists(f"{MUSIC_DATA}/artist_images/{artist_id}.jpg"):
         logger.error(f"image exists: {artist_id}")
-        return 1
+        return
     response = requests.get(f"https://music.youtube.com/channel/{artist_id}")
     if response.status_code != 200:
         logger.error(f"error getting channel")
-        return 1
+        return
     soup = BeautifulSoup(response.content, 'html.parser')
     image_tag = soup.find("meta", {"property": "og:image"})
     if not image_tag:
         logger.error(f"error getting channel image tag")
-        return 1
+        return
     image_url = image_tag.get("content")
     res = requests.get(image_url)
     if res.status_code != 200:
         logger.error(f"error downloading channel image")
-        return 1
+        return
     with open(f"{MUSIC_DATA}/artist_images/{artist_id}.jpg", "wb") as file:
         file.write(res.content)
     time.sleep(DOWNLOAD_TIMEOUT)
-    return 1
+    return
 
 
-def add_song(song_id, song_title, number, artist_id, song_type, image_link, postgres_client: Session):
-    dbs = postgres_client.get(DBSong, song_id)
-    if dbs:
-        return 0
-
-    dbs = DBSong(
-        id=song_id,
-        title=song_title,
-        length=number,
-        artist_id=artist_id,
-        type=song_type
-    )
-    postgres_client.add(dbs)
-    postgres_client.commit()
-
+@log_time
+def download_song_image_by_link(song_id, image_link):
     if not DOWNLOAD_IMAGES:
-        return 1
+        return
 
     # check if image exists
     if os.path.exists(f"{MUSIC_DATA}/song_images/{song_id}.jpg"):
         logger.error(f"image exists: {song_id}")
-        return 1
+        return
 
     res = requests.get(image_link)
     if res.status_code != 200:
         logger.error(f"error downloading song image")
-        return 1
+        return
     with open(f"{MUSIC_DATA}/song_images/{song_id}.jpg", "wb") as file:
         file.write(res.content)
     time.sleep(DOWNLOAD_TIMEOUT)
-    return 1
-
-
-def add_connections(seed_song_id, song_id, postgres_client: Session):
-    if seed_song_id == song_id:
-        return 0
-    dbsr = postgres_client.get(DBSongRelationV1, (seed_song_id, song_id))
-    if dbsr:
-        return 0
-    dbsr1 = DBSongRelationV1()
-    dbsr1.child_song_id = song_id
-    dbsr1.parent_song_id = seed_song_id
-    postgres_client.add(dbsr1)
-
-    dbsr2 = DBSongRelationV1()
-    dbsr2.parent_song_id = song_id
-    dbsr2.child_song_id = seed_song_id
-    postgres_client.add(dbsr2)
-    postgres_client.commit()
-    return 2
-
-
-def add_connections2(seed_song_id, song_id, postgres_client: Session):
-    if seed_song_id == song_id:
-        return 0
-    key1 = seed_song_id + song_id
-    key2 = song_id + seed_song_id
-    dbsr = postgres_client.get(DBSongRelationV2, key1)
-    if dbsr:
-        return 0
-    dbsr = postgres_client.get(DBSongRelationV2, key2)
-    if dbsr:
-        return 0
-    dbsr = DBSongRelationV2(
-        id=key1
-    )
-    postgres_client.add(dbsr)
-    postgres_client.commit()
-    return 1
+    return
 
 
 class Adder:
     def __init__(self, postgres_client: Session):
         self.artists = {}
+        self.song_images = {}
         self.songs = {}
         self.connections = {}
         self.postgres_client = postgres_client
@@ -223,8 +148,6 @@ class Adder:
         )
         self.artists[artist_id] = dba
 
-        # todo image?
-
     def add_song(self, song_id, song_title, number, artist_id, song_type, image_link):
 
         if self.postgres_client.get(DBSong, song_id):
@@ -239,8 +162,7 @@ class Adder:
             type=song_type
         )
         self.songs[song_id] = dbs
-
-        # todo imgae=
+        self.song_images[song_id] = image_link
 
     def add_connection(self, seed_song_id, song_id):
         if seed_song_id == song_id:
@@ -263,19 +185,6 @@ class Adder:
         )
         self.connections[key1] = dbsr
 
-
-@log_time
-def download_song_by_id(song_id: str):
-    # check if saved
-    if os.path.exists(f"{MUSIC_DATA}/songs/{song_id}.mp3"):
-        logger.info(f"cached: {song_id}")
-        return
-
-    if not DOWNLOAD_SONGS:
-        return
-
-    yt = YouTube(f"https://music.youtube.com/watch?v={song_id}")
-    yt.streams.filter(only_audio=True).first().download(
-        output_path=f"{MUSIC_DATA}/songs",
-        filename=f"{song_id}.mp3"
-    )
+    def get_results(self) -> Result:
+        artists = [a.id for a in self.artists.values()]
+        return Result(artist_image_ids=artists, songs=self.song_images)

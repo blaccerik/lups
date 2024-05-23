@@ -1,7 +1,5 @@
 import logging
 import random
-import time
-from functools import wraps
 from typing import List
 
 from sqlalchemy import func, and_
@@ -10,23 +8,9 @@ from sqlalchemy.orm import Session
 from database.models import DBArtist, DBSong, DBSongRelationV1, DBReaction
 from schemas.main import Artist, Song
 from util.download import download_channel_image, download_song, download_song_image, download_watch
+from util.log_time import log_time
 
-logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
-
-
-def log_time(func):
-    @wraps(func)
-    def timeit_wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        total_time = end_time - start_time
-        logger.info(f'Function {func.__name__.rjust(24)} Took {total_time:.4f} seconds')
-        return result
-
-    return timeit_wrapper
 
 
 @log_time
@@ -167,5 +151,4 @@ def get_next_song_by_user(user_id: int, postgres_client: Session) -> str:
         DBSong.id == DBReaction.song_id,
         DBReaction.user_id == user_id
     )).all()
-    print(result)
     pass

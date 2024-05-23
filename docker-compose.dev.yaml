@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
     build:
       context: music_worker
-    command: celery --app=main worker --concurrency=1 --pool=prefork --queues=music --loglevel=INFO
+    command: celery --app=main worker --concurrency=1 --pool=prefork --queues=music
     environment:
       POSTGRES_USER: erik
       POSTGRES_PASSWORD: erik
@@ -34,18 +34,17 @@ services:
       - postgres
     networks:
       - lups
-#  beat:
-#    container_name: beat
-#    build:
-#      context: worker
-#    command: celery --app beat beat --loglevel=debug
-#    depends_on:
-#      - redis
-#      - worker
-#    networks:
-#      - lups
-#    environment:
-#      TZ: "Europe/Tallinn"
+  beat:
+    container_name: beat
+    build:
+      context: scheduler
+    command: celery --app beat beat --loglevel=debug
+    depends_on:
+      - redis
+    networks:
+      - lups
+    environment:
+      TZ: "Europe/Tallinn"
   redis:
     container_name: redis
     restart: unless-stopped

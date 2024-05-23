@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from celery import Celery
 from celery.schedules import crontab
 
@@ -13,16 +11,16 @@ celery_app = Celery(
 )
 
 celery_app.conf.beat_schedule = {
-    'get-news': {
+    'news': {
         'task': 'news',
         'options': {'queue': 'normal'},
         # 'schedule': timedelta(seconds=5),
         'schedule': crontab(minute='19', hour='19')
     },
-    # 'get-music': {
-    #     'task': 'music',
-    #     'options': {'queue': 'music'},
-    #     'schedule': timedelta(seconds=999),
-    #     # 'schedule': crontab(minute='*', hour='*')
-    # },
+    'find_new_songs': {
+        'task': 'find_new_songs',
+        'options': {'queue': 'music:4'},
+        'schedule': crontab(minute='*/5', hour='23'),
+        'args': ('',),
+    },
 }

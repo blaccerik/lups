@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel, constr
 
@@ -25,3 +25,6 @@ class Song(BaseModel):
     type: SongType
 
 
+class Result(BaseModel):
+    artist_image_ids: List[str]
+    songs: Dict[str, str]

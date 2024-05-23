@@ -188,3 +188,11 @@ class DBFilter(Base):
     name = Column(String(100), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     config = Column(Text, nullable=False)
+
+
+class DBSongQueue(Base):
+    __tablename__ = "song_queue"
+    song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    count = Column(Integer, nullable=False)
+    hide = Column(Boolean, nullable=False, default=False)
