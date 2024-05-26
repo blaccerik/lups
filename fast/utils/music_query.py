@@ -62,6 +62,8 @@ class MusicQuery:
     def _get_ids3(self):
         result = []
         song_map, banned = self._get_mapping3()
+        if self.song_id not in banned:
+            result.append(self.song_id)
         queue = deque()
         queue.append(self.song_id)
         searched = {self.song_id}
@@ -114,12 +116,12 @@ class MusicQuery:
         bad_types = ["MUSIC_VIDEO_TYPE_UGC"]
         for song in songs:
 
-            # todo ugc include normal videos and music
-            # NEXUS - Nii Kuum OtFAdJmUzZ8
-            # Fix - Jaanipäev + sõnad mX97wSdyQH4
-            # Has Generative AI Already Peaked? - Computerphile dDUC-LqVrPU
-            if song.type in bad_types:
-                continue
+            # # todo ugc include normal videos and music
+            # # NEXUS - Nii Kuum OtFAdJmUzZ8
+            # # Fix - Jaanipäev + sõnad mX97wSdyQH4
+            # # Has Generative AI Already Peaked? - Computerphile dDUC-LqVrPU
+            # if song.type in bad_types:
+            #     continue
 
             for fc in self.filter.config:
                 text: str = song.title if fc.target_title else song.artist.name

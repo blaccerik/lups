@@ -30,7 +30,7 @@ class Adder:
         for s in self.song_data:
             if s not in db_songs:
                 new_songs.append(self.song_data[s])
-            elif db_songs[s].status == "scrapping":
+            elif db_songs[s].status == "working":
                 dbs = db_songs[s]
                 new_dbs = self.song_data[s]
                 dbs.status = "ready"

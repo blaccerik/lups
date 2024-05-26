@@ -17,9 +17,9 @@ class SongType(str, Enum):
     mvtpe = 'MUSIC_VIDEO_TYPE_PODCAST_EPISODE'
 
 
-class SongStatusType(str, Enum):
-    scrapping = 'scrapping'
-    ready = 'ready'
+class StatusType(str, Enum):
+    ready = "ready"
+    working = "working",
 
 
 class Song(BaseModel):
@@ -30,9 +30,14 @@ class Song(BaseModel):
     type: SongType
 
 
-class SongStatus(BaseModel):
-    type: SongStatusType
-    song: Song | None
+# class SongStatus(BaseModel):
+#     song: Song | None
+#     status: SongStatusType
+
+
+class SongQueue(BaseModel):
+    songs: List[Song]
+    status: StatusType
 
 
 class SongReaction(BaseModel):
@@ -57,8 +62,3 @@ class SongQueueResult(BaseModel):
     song_nr: int
     hidden: bool
     song_id: str
-
-
-class SongQueue(BaseModel):
-    songs: List[Song]
-    type: SongStatusType
