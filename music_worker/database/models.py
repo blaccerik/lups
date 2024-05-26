@@ -155,7 +155,7 @@ class DBSongRelationV2(Base):
     distance = Column(Float, nullable=False, default=1.0)
 
     def __repr__(self):
-        return f"Repr({self.parent_song_id} | {self.child_song_id})"
+        return f"Rel({self.id})"
 
 
 class DBFilter(Base):
@@ -171,5 +171,4 @@ class DBSongQueue(Base):
     song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     song_nr = Column(Integer, nullable=False)
-    artist_nr = Column(Integer, nullable=False)
     hidden = Column(Boolean, nullable=False, default=False)

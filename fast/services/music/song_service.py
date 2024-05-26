@@ -29,20 +29,22 @@ def _is_song_id_valid(song_id: str):
     # hack by https://gist.github.com/tonY1883/a3b85925081688de569b779b4657439b
     url = f"https://img.youtube.com/vi/{song_id}/mqdefault.jpg"
     response = requests.head(url, allow_redirects=True, timeout=3)
-    print(response.status_code == 200)
-    return response == 200
+    return response.status_code == 200
 
 
 def read_song(song_id: str, postgres_client: Session) -> SongStatus:
     # check database first for song
     # then check youtube api
-    dbs, dba = postgres_client.query(DBSong, DBArtist).join(
-        DBArtist, DBSong.artist_id == DBArtist.id
+    dbsa = postgres_client.query(DBSong, DBArtist).join(
+        DBArtist, DBSong.artist_id == DBArtist.id, isouter=True
     ).filter(DBSong.id == song_id).first()
-    # dbs, dba = dbsa if None
+    if dbsa:
+        dbs, dba = dbsa
+    else:
+        dbs, dba = None, None
     if dbs and dbs.status == "scrapping":
         return SongStatus(type='scrapping', song=None)
-    elif dbs and dbs.status == "ready":
+    elif dbs:
         return SongStatus(type='ready', song=Song(
             id=song_id,
             title=dbs.title,
@@ -50,9 +52,6 @@ def read_song(song_id: str, postgres_client: Session) -> SongStatus:
             type=dbs.type,
             artist=Artist(name=dba.name, id=dba.id) if dba else None
         ))
-    elif dbs and dbs.status == "idle":
-        start_scrape_for_song(song_id, postgres_client)
-        return SongStatus(type='scrapping', song=None)
     elif _is_song_id_valid(song_id):
         start_scrape_for_song(song_id, postgres_client)
         return SongStatus(type='scrapping', song=None)

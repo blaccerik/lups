@@ -82,7 +82,7 @@ class MusicQuery:
 
     def _ids_to_song_songs(self, ids) -> List[Song]:
         result = []
-        for dbs, dba, dbsd in self.postgres_client.query(
+        for dbs, dba in self.postgres_client.query(
                 DBSong, DBArtist
         ).join(
             DBArtist, DBArtist.id == DBSong.artist_id, isouter=True

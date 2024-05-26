@@ -8,7 +8,7 @@ from starlette.responses import FileResponse
 
 from database.postgres_database import get_postgres_db
 from schemas.auth import Userv2
-from schemas.music_schema import Song, Filter, SongReaction, SongQueueResult, SongStatus
+from schemas.music_schema import Song, Filter, SongReaction, SongQueueResult, SongStatus, SongQueue
 from services.music.filter_service import read_filters_by_user, create_filters_by_user, update_filters_by_user
 from services.music.queue_service import read_queue, read_previous
 from services.music.song_service import read_song, update_song_reaction, read_song_image, read_song_audio, \
@@ -104,7 +104,7 @@ async def get_user_previous(
     return read_previous(user.user_id, postgres_client)
 
 
-@router.get("/queue/{song_id}", response_model=List[Song])
+@router.get("/queue/{song_id}", response_model=SongQueue)
 async def get_user_queue(
         song_id: constr(min_length=11, max_length=11),
         filter_id: Optional[int] = Query(None, description="Filter ID"),

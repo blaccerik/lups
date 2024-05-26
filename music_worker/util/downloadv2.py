@@ -33,11 +33,6 @@ if not os.path.exists(path2):
     os.mkdir(path2)
     logger.error(path2)
 
-path3 = f"{MUSIC_DATA}/songs"
-if not os.path.exists(path3):
-    os.mkdir(path3)
-    logger.error(path3)
-
 path4 = f"{MUSIC_DATA}/song_json"
 if not os.path.exists(path4):
     os.mkdir(path4)

@@ -58,10 +58,6 @@ def find_new_songs_by_song_id(song_id: str, postgres_client: Session) -> Result:
             track["thumbnail"][-1]["url"],
         )
         a.add_connection(song_id, track["videoId"])
+
     a.add_to_db()
-    # update song state database
-    dbs = postgres_client.get(DBSong, song_id)
-    dbs.status = "ready"
-    postgres_client.add(dbs)
-    postgres_client.commit()
     return a.get_results()

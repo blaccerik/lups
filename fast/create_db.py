@@ -5,16 +5,17 @@ from database.models import DBNewsCategory
 
 if __name__ == '__main__':
     print("start")
-    # Drop all tables
-    Base.metadata.drop_all(engine)
-
+    metadata = MetaData()
+    metadata.reflect(bind=engine)
+    with engine.connect() as conn:
+        metadata.drop_all(bind=engine)
     print("dropped")
+
     # Create all tables
     Base.metadata.create_all(engine)
     print("created")
 
     postgres_client = SessionLocal()
-
     translate = {
         "top": "top",
         "business": "äri",

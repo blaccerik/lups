@@ -13,16 +13,16 @@ from utils.scrapping import start_scrape_for_song
 PREVIOUS_QUEUE_LIMIT = 5
 
 
-def _update_song_queue(user_id: int, song_id: str, count: int, postgres_client: Session):
+def _update_song_queue(user_id: int, song_id: str, song_nr: int, postgres_client: Session):
     dbsq = postgres_client.get(DBSongQueue, (song_id, user_id))
     if dbsq is None:
         dbsq = DBSongQueue(
             song_id=song_id,
             user_id=user_id,
-            count=count
+            song_nr=song_nr
         )
     else:
-        dbsq.count = dbsq.count + count
+        dbsq.song_nr = dbsq.song_nr + song_nr
     postgres_client.add(dbsq)
     postgres_client.commit()
 
@@ -62,7 +62,6 @@ def read_previous(user_id: int, postgres_client: Session) -> List[SongQueueResul
     ).all()
     return [SongQueueResult(
         song_nr=dbsq.song_nr,
-        artist_nr=dbsq.artist_nr,
         hidden=dbsq.hidden,
         song_id=dbsq.song_id
     ) for dbsq in dbsq_list]

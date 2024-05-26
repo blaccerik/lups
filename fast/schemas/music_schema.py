@@ -55,7 +55,6 @@ class Filter(BaseModel):
 
 class SongQueueResult(BaseModel):
     song_nr: int
-    artist_nr: int
     hidden: bool
     song_id: str
 
