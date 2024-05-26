@@ -52,9 +52,6 @@ class Adder:
             if not (c in con_ids or c_swap in con_ids):
                 new_connections.append(self.connection_data[c])
         self.postgres_client.add_all(new_connections)
-        print(len(new_artists))
-        print(len(new_songs))
-        print(len(new_connections))
         self.postgres_client.commit()
 
     def add_artist(self, artist_id, artist_name):
