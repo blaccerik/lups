@@ -62,7 +62,6 @@ def download_scrape(song_id):
     return result
 
 
-@log_time
 def download_artist_image_by_id(artist_id):
     if not DOWNLOAD_IMAGES:
         return
@@ -91,7 +90,6 @@ def download_artist_image_by_id(artist_id):
     return
 
 
-@log_time
 def download_song_image_by_link(song_id, image_link):
     if not DOWNLOAD_IMAGES:
         return
