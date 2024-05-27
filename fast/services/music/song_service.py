@@ -7,8 +7,10 @@ from fastapi import HTTPException
 from pytube import YouTube
 from sqlalchemy.orm import Session
 
-from database.models import DBReaction
-from schemas.music_schema import SongReaction
+from database.models import DBReaction, DBSong, DBArtist
+from schemas.music_schema import SongReaction, SingleSong, StatusType, Song, Artist
+from utils.helper_functions import _is_song_id_valid
+from utils.scrapping import start_scrape_for_song
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -23,32 +25,33 @@ MIN_QUEUE_SONGS = 40
 DEFAULT_SONG_IMAGE_PATH = "assets/default_song_image.png"
 
 
-# def read_song(song_id: str, postgres_client: Session) -> SongWrapper:
-#     # check database first for song
-#     # then check youtube api
-#     dbsa = postgres_client.query(DBSong, DBArtist).join(
-#         DBArtist, DBSong.artist_id == DBArtist.id, isouter=True
-#     ).filter(DBSong.id == song_id).first()
-#     if dbsa:
-#         dbs, dba = dbsa
-#     else:
-#         dbs, dba = None, None
-#     if dbs and dbs.status == "working":
-#         return SongWrapper(song=None, status=SongStatusType.working)
-#     elif dbs:
-#         return SongWrapper(status=dbs.status,
-#                            song=Song(
-#                                id=song_id,
-#                                title=dbs.title,
-#                                length=dbs.length,
-#                                type=dbs.type,
-#                                artist=Artist(name=dba.name, id=dba.id) if dba else None
-#                            ))
-#     elif _is_song_id_valid(song_id):
-#         start_scrape_for_song(song_id, postgres_client)
-#         return SongWrapper(status=SongStatusType.working, song=None)
-#     else:
-#         raise HTTPException(status_code=404, detail="Song not found")
+def read_song(song_id: str, postgres_client: Session) -> SingleSong:
+    # check database first for song
+    # then check youtube api
+    dbsa = postgres_client.query(DBSong, DBArtist).join(
+        DBArtist, DBSong.artist_id == DBArtist.id, isouter=True
+    ).filter(DBSong.id == song_id).first()
+    if dbsa:
+        dbs, dba = dbsa
+    else:
+        dbs, dba = None, None
+    if dbs and dbs.status == "working":
+        return SingleSong(song=None, status=StatusType.working)
+    elif dbs:
+        return SingleSong(
+            status=StatusType.ready,
+            song=Song(
+                id=song_id,
+                title=dbs.title,
+                length=dbs.length,
+                type=dbs.type,
+                artist=Artist(name=dba.name, id=dba.id) if dba else None
+            ))
+    elif _is_song_id_valid(song_id):
+        start_scrape_for_song(song_id, postgres_client)
+        return SingleSong(status=StatusType.working, song=None)
+    else:
+        raise HTTPException(status_code=404, detail="Song not found")
 
 
 def read_song_audio(song_id: str) -> str:

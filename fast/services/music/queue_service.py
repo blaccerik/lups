@@ -1,24 +1,16 @@
 from typing import List
 
-import requests
 from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from database.models import DBFilter, DBSong, DBSongQueue
 from schemas.music_schema import SongQueueResult, SongQueue, StatusType
-from utils.helper_functions import dbfilter_to_filter
+from utils.helper_functions import dbfilter_to_filter, _is_song_id_valid
 from utils.music_query import MusicQuery
 from utils.scrapping import start_scrape_for_song
 
 PREVIOUS_QUEUE_LIMIT = 5
-
-
-def _is_song_id_valid(song_id: str):
-    # hack by https://gist.github.com/tonY1883/a3b85925081688de569b779b4657439b
-    url = f"https://img.youtube.com/vi/{song_id}/mqdefault.jpg"
-    response = requests.head(url, allow_redirects=True, timeout=3)
-    return response.status_code == 200
 
 
 def _update_song_queue(user_id: int, song_id: str, song_nr: int, postgres_client: Session):

@@ -61,8 +61,7 @@ export class PlaylistComponent implements OnDestroy {
       mergeMap(([q, s]) => q && s ? this.musicService.getQueue(s.id) : EMPTY)
     ).subscribe(
       songs => {
-        const playlist = this.playlist()
-        this.playlist.set([...playlist, ...songs])
+        this.musicService.addSongsToPlaylist(songs)
         this.query.set(false)
       }
     )

@@ -36,9 +36,14 @@ export class DisplayComponent implements OnDestroy {
         }
       ),
       switchMap(params => this.musicService.getSong(params["song_id"]))
-    ).subscribe(song => {
-        this.currentSong.set(song);
-        this.musicService.addSongToPlaylist(song);
+    ).subscribe({
+        next: song => {
+          this.currentSong.set(song);
+          this.musicService.addSongsToPlaylist([song]);
+        },
+        error: err => {
+          console.log(err)
+        }
       }
     )
   }

@@ -30,9 +30,9 @@ class Song(BaseModel):
     type: SongType
 
 
-# class SongStatus(BaseModel):
-#     song: Song | None
-#     status: SongStatusType
+class SingleSong(BaseModel):
+    song: Song | None
+    status: StatusType
 
 
 class SongQueue(BaseModel):
