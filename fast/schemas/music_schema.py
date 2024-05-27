@@ -30,16 +30,6 @@ class Song(BaseModel):
     type: SongType
 
 
-class SingleSong(BaseModel):
-    song: Song | None
-    status: StatusType
-
-
-class SongQueue(BaseModel):
-    songs: List[Song]
-    status: StatusType
-
-
 class SongReaction(BaseModel):
     duration: int
     liked: bool

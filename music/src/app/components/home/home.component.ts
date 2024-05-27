@@ -37,7 +37,6 @@ export class HomeComponent implements OnDestroy {
   constructor() {
     this.queuePrev$ = this.musicService.getQueuePrev().subscribe(
       previousSongQueue => {
-        console.log(previousSongQueue)
         this.previous.set(previousSongQueue)
       }
     )

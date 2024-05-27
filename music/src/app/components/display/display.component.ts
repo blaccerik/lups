@@ -40,9 +40,6 @@ export class DisplayComponent implements OnDestroy {
         next: song => {
           this.currentSong.set(song);
           this.musicService.addSongsToPlaylist([song]);
-        },
-        error: err => {
-          console.log(err)
         }
       }
     )

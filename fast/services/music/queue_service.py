@@ -5,8 +5,8 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from database.models import DBFilter, DBSong, DBSongQueue
-from schemas.music_schema import SongQueueResult, SongQueue, StatusType
-from utils.helper_functions import dbfilter_to_filter, _is_song_id_valid
+from schemas.music_schema import SongQueueResult, Song
+from utils.helper_functions import dbfilter_to_filter
 from utils.music_query import MusicQuery
 from utils.scrapping import start_scrape_for_song
 
@@ -27,7 +27,7 @@ def _update_song_queue(user_id: int, song_id: str, song_nr: int, postgres_client
     postgres_client.commit()
 
 
-def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> SongQueue:
+def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> List[Song]:
     # check if user has filter
     if filter_id is None:
         dbf = None
@@ -43,20 +43,17 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
     # if not then start scrape
     db_seed_song = postgres_client.get(DBSong, song_id)
     if db_seed_song is None:
-        if _is_song_id_valid(song_id):
-            start_scrape_for_song(song_id, postgres_client)
-            return SongQueue(songs=[], status=StatusType.working)
-        else:
-            raise HTTPException(status_code=404, detail="Song not found")
+        start_scrape_for_song(song_id, postgres_client)
+        raise HTTPException(status_code=404, detail="Song not found")
     elif db_seed_song.status == "working":
-        return SongQueue(songs=[], status=StatusType.working)
+        raise HTTPException(status_code=404, detail="Song not found")
 
     # init queue
     _filter = dbfilter_to_filter(dbf)
     mq = MusicQuery(user_id, song_id, _filter, postgres_client)
     songs = mq.get_filtered_songs()
     _update_song_queue(user_id, song_id, len(songs), postgres_client)
-    return SongQueue(songs=songs, status=StatusType.ready)
+    return songs
 
 
 def read_previous(user_id: int, postgres_client: Session) -> List[SongQueueResult]:

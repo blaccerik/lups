@@ -1,5 +1,6 @@
 import random
 
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from database.models import DBSong
@@ -11,9 +12,11 @@ from util.log_time import log_time
 
 @log_time
 def select_random_song(postgres_client: Session) -> str:
-    dbs_list = (postgres_client.query(DBSong.id).filter(
-        DBSong.type != "MUSIC_VIDEO_TYPE_UGC"
-    ).all())
+    dbs_list = (postgres_client.query(DBSong.id).filter(and_(
+        DBSong.type != "MUSIC_VIDEO_TYPE_UGC",
+        DBSong.status != "ready",
+        DBSong.status != "working"
+    )).all())
     if len(dbs_list) == 0:
         return "dQw4w9WgXcQ"
     dbs = random.choice(dbs_list)

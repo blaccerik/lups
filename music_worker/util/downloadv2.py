@@ -16,7 +16,7 @@ if operating_system == 'Windows':
     MUSIC_DATA = f"{Path(os.path.abspath(__file__)).parent.parent.parent}/music_data"
 else:
     MUSIC_DATA = "/usr/src/app/music_data"
-DOWNLOAD_IMAGES = False
+DOWNLOAD_IMAGES = True
 DOWNLOAD_TIMEOUT = 0.5
 logger = logging.getLogger(__name__)
 logger.info(MUSIC_DATA)

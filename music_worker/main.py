@@ -40,6 +40,7 @@ def find_new_songs(song_id: str):
     postgres_client = SessionLocal()
     if song_id == "":
         song_id = select_random_song(postgres_client)
+    print(song_id)
     results = find_new_songs_by_song_id(song_id, postgres_client)
     postgres_client.close()
     logger.warning(f"Songs: {len(results.songs)} Artists: {len(results.artist_image_ids)}")

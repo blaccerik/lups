@@ -1,5 +1,5 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {catchError, EMPTY, map, Observable, of, retry, throwError} from "rxjs";
+import {Observable, of, retry} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
 export interface Artist {
@@ -18,24 +18,14 @@ export interface PreviousSongQueue {
   song_id: string
 }
 
-export interface SingleSong {
-  song?: Song
-  status: string
-}
-
-export interface SongQueue {
-  songs: Song[]
-  status: string
-}
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class MusicService {
   private url = "api/music"
-  private delay = 2000
-  private count = 3
+  private delay = 1000
+  private count = 5
   http = inject(HttpClient)
   currentSong = signal<Song | null>(null);
   playlist = signal<Song[]>([]);
@@ -52,14 +42,7 @@ export class MusicService {
   }
 
   getQueue(s: string): Observable<Song[]> {
-    return this.http.get<SongQueue>(this.url + "/queue/" + s).pipe(
-      catchError(() => {
-        return EMPTY
-      }),
-      map(sq => {
-        if (sq.status == "ready") return sq.songs
-        throw new Error("empty")
-      }),
+    return this.http.get<Song[]>(this.url + "/queue/" + s).pipe(
       retry({delay: this.delay, count: this.count})
     )
   }
@@ -69,14 +52,7 @@ export class MusicService {
     const songs = this.playlist()
     const song = songs.find(s => s.id === sid)
     if (song) return of(song)
-    return this.http.get<SingleSong>(this.url + "/song/" + sid).pipe(
-      catchError(() => {
-        return EMPTY
-      }),
-      map(ss => {
-        if (ss.status == "ready" && ss.song) return ss.song
-        throw new Error("empty")
-      }),
+    return this.http.get<Song>(this.url + "/song/" + sid).pipe(
       retry({delay: this.delay, count: this.count})
     )
   }
