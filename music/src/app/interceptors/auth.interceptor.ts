@@ -15,5 +15,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       return next(authReq);
     }
   }
+
+  // todo remove this
+  const authReq = req.clone({
+    setHeaders: {
+      Authorization: `Bearer erik`
+    }
+  });
+  return next(authReq);
+
   return next(req);
 };

@@ -1,4 +1,21 @@
 <div class="container">
-  <div>{{googleApiService.userinfo().info.name}}</div>
-  <button (click)="signOut()">signout</button>
+  <img *ngIf="googleApiService.loggedIn()"
+       class="image"
+       src="{{googleApiService.userinfo().info.picture}}"
+       alt="image">
+  <mat-form-field
+    color="primary"
+    appearance="outline"
+    class="test">
+    <mat-label>Search</mat-label>
+    <input matInput>
+    <button mat-icon-button
+            matSuffix>
+      <mat-icon>search</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <button class="button" (click)="signOut()">
+    <mat-icon>logout</mat-icon>
+  </button>
 </div>

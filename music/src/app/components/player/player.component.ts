@@ -81,6 +81,7 @@ export class PlayerComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.songSrc$?.unsubscribe()
     clearInterval(this.timer)
+    this.audio.pause()
   }
 
 

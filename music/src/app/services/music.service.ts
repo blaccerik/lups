@@ -14,8 +14,10 @@ export interface Song {
 }
 
 export interface PreviousSongQueue {
-  count: number,
-  song_id: string
+  song_id: string,
+  song_nr: number,
+  hidden: boolean,
+  image?: boolean
 }
 
 

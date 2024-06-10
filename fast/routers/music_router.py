@@ -49,9 +49,8 @@ async def get_song_image(
 ):
     image_path, exists = read_song_image(song_id)
     response = FileResponse(image_path)
-    print(image_path, exists)
-    if exists:
-        response.headers["Cache-Control"] = "public, max-age=3600"
+    # if exists:
+    #     response.headers["Cache-Control"] = "public, max-age=3600"
     return response
 
 

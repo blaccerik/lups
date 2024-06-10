@@ -33,18 +33,26 @@ export class GoogleApiService {
       scope: 'openid profile email',
       showDebugInformation: true,
     });
-    oAuthService.loadDiscoveryDocument().then((e) => {
-      oAuthService.tryLoginImplicitFlow().then((t) => {
-        this.loggedIn.set(oAuthService.hasValidAccessToken())
-        if (!oAuthService.hasValidAccessToken()) {
-          oAuthService.initLoginFlow()
-        } else {
-          oAuthService.loadUserProfile().then((userProfile) => {
-            this.userinfo.set(userProfile as UserInfo)
-          })
-        }
-      })
+    this.loggedIn.set(true)
+    this.userinfo.set({
+      info: {
+        sub: "erik",
+        name: "Moe Lester",
+        picture: "https://lh3.googleusercontent.com/a/ACg8ocKgt_tbLy-UDAKIN31UV1yr_OqV6Z8pBboQDZ_isWZf3G_mUZI=s96-c"
+      }
     })
+    // oAuthService.loadDiscoveryDocument().then((e) => {
+    //   oAuthService.tryLoginImplicitFlow().then((t) => {
+    //     this.loggedIn.set(oAuthService.hasValidAccessToken())
+    //     if (!oAuthService.hasValidAccessToken()) {
+    //       oAuthService.initLoginFlow()
+    //     } else {
+    //       oAuthService.loadUserProfile().then((userProfile) => {
+    //         this.userinfo.set(userProfile as UserInfo)
+    //       })
+    //     }
+    //   })
+    // })
   }
 
   signOut() {
