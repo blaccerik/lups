@@ -43,7 +43,7 @@ export class SongComponent implements OnDestroy {
       tap(() => this.img.set(null)),
       switchMap(s => s ? this.musicService.getSongImage(s.id) : EMPTY)
     ).subscribe(imgBlob => {
-        const objectURL = URL.createObjectURL(imgBlob);
+        const objectURL = URL.createObjectURL(imgBlob.blob);
         const imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectURL);
         this.img.set(imageUrl)
       }

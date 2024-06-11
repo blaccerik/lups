@@ -1,8 +1,40 @@
 <div class="container">
-  <div class="queue-info">queue</div>
+  <div class="queue-box">
+    <div class="queue-info"><mat-icon inline style="scale: 1.2; margin-right: 15px">queue_music</mat-icon>My queues</div>
+    <button class="queue-button" disabled>
+      <mat-icon>keyboard_arrow_left</mat-icon>
+    </button>
+    <button class="queue-button" (click)="sort()">
+      <mat-icon [ngClass]="{'rotate-mirror': asc() === 1}">sort</mat-icon>
+    </button>
+    <button class="queue-button" (click)="toggleHide()">
+      <mat-icon>{{hidden() ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </button>
+    <button class="queue-button">
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </button>
+  </div>
   <div class="queue">
-    <div *ngFor="let prev of previous()" (click)="clickOnPrev(prev.song_id)" class="queue-item">
-      <img class="queue-image" src="{{img}}">
+    <div style="margin: 20px; font-size: 25px" *ngIf="sortedQueue().length === 0">Nothing found :(</div>
+    <div *ngFor="let prev of sortedQueue()" (click)="clickOnPrev(prev.song_id)" class="queue-item">
+      <button mat-mini-fab class="queue-item-button" (click)="hideQueue($event, prev.song_id)"><mat-icon>close</mat-icon></button>
+      <img class="queue-image" src="{{prev.image}}">
+      <div class="queue-item-info">{{prev.song_id}}</div>
+      <div class="queue-item-info">{{prev.song_nr}}<mat-icon inline>library_music</mat-icon></div>
+    </div>
+  </div>
+  <div class="queue-box" style="margin-top: calc(2% + 45px)">
+    <div class="queue-info"><mat-icon inline style="scale: 1.2; margin-right: 15px">star_border</mat-icon>New songs</div>
+    <button class="queue-button" disabled>
+      <mat-icon>keyboard_arrow_left</mat-icon>
+    </button>
+    <button class="queue-button">
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </button>
+  </div>
+  <div class="queue">
+    <div *ngFor="let prev of queuePrev()" (click)="clickOnPrev(prev.song_id)" class="queue-item">
+      <img class="queue-image" src="{{prev.image}}">
     </div>
   </div>
 </div>

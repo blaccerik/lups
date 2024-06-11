@@ -3,12 +3,10 @@
 $opacity: 1;
 
 html, body {
-
   height: 100%;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  background: linear-gradient(165deg, rgba($main-color, $opacity), rgba(62, 214, 0, $opacity), rgba(112, 199, 0, $opacity),
-      rgba(153, 175, 0, $opacity), rgba(185, 143, 0, $opacity), rgba(204, 104, 0, $opacity))
+  background: linear-gradient(165deg, $main-color 25%, $second-color-dark 90%);
 }
 
 

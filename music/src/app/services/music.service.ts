@@ -1,5 +1,5 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {Observable, of, retry} from "rxjs";
+import {map, Observable, of, retry} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
 export interface Artist {
@@ -17,7 +17,12 @@ export interface PreviousSongQueue {
   song_id: string,
   song_nr: number,
   hidden: boolean,
-  image?: boolean
+  image?: string
+}
+
+export interface ImageBlob {
+  blob: Blob,
+  songId: string
 }
 
 
@@ -71,8 +76,11 @@ export class MusicService {
     return this.http.get<string>(this.url + "/song/" + s + "/audio")
   }
 
-  getSongImage(s: string) {
-    return this.http.get(this.url + "/song/" + s + "/image", {responseType: 'blob'})
+  getSongImage(s: string): Observable<ImageBlob> {
+    return this.http.get(this.url + "/song/" + s + "/image", {responseType: 'blob'}).pipe(
+      map(b => {
+        return {blob: b, songId: s}
+      }))
   }
 
   getQueuePrev() {
