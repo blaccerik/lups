@@ -1,6 +1,6 @@
 <div class="container">
-  <button mat-icon-button (click)="play()" [disabled]="duration() === 0">
-    <mat-icon>{{ duration() === 0 ? 'hourglass_empty' : (audio.paused ? 'play_arrow' : 'pause') }}</mat-icon>
+  <button mat-icon-button (click)="audioService.play()" [disabled]="duration() === 0">
+    <mat-icon>{{ duration() === 0 ? 'hourglass_empty' : (audioService.audio.paused ? 'play_arrow' : 'pause') }}</mat-icon>
   </button>
   {{ formatTime(currentTime) }}
   <mat-slider
@@ -12,7 +12,7 @@
   {{ formatTime(duration()) }}
   <div class="volume-container" (mouseenter)="isShowing.set(true)" (mouseleave)="isShowing.set(false)">
     <button mat-icon-button (click)="toggleMute()">
-      <mat-icon>{{ audio.volume === 0 ? 'volume_off' : 'volume_up' }}</mat-icon>
+      <mat-icon>{{ audioService.audio.volume === 0 ? 'volume_off' : 'volume_up' }}</mat-icon>
     </button>
     <mat-slider
       class="volume-slider"
@@ -21,7 +21,7 @@
       step="0.1"
       min="0"
       max="1">
-      <input matSliderThumb [ngModel]="audio.volume" (ngModelChange)="onVolumeChange($event)">
+      <input matSliderThumb [ngModel]="audioService.audio.volume" (ngModelChange)="onVolumeChange($event)">
     </mat-slider>
   </div>
 </div>

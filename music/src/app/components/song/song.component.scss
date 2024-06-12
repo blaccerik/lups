@@ -1,14 +1,35 @@
 .container {
-  background: red;
   height: 100%;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
-.image-container {
+.image {
+  height: 70%;
+  aspect-ratio: 1;
+  margin-bottom: 1%;
+  border: 3px solid black;
+  border-radius: 5px;
+  position: relative;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  & img {
+    width: 100%; /* or any custom size */
+    height: 100%;
+    object-fit: contain;
+  }
 }
 
-.image-container img {
-  width: 50%;
-  height: auto;
-  object-fit: contain;
+.animated-div {
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  //transform: translate(-50%, -50%);
 }

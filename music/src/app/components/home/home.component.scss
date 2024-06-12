@@ -15,8 +15,11 @@
   margin: 2% 0;
   display: flex;
   gap: 25px;
-  width: 90%;
+  width: 95%;
+  padding: 25px;
+  border: 3px solid black;
   border-radius: 5px;
+  overflow: hidden;
 
   &-box {
     display: flex;
@@ -67,11 +70,14 @@
 
     &-button {
       position: absolute;
-      top: -7px;
-      right: -7px;
+      top: -10px;
+      right: -10px;
       background-color: $second-color-dark;
       border: 3px solid black;
       scale: 0.8;
+      &:hover {
+        background-color: $second-color-dark2;
+      }
     }
 
     &-info {
@@ -82,11 +88,6 @@
       justify-content: space-between;
       gap: 5px;
       color: black;
-      //background-color: black;
-      //background-color: white;
-      //background-color: $second-color-dark;
-      //width: calc(100% - 14px);
-      //border: 3px solid black;
       border-radius: 10px;
       padding: 5px;
     }
@@ -96,7 +97,7 @@
     width: 175px;
     height: 175px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 5px;
     border: 3px solid black;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   }

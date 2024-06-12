@@ -8,6 +8,8 @@ import {YouTubePlayer} from '@angular/youtube-player';
 import {toObservable} from "@angular/core/rxjs-interop";
 import {EMPTY, Subscription, switchMap, tap} from "rxjs";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {AudioService} from "../../services/audio.service";
+import {animate, state, style, transition, trigger} from "@angular/animations";
 
 @Component({
   selector: 'app-song',
@@ -24,17 +26,33 @@ import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
     NgOptimizedImage
   ],
   templateUrl: './song.component.html',
-  styleUrl: './song.component.scss'
+  styleUrl: './song.component.scss',
+  animations: [
+    trigger('growShrink', [
+      state('void', style({
+        scale: 2,
+        opacity: 0.75
+      })),
+      state('*', style({
+        scale: 4,
+        opacity: 0
+      })),
+      transition('void => *', [
+        animate('0.3s ease-in')
+      ]),
+    ])
+  ]
 })
 export class SongComponent implements OnDestroy {
   private musicService = inject(MusicService)
   private sanitizer = inject(DomSanitizer)
+  audioService = inject(AudioService)
   song = this.musicService.currentSong.asReadonly()
   title = computed(() => {
     return this.song()?.title ?? ":("
   })
+  author = computed(() => this.song()?.artist?.name ?? ":(")
   img = signal<SafeUrl | null>(null)
-
   private songImg$: Subscription | undefined
 
   constructor() {
@@ -52,5 +70,20 @@ export class SongComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.songImg$?.unsubscribe()
+  }
+
+  click() {
+    this.audioService.play()
+    this.triggerAnimation()
+  }
+
+  showIcon = signal(false)
+
+  triggerAnimation() {
+    this.showIcon.set(true)
+  }
+
+  onAnimationDone() {
+    this.showIcon.set(false)
   }
 }
