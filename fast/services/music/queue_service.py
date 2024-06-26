@@ -4,8 +4,8 @@ from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from database.models import DBFilter, DBSong, DBSongQueue
-from schemas.music_schema import SongQueueResult, Song
+from database.models import DBFilter, DBSong, DBSongQueue, DBArtist
+from schemas.music_schema import SongQueueResult, Song, Artist
 from utils.helper_functions import dbfilter_to_filter
 from utils.music_query import MusicQuery
 from utils.scrapping import start_scrape_for_song
@@ -65,3 +65,27 @@ def read_previous(user_id: int, postgres_client: Session) -> List[SongQueueResul
         hidden=dbsq.hidden,
         song_id=dbsq.song_id
     ) for dbsq in dbsq_list]
+
+
+def read_new_songs(postgres_client: Session) -> List[Song]:
+    db_songs = postgres_client.query(DBSong).order_by(DBSong.date.desc()).limit(10)[::-1]
+    songs = []
+    for dbs in db_songs:
+        if dbs.artist_id is None:
+            a = None
+        else:
+            dba = postgres_client.get(DBArtist, dbs.artist_id)
+            a = Artist(
+                id=dba.id,
+                name=dba.name
+            )
+        song = Song(
+            id=dbs.id,
+            title=dbs.title,
+            length=dbs.length,
+            artist=a,
+            type=dbs.type
+        )
+        songs.append(song)
+    return songs
+

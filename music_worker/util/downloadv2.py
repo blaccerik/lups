@@ -3,9 +3,11 @@ import logging
 import os
 import platform
 import time
+from io import BytesIO
 from pathlib import Path
 
 import requests
+from PIL import Image
 from bs4 import BeautifulSoup
 from ytmusicapi import YTMusic
 
@@ -93,7 +95,6 @@ def download_artist_image_by_id(artist_id):
 def download_song_image_by_link(song_id, image_link):
     if not DOWNLOAD_IMAGES:
         return
-
     # check if image exists
     if os.path.exists(f"{MUSIC_DATA}/song_images/{song_id}.jpg"):
         logger.error(f"image exists: {song_id}")
@@ -101,9 +102,21 @@ def download_song_image_by_link(song_id, image_link):
 
     res = requests.get(image_link)
     if res.status_code != 200:
-        logger.error(f"error downloading song image")
+        logger.error(f"error downloading song image {song_id} {image_link}")
         return
-    with open(f"{MUSIC_DATA}/song_images/{song_id}.jpg", "wb") as file:
-        file.write(res.content)
+
+    img = Image.open(BytesIO(res.content))
+    w = img.width
+    h = img.height
+    # modify image if it's not square
+    if w != h:
+        s = min(w, h)
+        img = img.crop((
+            (w - s) // 2,
+            (h - s) // 2,
+            w - ((w - s) // 2),
+            h - ((h - s) // 2)
+        ))
+    img.save(f"{MUSIC_DATA}/song_images/{song_id}.jpg")
     time.sleep(DOWNLOAD_TIMEOUT)
     return

@@ -22,7 +22,8 @@ services:
     restart: unless-stopped
     build:
       context: music_worker
-    command: celery --app=main worker --concurrency=1 --pool=prefork --queues=music --loglevel=WARNING
+    # pool solo works better for priority queues
+    command: celery --app=main worker --concurrency=1 --pool=solo --queues=music --loglevel=WARNING
     environment:
       POSTGRES_USER: erik
       POSTGRES_PASSWORD: erik

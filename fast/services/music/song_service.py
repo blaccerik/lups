@@ -74,7 +74,6 @@ def read_song_audio(song_id: str) -> str:
 
 def read_song_image(song_id: str) -> (str, bool):
     # try to find image
-    print(MUSIC_DATA)
     path = f"{MUSIC_DATA}/song_images/{song_id}.jpg"
     if os.path.exists(path):
         return path, True

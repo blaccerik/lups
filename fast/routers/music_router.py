@@ -10,7 +10,7 @@ from database.postgres_database import get_postgres_db
 from schemas.auth import Userv2
 from schemas.music_schema import Filter, SongReaction, SongQueueResult, Song
 from services.music.filter_service import read_filters_by_user, create_filters_by_user, update_filters_by_user
-from services.music.queue_service import read_queue, read_previous
+from services.music.queue_service import read_queue, read_previous, read_new_songs
 from services.music.song_service import update_song_reaction, read_song_image, read_song_audio, \
     read_artist_image, read_song
 from utils.auth import get_user_v2
@@ -49,8 +49,8 @@ async def get_song_image(
 ):
     image_path, exists = read_song_image(song_id)
     response = FileResponse(image_path)
-    # if exists:
-    #     response.headers["Cache-Control"] = "public, max-age=3600"
+    if exists:
+        response.headers["Cache-Control"] = "public, max-age=1"
     return response
 
 
@@ -104,6 +104,11 @@ async def get_user_previous(
         postgres_client: Session = Depends(get_postgres_db)
 ):
     return read_previous(user.user_id, postgres_client)
+
+
+@router.get("/queue/new", response_model=List[Song])
+async def get_new_songs(postgres_client: Session = Depends(get_postgres_db)):
+    return read_new_songs(postgres_client)
 
 
 @router.get("/queue/{song_id}", response_model=List[Song])

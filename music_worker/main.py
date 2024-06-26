@@ -1,4 +1,5 @@
 import logging
+import time
 
 from celery import Celery
 
@@ -23,6 +24,12 @@ celery_app.conf.broker_transport_options = {
     'sep': ':',
     'queue_order_strategy': 'priority',
 }
+
+
+@celery_app.task(name="test1")
+def test(_id):
+    time.sleep(0.1)
+    print(f"test id: {_id}")
 
 
 @celery_app.task(name="download_song_image")

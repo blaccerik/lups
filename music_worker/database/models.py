@@ -116,6 +116,7 @@ class DBSong(Base):
     # video url seems to be 11 chars long
     id = Column(String(11), primary_key=True)
     status = Column(Enum("ready", "working", "idle", name="status"), nullable=False)
+    date = Column(DateTime, nullable=False, default=func.now())
     title = Column(String(100), nullable=True)
     length = Column(Integer, nullable=True)
     artist_id = Column(String(24), ForeignKey('artist.id'), nullable=True)

@@ -14,13 +14,12 @@ celery_app.conf.beat_schedule = {
     'news': {
         'task': 'news',
         'options': {'queue': 'normal'},
-        # 'schedule': timedelta(seconds=5),
         'schedule': crontab(minute='19', hour='19')
     },
     'find_new_songs': {
         'task': 'find_new_songs',
         'options': {'queue': 'music:4'},
-        'schedule': crontab(minute='*/5', hour='*/5'),
+        'schedule': crontab(minute='*/10', hour='*/9'),
         'args': ('',),
     },
 }

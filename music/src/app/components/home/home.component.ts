@@ -1,5 +1,5 @@
 import {Component, computed, inject, OnDestroy, signal} from '@angular/core';
-import {MusicService, PreviousSongQueue} from "../../services/music.service";
+import {MusicService, PreviousSongQueue, Song} from "../../services/music.service";
 import {mergeMap, Subscription, switchMap, tap} from "rxjs";
 import {Router} from "@angular/router";
 import {NgClass, NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
@@ -37,6 +37,8 @@ export class HomeComponent implements OnDestroy {
       .filter(q => q.hidden === h)
       .sort((a, b) => a.song_nr - (b.song_nr * asc))
   })
+  newSongs = signal<null | Song[]>(null)
+  newSongs$: Subscription | undefined
   asc = signal(-1)
   hidden = signal(false)
 
@@ -53,14 +55,28 @@ export class HomeComponent implements OnDestroy {
       sq.image = URL.createObjectURL(imageBlob.blob)
       this.queuePrev.set([...data])
     });
+
+    this.newSongs$ = this.musicService.getNewSongs().pipe(
+      tap(songs => this.newSongs.set(songs)),
+      switchMap(songs => songs), // flatten the array of items into individual items
+      mergeMap(song => this.musicService.getSongImage(song.id)) // process each item as soon as it's emitted
+    ).subscribe(imageBlob => {
+      const songs = this.newSongs();
+      if (!songs) return;
+      const song = songs.find(s => s.id === imageBlob.songId);
+      if (!song) return;
+      song.image = URL.createObjectURL(imageBlob.blob);
+      this.newSongs.set([...songs]);
+    });
   }
 
   clickOnPrev(sid: string) {
-    this.router.navigate(["song", sid])
+    this.router.navigate(["song", sid]);
   }
 
   ngOnDestroy(): void {
-    this.queuePrev$?.unsubscribe()
+    this.queuePrev$?.unsubscribe();
+    this.newSongs$?.unsubscribe();
   }
 
   sort() {

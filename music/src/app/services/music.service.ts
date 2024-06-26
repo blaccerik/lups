@@ -7,10 +7,14 @@ export interface Artist {
   id: string
 }
 
+
 export interface Song {
   id: string;
   title: string;
   artist: Artist | null;
+  length: number;
+  type: string;
+  image?: string
 }
 
 export interface PreviousSongQueue {
@@ -85,5 +89,9 @@ export class MusicService {
 
   getQueuePrev() {
     return this.http.get<PreviousSongQueue[]>(this.url + "/queue/previous")
+  }
+
+  getNewSongs() {
+    return this.http.get<Song[]>(this.url + "/queue/new")
   }
 }
