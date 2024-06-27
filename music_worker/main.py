@@ -26,10 +26,11 @@ celery_app.conf.broker_transport_options = {
 }
 
 
-@celery_app.task(name="test1")
+@celery_app.task(name="test")
 def test(_id):
     time.sleep(0.1)
     print(f"test id: {_id}")
+    return _id
 
 
 @celery_app.task(name="download_song_image")
@@ -47,7 +48,7 @@ def find_new_songs(song_id: str):
     postgres_client = SessionLocal()
     if song_id == "":
         song_id = select_random_song(postgres_client)
-    print(song_id)
+    logger.warning(f"Selected song: {song_id}")
     results = find_new_songs_by_song_id(song_id, postgres_client)
     postgres_client.close()
     logger.warning(f"Songs: {len(results.songs)} Artists: {len(results.artist_image_ids)}")

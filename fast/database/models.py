@@ -171,5 +171,5 @@ class DBSongQueue(Base):
     __tablename__ = "song_queue"
     song_id = Column(String(11), ForeignKey("song.id", ondelete='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    song_nr = Column(Integer, nullable=False)
+    date = Column(DateTime, nullable=False, default=func.now())
     hidden = Column(Boolean, nullable=False, default=False)

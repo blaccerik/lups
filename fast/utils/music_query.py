@@ -2,7 +2,7 @@ import logging
 import time
 from collections import deque
 from functools import wraps
-from typing import List
+from typing import List, Generator
 
 from sqlalchemy.orm import Session
 
@@ -59,7 +59,7 @@ class MusicQuery:
         return result, banned
 
     @log_time
-    def _get_ids3(self):
+    def _get_ids3(self) -> Generator:
         result = []
         song_map, banned = self._get_mapping3()
         if self.song_id not in banned:

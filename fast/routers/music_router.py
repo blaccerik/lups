@@ -8,12 +8,13 @@ from starlette.responses import FileResponse
 
 from database.postgres_database import get_postgres_db
 from schemas.auth import Userv2
-from schemas.music_schema import Filter, SongReaction, SongQueueResult, Song
+from schemas.music_schema import Filter, SongReaction, QueuePrevious, Song
 from services.music.filter_service import read_filters_by_user, create_filters_by_user, update_filters_by_user
 from services.music.queue_service import read_queue, read_previous, read_new_songs
 from services.music.song_service import update_song_reaction, read_song_image, read_song_audio, \
     read_artist_image, read_song
 from utils.auth import get_user_v2
+from utils.celery_config import celery_app
 
 router = APIRouter(prefix="/api/music", tags=["Music"])
 logger = logging.getLogger(__name__)
@@ -23,6 +24,13 @@ logger = logging.getLogger(__name__)
 async def get_music(
 ):
     return "get works"
+
+
+@router.get("/celery-test")
+async def get_music(
+):
+    celery_app.send_task("test", args=[1], queue="music:1")
+    return "hello"
 
 
 @router.get("/song/{song_id}", response_model=Song)
@@ -98,7 +106,7 @@ async def put_user_filter(
     return update_filters_by_user(user.user_id, f, postgres_client)
 
 
-@router.get("/queue/previous", response_model=List[SongQueueResult])
+@router.get("/queue/previous", response_model=List[QueuePrevious])
 async def get_user_previous(
         user: Userv2 = Depends(get_user_v2),
         postgres_client: Session = Depends(get_postgres_db)

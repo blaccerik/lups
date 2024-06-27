@@ -48,7 +48,6 @@ class Filter(BaseModel):
     delete: Optional[bool] = None
 
 
-class SongQueueResult(BaseModel):
-    song_nr: int
+class QueuePrevious(BaseModel):
+    song: Song
     hidden: bool
-    song_id: str

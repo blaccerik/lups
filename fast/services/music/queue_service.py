@@ -1,30 +1,15 @@
 from typing import List
 
 from fastapi import HTTPException
-from sqlalchemy import and_
+from sqlalchemy import and_, desc
 from sqlalchemy.orm import Session
 
-from database.models import DBFilter, DBSong, DBSongQueue, DBArtist
-from schemas.music_schema import SongQueueResult, Song, Artist
+from database.models import DBFilter, DBSong, DBArtist, DBSongQueue
+from schemas.music_schema import QueuePrevious, Song, Artist
+from services.music.song_service import read_song
 from utils.helper_functions import dbfilter_to_filter
 from utils.music_query import MusicQuery
 from utils.scrapping import start_scrape_for_song
-
-PREVIOUS_QUEUE_LIMIT = 5
-
-
-def _update_song_queue(user_id: int, song_id: str, song_nr: int, postgres_client: Session):
-    dbsq = postgres_client.get(DBSongQueue, (song_id, user_id))
-    if dbsq is None:
-        dbsq = DBSongQueue(
-            song_id=song_id,
-            user_id=user_id,
-            song_nr=song_nr
-        )
-    else:
-        dbsq.song_nr = dbsq.song_nr + song_nr
-    postgres_client.add(dbsq)
-    postgres_client.commit()
 
 
 def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> List[Song]:
@@ -52,19 +37,22 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
     _filter = dbfilter_to_filter(dbf)
     mq = MusicQuery(user_id, song_id, _filter, postgres_client)
     songs = mq.get_filtered_songs()
-    _update_song_queue(user_id, song_id, len(songs), postgres_client)
     return songs
 
 
-def read_previous(user_id: int, postgres_client: Session) -> List[SongQueueResult]:
+def read_previous(user_id: int, postgres_client: Session) -> List[QueuePrevious]:
     dbsq_list = postgres_client.query(DBSongQueue).filter(
         DBSongQueue.user_id == user_id
-    ).all()
-    return [SongQueueResult(
-        song_nr=dbsq.song_nr,
-        hidden=dbsq.hidden,
-        song_id=dbsq.song_id
-    ) for dbsq in dbsq_list]
+    ).order_by(desc(DBSongQueue.date)).limit(10).all()
+    result = []
+    for dbsq in dbsq_list:
+        sid = dbsq.song_id
+        song = read_song(sid, postgres_client)
+        result.append(QueuePrevious(
+            song=song,
+            hidden=dbsq.hidden
+        ))
+    return result
 
 
 def read_new_songs(postgres_client: Session) -> List[Song]:
@@ -88,4 +76,3 @@ def read_new_songs(postgres_client: Session) -> List[Song]:
         )
         songs.append(song)
     return songs
-
