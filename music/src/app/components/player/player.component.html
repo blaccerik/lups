@@ -1,6 +1,6 @@
 <div class="container">
   <button mat-icon-button (click)="audioService.play()" [disabled]="duration() === 0">
-    <mat-icon>{{ duration() === 0 ? 'hourglass_empty' : (audioService.audio.paused ? 'play_arrow' : 'pause') }}</mat-icon>
+    <mat-icon style="color: white">{{ duration() === 0 ? 'hourglass_empty' : (audioService.audio.paused ? 'play_arrow' : 'pause') }}</mat-icon>
   </button>
   {{ formatTime(currentTime) }}
   <mat-slider

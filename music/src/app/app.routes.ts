@@ -6,7 +6,7 @@ import {RedirectComponent} from "./components/redirect/redirect.component";
 
 export const routes: Routes = [
   {path: '', component: HomeComponent, canActivate: [authGuard]},
-  {path: 'song/:song_id', component: DisplayComponent, canActivate: [authGuard]},
+  {path: 'queue/:queue_id', component: DisplayComponent, canActivate: [authGuard]},
   {path: 'redirect', component: RedirectComponent},
   {path: '**', redirectTo: '', pathMatch: 'full' },
 ];

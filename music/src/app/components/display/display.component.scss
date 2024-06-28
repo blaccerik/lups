@@ -8,16 +8,24 @@
 }
 
 app-playlist {
-  flex: 30%;
+  width: 35%;
 }
 
 app-song {
-  flex: 70%;
+  width: 65%;
 }
 
 @media (max-width: $menuBreakpoint) {
   .container {
     flex-direction: column;
+  }
+
+  app-playlist {
+    width: 100%;
+  }
+
+  app-song {
+    width: 100%;
   }
 }
 

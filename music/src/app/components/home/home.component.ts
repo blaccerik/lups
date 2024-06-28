@@ -1,5 +1,5 @@
-import {Component, computed, inject, OnDestroy, signal} from '@angular/core';
-import {MusicService, PreviousSongQueue, Song} from "../../services/music.service";
+import {Component, computed, inject, OnDestroy, Signal, signal} from '@angular/core';
+import {MusicService, QueuePrevious, Song} from "../../services/music.service";
 import {mergeMap, Subscription, switchMap, tap} from "rxjs";
 import {Router} from "@angular/router";
 import {NgClass, NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
@@ -27,15 +27,15 @@ export class HomeComponent implements OnDestroy {
   musicService = inject(MusicService)
   router = inject(Router)
   queuePrev$: Subscription | undefined
-  queuePrev = signal<null | PreviousSongQueue[]>(null)
-  sortedQueue = computed(() => {
+  queuePrev = signal<null | QueuePrevious[]>(null)
+  sortedQueue: Signal<QueuePrevious[]> = computed(() => {
     const queue = this.queuePrev()
     if (!queue) return []
     const h = this.hidden()
     const asc = this.asc()
     return queue
       .filter(q => q.hidden === h)
-      .sort((a, b) => a.song_nr - (b.song_nr * asc))
+      // .sort((a, b) => a.song_nr - (b.song_nr * asc))
   })
   newSongs = signal<null | Song[]>(null)
   newSongs$: Subscription | undefined
@@ -46,13 +46,13 @@ export class HomeComponent implements OnDestroy {
     this.queuePrev$ = this.musicService.getQueuePrev().pipe(
       tap(data => this.queuePrev.set(data)),
       switchMap(data => data), // flatten the array of items into individual items
-      mergeMap(item => this.musicService.getSongImage(item.song_id)) // process each item as soon as it's emitted
+      mergeMap(item => this.musicService.getSongImage(item.song.id)) // process each item as soon as it's emitted
     ).subscribe(imageBlob => {
       const data = this.queuePrev()
       if (!data) return
-      const sq = data.find(d => d.song_id === imageBlob.songId)
+      const sq = data.find(d => d.song.id === imageBlob.songId)
       if (!sq) return
-      sq.image = URL.createObjectURL(imageBlob.blob)
+      sq.song.image = URL.createObjectURL(imageBlob.blob)
       this.queuePrev.set([...data])
     });
 
@@ -71,7 +71,7 @@ export class HomeComponent implements OnDestroy {
   }
 
   clickOnPrev(sid: string) {
-    this.router.navigate(["song", sid]);
+    this.router.navigate(["queue", sid]);
   }
 
   ngOnDestroy(): void {
@@ -91,7 +91,7 @@ export class HomeComponent implements OnDestroy {
     event.stopPropagation();
     const queue = this.queuePrev()
     if (!queue) return
-    const song = queue.find(q => q.song_id === sid)
+    const song = queue.find(q => q.song.id === sid)
     if (!song) return;
     song.hidden = !song.hidden
     this.queuePrev.set([...queue])

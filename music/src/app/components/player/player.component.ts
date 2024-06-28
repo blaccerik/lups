@@ -58,13 +58,7 @@ export class PlayerComponent implements OnDestroy {
       switchMap(s => s ? this.musicService.getAudio(s.id) : EMPTY)
     ).subscribe(url => {
         this.audioService.setSource(url, this.volume)
-        // if user hasn't interacted with site then audio cant play
         this.audioService.play()
-        // this.audioService.audio.play().then(() => {
-        //   this.startTimer()
-        // }).catch(error => {
-        //   this.audioService.audio.pause()
-        // });
       }
     )
   }

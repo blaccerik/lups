@@ -5,9 +5,8 @@ import {MatIcon} from "@angular/material/icon";
 import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 import {MusicService} from "../../services/music.service";
 import {YouTubePlayer} from '@angular/youtube-player';
-import {toObservable} from "@angular/core/rxjs-interop";
-import {EMPTY, Subscription, switchMap, tap} from "rxjs";
-import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {Subscription} from "rxjs";
+import {DomSanitizer} from "@angular/platform-browser";
 import {AudioService} from "../../services/audio.service";
 import {animate, state, style, transition, trigger} from "@angular/animations";
 
@@ -52,20 +51,12 @@ export class SongComponent implements OnDestroy {
     return this.song()?.title ?? ":("
   })
   author = computed(() => this.song()?.artist?.name ?? ":(")
-  img = signal<SafeUrl | null>(null)
+  img = computed(() => {
+    return this.song()?.image
+  })
   private songImg$: Subscription | undefined
 
   constructor() {
-    // update song image
-    this.songImg$ = toObservable(this.song).pipe(
-      tap(() => this.img.set(null)),
-      switchMap(s => s ? this.musicService.getSongImage(s.id) : EMPTY)
-    ).subscribe(imgBlob => {
-        const objectURL = URL.createObjectURL(imgBlob.blob);
-        const imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-        this.img.set(imageUrl)
-      }
-    )
   }
 
   ngOnDestroy(): void {

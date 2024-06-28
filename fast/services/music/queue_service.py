@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from fastapi import HTTPException
@@ -10,6 +11,22 @@ from services.music.song_service import read_song
 from utils.helper_functions import dbfilter_to_filter
 from utils.music_query import MusicQuery
 from utils.scrapping import start_scrape_for_song
+
+
+def update_song_queue_date(user_id: int, song_id: str, postgres_client: Session):
+    dbsq = postgres_client.query(DBSongQueue).filter(and_(
+        DBSongQueue.user_id == user_id,
+        DBSongQueue.song_id == song_id
+    )).first()
+    if dbsq is None:
+        dbsq = DBSongQueue(
+            song_id=song_id,
+            user_id=user_id
+        )
+    else:
+        dbsq.date = datetime.now()
+    postgres_client.add(dbsq)
+    postgres_client.commit()
 
 
 def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_client: Session) -> List[Song]:
@@ -37,6 +54,7 @@ def read_queue(user_id: int, song_id: str, filter_id: int | None, postgres_clien
     _filter = dbfilter_to_filter(dbf)
     mq = MusicQuery(user_id, song_id, _filter, postgres_client)
     songs = mq.get_filtered_songs()
+    update_song_queue_date(user_id, song_id, postgres_client)
     return songs
 
 

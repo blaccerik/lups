@@ -1,7 +1,9 @@
 @import 'variables';
 
 .container {
-  background: yellow;
+  border-top: 3px solid white;
+  background-color: $dark;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,4 +29,23 @@
   min-width: 75px;
   z-index: 1000;
   transform: rotate(-90deg);
+}
+
+:host ::ng-deep {
+
+  --mdc-slider-handle-width: 15px;
+  --mdc-slider-handle-height: 15px;
+
+  --mdc-slider-active-track-color: white;
+  --mdc-slider-inactive-track-color: white;
+
+  --mdc-slider-focus-handle-color: white;
+  --mdc-slider-handle-color: white;
+
+  // dont do anything
+  //--mdc-slider-hover-handle-color: white;
+  //--mdc-slider-with-overlap-handle-outline-color: white;
+  //--mdc-slider-disabled-handle-color: white;
+  //--mdc-slider-label-container-color: white;
+  //--mdc-slider-with-tick-marks-active-container-color: white;
 }

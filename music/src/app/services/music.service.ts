@@ -17,11 +17,9 @@ export interface Song {
   image?: string
 }
 
-export interface PreviousSongQueue {
-  song_id: string,
-  song_nr: number,
+export interface QueuePrevious {
+  song: Song
   hidden: boolean,
-  image?: string
 }
 
 export interface ImageBlob {
@@ -88,7 +86,7 @@ export class MusicService {
   }
 
   getQueuePrev() {
-    return this.http.get<PreviousSongQueue[]>(this.url + "/queue/previous")
+    return this.http.get<QueuePrevious[]>(this.url + "/queue/previous")
   }
 
   getNewSongs() {

@@ -3,14 +3,11 @@
 .container {
   display: flex;
   flex-direction: column;
-  //padding: 5%;
-  //width: 90%;
 }
 
 .rotate-mirror {
   transform: rotate(180deg) scaleX(-1);
 }
-
 
 .title {
 
@@ -47,11 +44,11 @@
 }
 
 .queue {
+  justify-content: start;
   padding: 3%;
   display: grid;
-  grid-gap: 25px;
-  grid-template-columns: repeat(auto-fit, minmax(206px, 1fr));
   grid-auto-flow: column;
+  gap: 25px;
   overflow: hidden;
 
 
@@ -61,8 +58,8 @@
     align-items: flex-start;
     font-weight: 400;
     font-size: 16px;
+    width: 206px;
     -webkit-transition: transform 200ms ease-in-out;
-    position: relative;
 
     &:hover {
       cursor: pointer;
@@ -97,6 +94,7 @@
   }
 
   &-image {
+    position: relative;
     width: 200px;
     height: 200px;
     border-radius: 5px;

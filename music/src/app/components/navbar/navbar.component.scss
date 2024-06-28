@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 95%, rgba(0, 0, 0, 0));
+  background: $dark;
   color: white;
   font-size: 20px;
   gap: 10px;
@@ -44,7 +44,7 @@ mat-form-field {
 
 
 .button {
-  background-color: black;
+  background-color: $dark;
   color: white;
   border-radius: 15px;
   border: 3px solid white;

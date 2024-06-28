@@ -23,10 +23,14 @@ export class AudioService {
 
 
   play(): void {
-    if (this.audio.readyState < 2) return;
     if (this.audio.paused) {
-      this.audio.play().then();
-      this.startTimer()
+      // if user hasn't interacted with site then audio cant play
+      try {
+        // todo remove this
+        // this.audio.play().then();
+        // this.startTimer()
+      } catch {
+      }
     } else {
       this.audio.pause();
       clearInterval(this.timer);

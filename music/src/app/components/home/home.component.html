@@ -16,11 +16,13 @@
   </div>
   <div class="queue">
     <div style="margin: 20px; font-size: 25px" *ngIf="sortedQueue().length === 0">Nothing found :(</div>
-    <div *ngFor="let prev of sortedQueue()" (click)="clickOnPrev(prev.song_id)" class="queue-item">
-      <button mat-mini-fab class="queue-item-button" (click)="hideQueue($event, prev.song_id)"><mat-icon>close</mat-icon></button>
-      <img class="queue-image" src="{{prev.image}}">
-      <div class="queue-item-info">{{prev.song_id}}</div>
-      <div class="queue-item-info">{{prev.song_nr}}<mat-icon inline>library_music</mat-icon></div>
+    <div *ngFor="let prev of sortedQueue()" (click)="clickOnPrev(prev.song.id)" class="queue-item">
+      <div class="queue-image">
+        <button mat-mini-fab class="queue-item-button" (click)="hideQueue($event, prev.song.id)"><mat-icon>close</mat-icon></button>
+        <img src="{{prev.song.image}}" width="200" height="200">
+      </div>
+      <div class="queue-item-info">{{prev.song.title}}</div>
+      <div class="queue-item-info">{{prev.song.artist?.name ?? 'Unknown'}}</div>
     </div>
   </div>
   <div class="title">
@@ -35,7 +37,7 @@
   <div class="queue">
     <div *ngFor="let song of newSongs()" (click)="clickOnPrev(song.id)" class="queue-item">
       <div class="queue-image">
-        <img ngSrc="{{song.image}}" width="200" height="200">
+        <img src="{{song.image}}" width="200" height="200">
       </div>
       <div class="queue-item-info">{{song.title}}</div>
       <div>{{song.artist?.name ?? 'Unknown'}}</div>

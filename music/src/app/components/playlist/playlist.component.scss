@@ -1,6 +1,47 @@
+@import 'variables';
+
 .container {
-  width: 100%;
-  height: 100%;
-  background: aqua;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  background-color: $dark;
   overflow-y: auto;
+  border: 3px solid white;
+}
+
+.item {
+  display: flex;
+  color: white;
+
+  &:hover {
+    cursor: pointer;
+    background-color: $second-color-dark;
+  }
+
+  &-box {
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 60px);
+  }
+
+  &-selected {
+    background-color: $main-color;
+    color: black;
+  }
+
+  &-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &-image {
+    margin: 5px;
+    width: 45px;
+    height: 45px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: black;
+  }
 }
