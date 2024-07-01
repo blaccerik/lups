@@ -26,7 +26,7 @@ export class AudioService {
     if (this.audio.paused) {
       // if user hasn't interacted with site then audio cant play
       try {
-        // todo remove this
+        // todo remove
         // this.audio.play().then();
         // this.startTimer()
       } catch {

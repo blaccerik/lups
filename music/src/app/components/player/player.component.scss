@@ -6,15 +6,15 @@
   color: white;
   display: flex;
   align-items: center;
-  justify-content: center;
   position:fixed;
   width: 100%;
   bottom: 0;
   height: $footerHeight;
+  flex-direction: row;
 }
 
 .time-slider {
-  width: 50%;
+  width: calc(100% - 200px);
   margin: 0 20px;
 }
 
@@ -29,6 +29,35 @@
   min-width: 75px;
   z-index: 1000;
   transform: rotate(-90deg);
+}
+
+.first-row {
+  display: flex;
+  flex-direction: row;
+  width: 150px;
+}
+
+.second-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+@media (max-width: $menuBreakpoint) {
+  .container {
+    flex-direction: column;
+    height: $footerHeightBig;
+  }
+
+  .first-row {
+    scale: 2;
+    margin: 24px;
+  }
+
+  .second-row {
+    justify-content: center;
+  }
 }
 
 :host ::ng-deep {

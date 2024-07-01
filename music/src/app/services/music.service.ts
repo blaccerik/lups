@@ -1,5 +1,5 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {map, Observable, of, retry} from "rxjs";
+import {BehaviorSubject, map, Observable, of, retry} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
 export interface Artist {
@@ -35,10 +35,12 @@ export class MusicService {
   private url = "api/music"
   private delay = 1000
   private count = 5
-  http = inject(HttpClient)
+  private http = inject(HttpClient)
   currentSong = signal<Song | null>(null);
   playlist = signal<Song[]>([]);
   listenTime = signal(0);
+  private query = new BehaviorSubject<void>(undefined);
+
 
   addSongsToPlaylist(songs: Song[]) {
     const playListSongs = this.playlist()
@@ -48,13 +50,32 @@ export class MusicService {
       }
     }
     this.playlist.set([...playListSongs])
+    if (!this.currentSong()) {
+      this.currentSong.set(songs[0])
+    }
   }
 
-  getQueue(s: string): Observable<Song[]> {
-    return this.http.get<Song[]>(this.url + "/queue/" + s).pipe(
-      retry({delay: this.delay, count: this.count})
-    )
+  private postData(sid: string) {
+    // send metadata to backend
+    const time = this.listenTime();
+    if (time > 3) this.postSong(sid, time).subscribe()
+    this.listenTime.set(0)
   }
+
+  setCurrentSong(song: Song) {
+    const old = this.currentSong()
+    if (old) this.postData(old.id)
+    this.currentSong.set(song)
+  }
+
+  reQuerySongs() {
+    this.query.next()
+  }
+
+  getQuery() {
+    return this.query.asObservable()
+  }
+
 
   getSong(sid: string): Observable<Song> {
     // check playlist for song data
@@ -86,7 +107,14 @@ export class MusicService {
   }
 
   getQueuePrev() {
-    return this.http.get<QueuePrevious[]>(this.url + "/queue/previous")
+    return this.http.get<QueuePrevious[]>(`${this.url}/queue/previous`)
+  }
+
+
+  getQueue(s: string): Observable<Song[]> {
+    return this.http.get<Song[]>(this.url + "/queue/" + s).pipe(
+      retry({delay: this.delay, count: this.count})
+    )
   }
 
   getNewSongs() {

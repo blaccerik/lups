@@ -18,6 +18,7 @@ app-song {
 @media (max-width: $menuBreakpoint) {
   .container {
     flex-direction: column;
+    height: calc(100% - $footerHeightBig);
   }
 
   app-playlist {

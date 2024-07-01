@@ -26,10 +26,27 @@
   }
 }
 
+.title {
+  font-size: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  margin: 15px;
+}
+
+.author {
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 .animated-div {
   color: white;
   position: absolute;
   top: 50%;
   left: 50%;
-  //transform: translate(-50%, -50%);
 }
