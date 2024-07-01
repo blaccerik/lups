@@ -1,11 +1,28 @@
 @import 'variables';
 
 .container {
-  width: calc(100% - 6px);
+  width: calc(100% - 3px);
   height: calc(100% - 6px);
   background-color: $dark;
   overflow-y: auto;
   border: 3px solid white;
+  border-right: 0;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: white;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $dark;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+  }
 }
 
 .item {
