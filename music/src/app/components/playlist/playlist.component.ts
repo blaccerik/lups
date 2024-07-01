@@ -25,6 +25,8 @@ export class PlaylistComponent implements OnDestroy {
 
   currentSong = this.musicService.currentSong.asReadonly();
   playlist = this.musicService.playlist.asReadonly();
+  // todo maybe if more songs are added scrollbar might stop working
+  // not sure tho?
 
   private currentSong$: Subscription | undefined
 
