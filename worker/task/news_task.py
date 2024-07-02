@@ -21,13 +21,13 @@ else:
     IMAGE_PATH = "/usr/src/app/images"
 print(f"image path {IMAGE_PATH}")
 
-
 def load_key():
     # Load environment variables from .env file
     load_dotenv()
     api_key = os.environ.get("NEWS_API_KEY")
     return api_key
 
+print(f"news api key {load_key()}")
 
 def cat_to_est(string):
     translate = {
