@@ -21,8 +21,8 @@ else:
 DOWNLOAD_IMAGES = True
 DOWNLOAD_TIMEOUT = 0.5
 logger = logging.getLogger(__name__)
-logger.info(MUSIC_DATA)
-logger.info(DOWNLOAD_IMAGES)
+logger.warning(MUSIC_DATA)
+logger.warning(DOWNLOAD_IMAGES)
 
 # check if folders are there
 path1 = f"{MUSIC_DATA}/artist_images"

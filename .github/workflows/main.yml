@@ -25,6 +25,7 @@ jobs:
         script: |
           cd /home/${{ secrets.SERVER_USERNAME }}/lups
           echo "NEWS_API_KEY=${{ secrets.NEWS_API_KEY }}" > .env
+          echo ${{ secrets.YT_OAUTH }} > music_worker/oauth.json
           git pull origin master
           docker compose down
           docker compose up -d --build --remove-orphans
