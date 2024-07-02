@@ -31,5 +31,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copy the built Angular app from the previous stage into the Nginx directory
 COPY --from=builder /app/dist/lups/browser /var/www/html
 
+COPY test.html /var/test/html
+
 # Start Nginx when the container runs
 CMD ["nginx", "-g", "daemon off;"]
