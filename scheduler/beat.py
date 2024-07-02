@@ -19,7 +19,7 @@ celery_app.conf.beat_schedule = {
     'find_new_songs': {
         'task': 'find_new_songs',
         'options': {'queue': 'music:4'},
-        'schedule': crontab(minute='*/10', hour='*/9'),
+        'schedule': crontab(minute='*/10', hour='*'),
         'args': ('',),
     },
 }
