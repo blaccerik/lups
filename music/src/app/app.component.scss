@@ -1,0 +1,26 @@
+@import 'variables';
+
+.router-container {
+  position: absolute;
+  top: $menuHeight;
+  left: 0;
+  width: 100%;
+  height: calc(100% - calc($menuHeight));
+  overflow-y: auto;
+}
+
+.router-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.router-container::-webkit-scrollbar-track {
+  background: $main-color;
+}
+
+.router-container::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.router-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

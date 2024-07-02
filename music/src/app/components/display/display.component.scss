@@ -1,0 +1,48 @@
+@import 'variables';
+
+.container {
+  display: flex;
+  width: 100%;
+  height: calc(100% - $footerHeight);
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: white;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $dark;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+  }
+}
+
+app-playlist {
+  width: 35%;
+}
+
+app-song {
+  width: 65%;
+}
+
+@media (max-width: $menuBreakpoint) {
+  .container {
+    flex-direction: column;
+    height: calc(100% - $footerHeightBig);
+  }
+
+  app-playlist {
+    width: 100%;
+  }
+
+  app-song {
+    width: 100%;
+  }
+}
+

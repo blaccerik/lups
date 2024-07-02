@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="title">
+    <div class="title-info"><mat-icon inline style="scale: 1.2; margin-right: 15px">queue_music</mat-icon>My queues</div>
+    <button class="title-button" disabled>
+      <mat-icon>keyboard_arrow_left</mat-icon>
+    </button>
+    <button class="title-button" (click)="sort()">
+      <mat-icon [ngClass]="{'rotate-mirror': asc() === 1}">sort</mat-icon>
+    </button>
+    <button class="title-button" (click)="toggleHide()">
+      <mat-icon>{{hidden() ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </button>
+    <button class="title-button">
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </button>
+  </div>
+  <div class="queue">
+    <div style="margin: 20px; font-size: 25px" *ngIf="sortedQueue().length === 0">Nothing found :(</div>
+    <div *ngFor="let prev of sortedQueue()" (click)="clickOnPrev(prev.song.id)" class="queue-item">
+      <div class="queue-image">
+        <button mat-mini-fab class="queue-item-button" (click)="hideQueue($event, prev.song.id)"><mat-icon>close</mat-icon></button>
+        <img src="{{prev.song.image}}" width="200" height="200">
+      </div>
+      <div class="queue-item-info">{{prev.song.title}}</div>
+      <div class="queue-item-info">{{prev.song.artist?.name ?? 'Unknown'}}</div>
+    </div>
+  </div>
+  <div class="title">
+    <div class="title-info"><mat-icon inline style="scale: 1.2; margin-right: 15px">star_border</mat-icon>New songs</div>
+    <button class="title-button" disabled>
+      <mat-icon>keyboard_arrow_left</mat-icon>
+    </button>
+    <button class="title-button">
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </button>
+  </div>
+  <div class="queue">
+    <div *ngFor="let song of newSongs()" (click)="clickOnPrev(song.id)" class="queue-item">
+      <div class="queue-image">
+        <img src="{{song.image}}" width="200" height="200">
+      </div>
+      <div class="queue-item-info">{{song.title}}</div>
+      <div>{{song.artist?.name ?? 'Unknown'}}</div>
+    </div>
+  </div>
+</div>
+
+
+
+

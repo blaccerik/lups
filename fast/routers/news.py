@@ -5,22 +5,23 @@ from fastapi.params import Depends
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from database.postgres_database import get_postgres_db
+from schemas.auth import User
+from schemas.schemas import News, NewsId
 from services.chat_service import read_user
 from services.news_service import read_all_news, read_news, find_image, create_news
 from utils.auth import get_current_user
-from utils.database import get_db
-from utils.schemas import News, NewsId, User
 
-router = APIRouter(prefix="/api/news")
+router = APIRouter(prefix="/api/news", tags=["News"])
 
 
 @router.get("/", response_model=List[News])
-async def get_news(page: int = 0, db: Session = Depends(get_db)):
+async def get_news(page: int = 0, db: Session = Depends(get_postgres_db)):
     return read_all_news(page, db)
 
 
 @router.get("/{news_id}", response_model=News)
-async def get_news_by_id(news_id: int, db: Session = Depends(get_db)):
+async def get_news_by_id(news_id: int, db: Session = Depends(get_postgres_db)):
     return read_news(news_id, db)
 
 
@@ -37,7 +38,7 @@ async def post_news(
         category: str = Form(),
         image: UploadFile = File(default=None),
         current_user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_postgres_db)
 ):
     user_id = read_user(current_user, db)
     return create_news(user_id, title, text, category, image, db)
@@ -51,7 +52,7 @@ async def put_news(
         category: str = Form(),
         image: UploadFile = File(default=None),
         current_user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_postgres_db)
 ):
     user_id = read_user(current_user, db)
     return create_news(user_id, title, text, category, image, db, news_id)

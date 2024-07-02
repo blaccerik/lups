@@ -5,6 +5,7 @@ SQLAlchemy
 celery
 psycopg2
 redis
+pytube==15.0.0
 deep-translator
 google-auth
 google-auth-oauthlib

@@ -12,11 +12,11 @@ from services.chat_service import read_user
 from services.games.family import read_games_by_user, create_game_by_user, read_game, create_game_data, \
     set_game_status, read_game_by_code
 from utils.auth import get_current_user
-from utils.database import get_db
-from utils.redis_database import get_redis
-from utils.schemas import User
+from database.postgres_database import get_postgres_db
+from database.redis_database import get_redis_database
+from schemas.auth import User
 
-router = APIRouter(prefix="/api/familyfeud")
+router = APIRouter(prefix="/api/familyfeud", tags=["Games"])
 connected_clients = {}
 
 logger = logging.getLogger("Family")
@@ -25,7 +25,7 @@ logger = logging.getLogger("Family")
 @router.get("/games")
 async def get_token(
         user: User = Depends(get_current_user),
-        postgres_client: Session = Depends(get_db)
+        postgres_client: Session = Depends(get_postgres_db)
 ):
     user_id = read_user(user, postgres_client)
     return read_games_by_user(user_id, postgres_client)
@@ -34,7 +34,7 @@ async def get_token(
 @router.post("/create")
 async def create_game(
         user: User = Depends(get_current_user),
-        postgres_client: Session = Depends(get_db),
+        postgres_client: Session = Depends(get_postgres_db),
 ):
     user_id = read_user(user, postgres_client)
     return create_game_by_user(user_id, postgres_client)
@@ -44,7 +44,7 @@ async def create_game(
 async def get_game_data(
         code: str,
         user: User = Depends(get_current_user),
-        postgres_client: Session = Depends(get_db)
+        postgres_client: Session = Depends(get_postgres_db)
 ):
     user_id = read_user(user, postgres_client)
     return read_game(code, user_id, postgres_client)
@@ -55,7 +55,7 @@ async def post_data(
         code: str = Path(min_length=4, max_length=4),
         data: List[GameRound] = Body(),
         user: User = Depends(get_current_user),
-        postgres_client: Session = Depends(get_db)
+        postgres_client: Session = Depends(get_postgres_db)
 ):
     logger.info(f"{code} {data}")
     user_id = read_user(user, postgres_client)
@@ -68,8 +68,8 @@ async def start_game(
         code: str,
         game_status: GameStatus,
         user: User = Depends(get_current_user),
-        redis_client: Redis = Depends(get_redis),
-        postgres_client: Session = Depends(get_db)
+        redis_client: Redis = Depends(get_redis_database),
+        postgres_client: Session = Depends(get_postgres_db)
 ):
     user_id = read_user(user, postgres_client)
     return await set_game_status(code, user_id, game_status, postgres_client, redis_client)
@@ -80,8 +80,8 @@ async def websocket_endpoint(
         code: str,
         websocket: WebSocket,
         auth: str | None = None,
-        redis_client: Redis = Depends(get_redis),
-        postgres_client: Session = Depends(get_db),
+        redis_client: Redis = Depends(get_redis_database),
+        postgres_client: Session = Depends(get_postgres_db),
 ):
     await websocket.accept()
 

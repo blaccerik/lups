@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from database.models import DBNewsExtra, DBNews, DBNewsCategory
 from database.postgres_database import SessionLocal
 
-NEWS_API_QUERY_NUMBER = 1
+NEWS_API_QUERY_NUMBER = 10
 
 if sys.platform == "win32":
     IMAGE_PATH = f"{Path(os.path.abspath(__file__)).parent.parent.parent}/images"
@@ -21,13 +21,13 @@ else:
     IMAGE_PATH = "/usr/src/app/images"
 print(f"image path {IMAGE_PATH}")
 
-
 def load_key():
     # Load environment variables from .env file
     load_dotenv()
     api_key = os.environ.get("NEWS_API_KEY")
     return api_key
 
+print(f"news api key {load_key()}")
 
 def cat_to_est(string):
     translate = {
@@ -163,6 +163,9 @@ def process_news(result, postgres_client: Session):
 
 def get_news():
     key = load_key()
+    if not key.startswith("pub"):
+        print("no key")
+        return
     api = NewsDataApiClient(apikey=key)
 
     page = None

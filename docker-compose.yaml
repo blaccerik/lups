@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # !! run these commands to create a new certificate (not renew)
   # docker compose down
-  # docker compose run -p 80:80 --rm  certbot certonly -d lyps.ee
+  # docker compose run -p 80:80 --rm  certbot certonly -d lyps.ee -d www.lyps.ee
   certbot:
     container_name: certbot
     image: certbot/certbot
@@ -44,19 +44,35 @@ services:
       TZ: "Europe/Tallinn"
     volumes:
       - image_data:/usr/src/app/images
+      - music_data:/usr/src/app/music_data
   worker:
     container_name: worker
     restart: unless-stopped
     build:
       context: worker
-    command: celery --app main worker --concurrency=1 --pool prefork
+    command: celery --app main worker --concurrency=1 --pool prefork --queues=normal
     environment:
       POSTGRES_USER: erik
       POSTGRES_PASSWORD: erik
-      NEWS_API_KEY: ${NEWS_API_KEY}
+      NEWS_API_KEY: "test_key"
+      TZ: "Europe/Tallinn"
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - lups
+  music:
+    container_name: music
+    restart: unless-stopped
+    build:
+      context: music_worker
+    command: celery --app=main worker --concurrency=1 --pool=solo --queues=music --loglevel=WARNING
+    environment:
+      POSTGRES_USER: erik
+      POSTGRES_PASSWORD: erik
       TZ: "Europe/Tallinn"
     volumes:
-      - image_data:/usr/src/app/images
+      - music_data:/usr/src/app/music_data
     depends_on:
       - redis
       - postgres
@@ -87,20 +103,20 @@ services:
     environment:
       TZ: "Europe/Tallinn"
   postgres:
-      container_name: postgres
-      restart: unless-stopped
-      image: postgres:alpine
-      expose:
-        - 5432
-      environment:
-        POSTGRES_DB: postgres
-        POSTGRES_USER: erik
-        POSTGRES_PASSWORD: erik
-        TZ: "Europe/Tallinn"
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
-      networks:
-        - lups
+    container_name: postgres
+    restart: unless-stopped
+    image: postgres:alpine
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: erik
+      POSTGRES_PASSWORD: erik
+      TZ: "Europe/Tallinn"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lups
 
 networks:
   lups:
@@ -108,6 +124,7 @@ networks:
 
 volumes:
   cert_data:
+  music_data:
   postgres_data:
   image_data:
   redis_data:

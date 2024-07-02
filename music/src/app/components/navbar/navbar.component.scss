@@ -1,0 +1,69 @@
+@import 'variables';
+
+.container {
+  width: 100%;
+  z-index: 100;
+  position: fixed;
+  height: $menuHeight;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $dark;
+  color: white;
+  font-size: 20px;
+  gap: 10px;
+}
+
+mat-form-field {
+  width: 500px;
+  height: 56px;
+  border-radius: 20px;
+}
+
+:host ::ng-deep {
+  --mdc-outlined-text-field-outline-width: 3px;
+  --mdc-outlined-text-field-focus-outline-width: 3px;
+  --mdc-outlined-text-field-container-shape: 15px;
+  --mdc-outlined-text-field-label-text-size: 20px;
+
+  --mdc-outlined-text-field-input-text-color: white;
+
+  --mdc-outlined-text-field-outline-color: white;
+  --mdc-outlined-text-field-hover-outline-color: #{$main-color};
+  --mdc-outlined-text-field-focus-outline-color: #{$main-color};
+
+  --mdc-outlined-text-field-label-text-color: white;
+  --mdc-outlined-text-field-hover-label-text-color: white;
+  --mdc-outlined-text-field-focus-label-text-color: white;
+
+  --mdc-outlined-text-field-caret-color: white;
+  --mdc-icon-button-icon-color: white;
+}
+
+
+.button {
+  background-color: $dark;
+  color: white;
+  border-radius: 15px;
+  border: 3px solid white;
+  padding: 13px 13px 9px 13px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  margin-right: 15px;
+}
+
+.button:hover {
+  border-color: #{$main-color};
+}
+
+.image {
+  border-radius: 50%;
+  height: 56px;
+  width: 56px;
+  margin-left: 15px;
+}
+
+

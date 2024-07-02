@@ -1,0 +1,10 @@
+<div class="container">
+  <div class="image">
+    <img *ngIf="img()" [src]="img()" alt="image" (click)="click()"/>
+    <div *ngIf="showIcon()" class="animated-div" [@growShrink] (@growShrink.done)="onAnimationDone()">
+      <mat-icon>{{ audioService.audio.paused ? 'play_arrow' : 'pause' }}</mat-icon>
+    </div>
+  </div>
+  <div class="title">{{title()}}</div>
+  <div class="author">{{author()}}</div>
+</div>

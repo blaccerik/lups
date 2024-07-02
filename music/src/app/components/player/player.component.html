@@ -1,0 +1,44 @@
+<div class="container">
+  <div class="first-row">
+    <button mat-icon-button (click)="playNew(-1)">
+      <mat-icon style="color: white">skip_previous</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="audioService.play()" [disabled]="duration() === 0">
+      <mat-icon
+        style="color: white">{{ duration() === 0 ? 'hourglass_empty' : (audioService.audio.paused ? 'play_arrow' : 'pause') }}
+      </mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="playNew(1)">
+      <mat-icon style="color: white">skip_next</mat-icon>
+    </button>
+  </div>
+
+  <div class="second-row">
+    {{ formatTime(currentTime) }}
+    <mat-slider
+      class="time-slider"
+      min="0"
+      max="{{ duration() }}">
+      <input matSliderThumb [(ngModel)]="currentTime" (ngModelChange)="onTimeChange($event)">
+    </mat-slider>
+    {{ formatTime(duration()) }}
+    <div class="volume-container" (mouseenter)="isShowing.set(true)" (mouseleave)="isShowing.set(false)">
+      <button mat-icon-button (click)="toggleMute()">
+        <mat-icon>{{ audioService.audio.volume === 0 ? 'volume_off' : 'volume_up' }}</mat-icon>
+      </button>
+      <mat-slider
+        class="volume-slider"
+        *ngIf="isShowing()"
+        color="primary"
+        step="0.1"
+        min="0"
+        max="1">
+        <input matSliderThumb [ngModel]="audioService.audio.volume" (ngModelChange)="onVolumeChange($event)">
+      </mat-slider>
+    </div>
+  </div>
+</div>
+
+

@@ -1,0 +1,10 @@
+celery==5.4.0
+redis==5.0.3
+psycopg2==2.9.9
+SQLAlchemy==2.0.28
+pydantic==2.6.1
+python-dotenv==1.0.1
+pytube==15.0.0
+ytmusicapi==1.6.0
+beautifulsoup4==4.12.2
+Pillow

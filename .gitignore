@@ -3,3 +3,9 @@ ai_test/
 celeryr/t5-model/
 news_test/
 .env
+music_data/
+*.pyc 
+images/
+.idea/
+testing/
+music_worker/oauth.json

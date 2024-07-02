@@ -1,0 +1,13 @@
+@import 'variables';
+
+$opacity: 1;
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: linear-gradient(165deg, $main-color 25%, $second-color-dark 90%);
+}
+
+
+

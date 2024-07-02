@@ -8,10 +8,10 @@ from redis.client import Redis
 
 from services.place_service import update_pixel, read_pixels
 from utils.auth import get_current_user_with_token
-from utils.redis_database import get_redis
-from utils.schemas import PlaceInput, PlaceOutput
+from database.redis_database import get_redis_database
+from schemas.schemas import PlaceInput, PlaceOutput
 
-router = APIRouter(prefix="/api/place")
+router = APIRouter(prefix="/api/place", tags=["Place"])
 connected_clients = []
 
 logger = logging.getLogger("Place")
@@ -19,12 +19,12 @@ logger = logging.getLogger("Place")
 
 # response model must be set for faster send
 @router.get("/", response_model=List[PlaceOutput])
-async def get_pixels(redis_client: Redis = Depends(get_redis)):
+async def get_pixels(redis_client: Redis = Depends(get_redis_database)):
     return await read_pixels(redis_client)
 
 
 @router.websocket("/ws")
-async def websocket_endpoint(authorization: str, websocket: WebSocket, redis_client: Redis = Depends(get_redis)):
+async def websocket_endpoint(authorization: str, websocket: WebSocket, redis_client: Redis = Depends(get_redis_database)):
     await websocket.accept()
     user = await get_current_user_with_token(authorization)
     # Add the websocket to the list of connected clients

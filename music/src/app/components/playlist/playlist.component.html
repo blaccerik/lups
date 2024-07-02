@@ -1,0 +1,14 @@
+<div class="container">
+  <div *ngFor="let song of playlist()"
+       (click)="clickOnSong(song)"
+       class="item"
+       [class.item-selected]="song.id === currentSong()?.id">
+    <div class="item-image">
+      <img *ngIf="song.image" src="{{song.image}}" width="45" height="45">
+    </div>
+    <div class="item-box">
+      <div class="item-title">{{song.title}}</div>
+      <div>{{song.artist?.name ?? 'Unknown'}}</div>
+    </div>
+  </div>
+</div>

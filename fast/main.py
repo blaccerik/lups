@@ -4,10 +4,10 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import news, place, chat, familyfeud
-from utils.database import SessionLocal
-from utils.redis_database import get_client
-from utils.schemas import PlacePixel, PlaceColor
+from routers import news, place, chat, familyfeud, music_router
+from database.postgres_database import SessionLocal
+from database.redis_database import get_client
+from schemas.schemas import PlacePixel, PlaceColor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,16 +23,15 @@ app.add_middleware(
     allow_headers=origins,
 )
 
-# app.add_middleware(GZipMiddleware, minimum_size=1000)
-
 app.include_router(chat.router)
 app.include_router(place.router)
 app.include_router(news.router)
 app.include_router(familyfeud.router)
+app.include_router(music_router.router)
 
 @app.get("/")
 async def main():
-    return "get works"
+    return "get works now"
 
 @app.on_event("startup")
 async def startup_event():
@@ -44,7 +43,7 @@ async def startup_event():
     # clear redis jobs
     print(await redis_client.hgetall("streams"))
     print(await redis_client.smembers("chats"))
-    print(await redis_client.hgetall("games"))
+    # print(await redis_client.hgetall("games"))
     await redis_client.delete("streams")
     await redis_client.delete("chats")
     print(await redis_client.hgetall("streams"))

@@ -9,12 +9,6 @@ class Answer(BaseModel):
     points: conint(ge=1, le=100)
 
 
-# class GameRoundData(BaseModel):
-#     current: int
-#     total: int
-#     answers: List[Answer]
-
-
 class Game(BaseModel):
     code: str
     started: bool
@@ -42,10 +36,12 @@ class LiveGameType(str, Enum):
     game = "game"
     error = "error"
 
+
 class LiveGameAnswer(BaseModel):
     text: str
     points: int
     revealed: bool
+
 
 class LiveGame(BaseModel):
     type: LiveGameType
@@ -53,8 +49,3 @@ class LiveGame(BaseModel):
     number: int
     question: str
     strikes: int
-
-
-# class GameReceiveData(BaseModel):
-#     round_number: int
-#     question: Question
