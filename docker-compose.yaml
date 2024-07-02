@@ -81,11 +81,10 @@ services:
   beat:
     container_name: beat
     build:
-      context: worker
+      context: scheduler
     command: celery --app beat beat --loglevel=debug
     depends_on:
       - redis
-      - worker
     networks:
       - lups
     environment:
