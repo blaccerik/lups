@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # !! run these commands to create a new certificate (not renew)
   # docker compose down
-  # docker compose run -p 80:80 --rm  certbot certonly -d lyps.ee -d www.lyps.ee
+  # docker compose run -p 80:80 --rm  certbot certonly -d lyps.ee -d www.lyps.ee -d music.lyps.ee
   certbot:
     container_name: certbot
     image: certbot/certbot
