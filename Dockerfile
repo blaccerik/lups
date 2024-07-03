@@ -5,7 +5,7 @@ FROM node:18-alpine as builder
 WORKDIR /app
 
 # Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+COPY lups/package*.json ./
 
 # Install Angular CLI globally
 RUN npm install -g @angular/cli
@@ -14,10 +14,11 @@ RUN npm install -g @angular/cli
 RUN npm install
 
 # Copy the rest of your application's source code to the working directory
-COPY . .
+COPY lups/. .
 
 # Build your Angular application
 RUN ng build
+
 
 # Use Nginx as the base image for serving the Angular app
 FROM nginx:alpine
@@ -26,12 +27,12 @@ FROM nginx:alpine
 RUN apk update && apk add bash
 
 # Copy conf
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Copy the built Angular app from the previous stage into the Nginx directory
 COPY --from=builder /app/dist/lups/browser /var/www/html
 
-COPY test.html /var/music/html/index.html
+COPY lups/test.html /var/music/html/index.html
 
 # Start Nginx when the container runs
 CMD ["nginx", "-g", "daemon off;"]
