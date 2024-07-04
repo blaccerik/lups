@@ -1,24 +1,27 @@
-# Use an official Node.js runtime as a parent image
 FROM node:18-alpine as builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
 COPY lups/package*.json ./
 
-# Install Angular CLI globally
-RUN npm install -g @angular/cli
-
-# Install project dependencies
 RUN npm install
 
-# Copy the rest of your application's source code to the working directory
 COPY lups/. .
 
-# Build your Angular application
-RUN ng build
+RUN npm run ng build
 
+
+FROM node:18-alpine as music_builder
+
+WORKDIR /app
+
+COPY music/package*.json ./
+
+RUN npm install
+
+COPY music/. .
+
+RUN npm run ng build
 
 # Use Nginx as the base image for serving the Angular app
 FROM nginx:alpine
@@ -32,7 +35,7 @@ COPY nginx/nginx.conf /etc/nginx/nginx.conf
 # Copy the built Angular app from the previous stage into the Nginx directory
 COPY --from=builder /app/dist/lups/browser /var/www/html
 
-COPY lups/test.html /var/music/html/index.html
+COPY --from=music_builder /app/dist/music/browser /var/music/html
 
 # Start Nginx when the container runs
 CMD ["nginx", "-g", "daemon off;"]
