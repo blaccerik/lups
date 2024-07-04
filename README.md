@@ -1,138 +1,90 @@
-## Run dev
+# DEV ENV
+
+## Prerequisites
+
+* Python 3.10+
+* Node 18
+* Docker
+
+```console
+~/lups/lups$ npm i
+~/lups/fast$ pip install -r requirements.txt
+```
+
+## Frontend (www.lyps.ee)
+
+```console
+~/lups/lups$ npm i
+~/lups/lups$ ng serve
+```
+
+if 'ng' command didnt work you can try
+
+```console
+~/lups/lups$ npm run ng serve
+
+```
+
+or install it globally
+
+```console
+~/lups/lups$ npm install -g @angular/cli
+~/lups/lups$ ng serve
+```
+
+## Frontend (music.lyps.ee)
+
+Only one frontend can run at the same time
+
+```console
+~/lups/music$ npm i
+~/lups/music$ ng serve
+```
+
+## Backend (dev)
+
+Start database and workers
+
+```console
+~/lups$ docker compose -f docker-compose.dev.yaml up -d --build
+```
+
+Create / Reset database
+
+```console
+~/lups/fast$ python create_db.py
+```
+
+Run app
+
+```console
+~/lups/fast$ uvicorn main:app --reload
+```
+
+## Backend (docker)
+
+```console
+~/lups$ docker compose -f docker-compose.backend.yaml up -d --build
+```
+
+to create tables
+
+```console
+~/lups$ docker exec -ti fastapi /bin/bash
+/app# python create_db.py
+```
+
+# ADVANCED
 
 ## Run tests
 
-```properties
-/lups/fast python -m unittest discover -s ./tests
+```console
+~/lups/fast$ python -m unittest discover -s ./tests
 ```
 
-[//]: # (### Frontend)
+## Generate oauth for yt api (browser needed)
 
-[//]: # (```console)
-
-[//]: # (cd lups)
-
-[//]: # (ng serve)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (### Database + Backend &#40;debug&#41;)
-
-[//]: # (```console)
-
-[//]: # (docker-compose -f docker-compose.dev.yaml up -d)
-
-[//]: # (python flaskr\run_server.py)
-
-[//]: # (```)
-
-[//]: # (<details>)
-
-[//]: # (<summary>Notes</summary>)
-
-[//]: # (Celery can only be tested in docker else it can't connect to Flask)
-
-[//]: # (</details>  )
-
-[//]: # ()
-[//]: # (### Database + Backend &#40;Prod&#41;)
-
-[//]: # (```console)
-
-[//]: # (docker-compose up -d)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (## Run Prod)
-
-[//]: # ()
-[//]: # (### SSH into server)
-
-[//]: # (```console)
-
-[//]: # (ssh user@ip -i pem_file)
-
-[//]: # (ssh erik@52.174.181.107 -i C:\Users\erik\desktop\erikfinal.pem)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (### Stop service &#40;server&#41;)
-
-[//]: # (```console)
-
-[//]: # (sudo systemctl stop nginx)
-
-[//]: # (cd /var/www)
-
-[//]: # (docker compose down)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (### Build and transfer &#40;local machine&#41;)
-
-[//]: # (```console)
-
-[//]: # (cd lups)
-
-[//]: # (ng build)
-
-[//]: # (cd ..)
-
-[//]: # (python transfer_all.py)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (### Start service &#40;server&#41;)
-
-[//]: # (```console)
-
-[//]: # (docker compose up -d)
-
-[//]: # (sudo systemctl start nginx)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (### &#40;optional&#41; Build tables &#40;server&#41;)
-
-[//]: # (```console)
-
-[//]: # (docker ps)
-
-[//]: # (```)
-
-[//]: # (Flask's container name should be **www-flask-1**)
-
-[//]: # (```console)
-
-[//]: # (docker exec -it www-flask-1 bash)
-
-[//]: # (flask --app run_server:create_app cli create_tables)
-
-[//]: # (```)
-
-[//]: # (<details>)
-
-[//]: # (<summary>Notes</summary>)
-
-[//]: # (This resets database and deletes all files)
-
-[//]: # (</details>)
-
-[//]: # ()
-[//]: # (### &#40;optional&#41; Database access &#40;server&#41;)
-
-[//]: # (```console)
-
-[//]: # (docker exec -it www-mysql-1 mysql -u erik -p)
-
-[//]: # (use erik_db;)
-
-[//]: # (select * from users;)
-
-[//]: # (```)
+```console
+~/lups/music_worker$ pip install -r requirements.txt
+~/lups/music_worker$ ytmusicapi oauth
+```
