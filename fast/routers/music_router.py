@@ -1,10 +1,12 @@
 import logging
+from io import BytesIO
 from typing import List, Optional
 
+import requests
 from fastapi import APIRouter, Depends, Query, Response
 from pydantic import constr
 from sqlalchemy.orm import Session
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, StreamingResponse
 
 from database.postgres_database import get_postgres_db
 from schemas.auth import Userv2
@@ -31,6 +33,22 @@ async def get_music(
 ):
     celery_app.send_task("test", args=[1], queue="music:1")
     return "hello"
+
+
+@router.get("/audio-test")
+async def get_audio():
+    link = "https://file-examples.com/storage/fed61f387f6686cd19d49b1/2017/11/file_example_MP3_1MG.mp3"
+    response = requests.get(link)
+    print("DOWNLOADED")
+    return StreamingResponse(BytesIO(response.content), media_type='audio/mpeg')
+
+    # async with httpx.AsyncClient() as client:
+    #     response = await client.get(link)
+    # return StreamingResponse(response.iter_bytes(), media_type='audio/mpeg')
+
+    # mp3_file_path = "example.mp3"
+    #
+    # return FileResponse(mp3_file_path, media_type='audio/mpeg')
 
 
 @router.get("/song/{song_id}", response_model=Song)

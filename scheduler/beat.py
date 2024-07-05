@@ -1,3 +1,5 @@
+import os
+
 from celery import Celery
 from celery.schedules import crontab
 
@@ -19,7 +21,7 @@ celery_app.conf.beat_schedule = {
     'find_new_songs': {
         'task': 'find_new_songs',
         'options': {'queue': 'music:4'},
-        'schedule': crontab(minute='*/10', hour='*'),
+        'schedule': crontab(minute=os.environ.get('MINUTE', '*/10'), hour=os.environ.get('HOUR', '*')),
         'args': ('',),
     },
 }

@@ -46,6 +46,8 @@ services:
       - lups
     environment:
       TZ: "Europe/Tallinn"
+      MINUTE: "*/60"
+      HOUR: "*"
   redis:
     container_name: redis
     restart: unless-stopped
